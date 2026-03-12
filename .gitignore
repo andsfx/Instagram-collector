@@ -5,4 +5,13 @@ playwright/.auth/
 *.log
 .env
 cookies.json
-storage-state.jsonconfig/local.jsondata/raw/data/processed/logs/
+storage-state.json
+config/local.json
+data/raw/
+data/processed/
+logs/
+__pycache__/
+.pytest_cache/
+*.tmp
+*.bak
+*.sqlite

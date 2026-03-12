@@ -25,7 +25,18 @@ if (-not $Followers) {
 }
 
 if (-not $SkipCollect) {
-  Write-Host "[1/4] Collecting posts for $Account ..."
+  Write-Host "[1/5] Collecting profile stats for $Account ..."
+  if (Test-Path '.\scripts\collect\collect-profile-stats.py') {
+    try {
+      python .\scripts\collect\collect-profile-stats.py $Account | Out-Null
+    } catch {
+      Write-Warning "Profile stats collection failed: $($_.Exception.Message)"
+    }
+  } else {
+    Write-Warning 'collect-profile-stats.py not found; skipping profile collection'
+  }
+
+  Write-Host "[2/5] Collecting posts for $Account ..."
   if (Test-Path '.\collect-instagram-posts-full.js') {
     node .\collect-instagram-posts-full.js $Account
   } elseif (Test-Path '.\scripts\collect\collect-instagram-posts-full.js') {
@@ -34,23 +45,24 @@ if (-not $SkipCollect) {
     Write-Warning 'collect-instagram-posts-full.js not found; skipping collection'
   }
 } else {
-  Write-Host "[1/4] Skipped collection"
+  Write-Host "[1/5] Skipped profile collection"
+  Write-Host "[2/5] Skipped post collection"
 }
 
-Write-Host "[2/4] Calculating metrics for $Account ..."
+Write-Host "[3/5] Calculating metrics for $Account ..."
 node .\calc-instagram-metrics.js $Account $Followers | Out-Null
 
-Write-Host "[3/5] Merging dataset for $Account ..."
+Write-Host "[4/5] Merging dataset for $Account ..."
 node .\scripts\transform\merge-instagram-dataset.js $Account
 
-Write-Host "[4/5] Validating output for $Account ..."
+Write-Host "[5/6] Validating output for $Account ..."
 node .\scripts\transform\validate-output.js $Account
 
 if (-not $SkipSheetSync) {
-  Write-Host "[5/5] Updating Google Sheet for $Account ..."
+  Write-Host "[6/6] Updating Google Sheet for $Account ..."
   node .\scripts\sync\update-google-sheet.js $Account
 } else {
-  Write-Host "[5/5] Skipped Google Sheet sync"
+  Write-Host "[6/6] Skipped Google Sheet sync"
 }
 
 $metricsPath = Join-Path $RepoRoot ("data\processed\metrics\{0}-metrics.json" -f $Account)
