@@ -203,6 +203,7 @@ $env:GOG_ACCOUNT = "your-email@example.com"
 - `docs/setup-auth.md`
 - `docs/daily-operations.md`
 - `docs/apify-transition.md`
+- `docs/apify-batch.md`
 
 ## Troubleshooting
 
@@ -256,3 +257,11 @@ Untuk run harian paling aman:
 - Repo ini masih menjaga backward compatibility untuk beberapa file root lama
 - File sensitif dan cache di-ignore lewat `.gitignore`
 - Output data di `data/raw/` dan `data/processed/` saat ini di-ignore dari Git
+
+
+## Apify Batch Runner
+
+```powershell
+$env:APIFY_TOKEN = "your_apify_token"
+node .\scripts\apify\run-apify-batch.js
+```
