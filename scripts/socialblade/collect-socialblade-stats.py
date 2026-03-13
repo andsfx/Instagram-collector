@@ -85,7 +85,6 @@ def main():
 
     try:
         from scrapling import Fetcher
-        Fetcher.configure(auto_match=False)
     except Exception as exc:
         result = {
             'date': datetime.now(timezone.utc).date().isoformat(),
