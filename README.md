@@ -184,6 +184,12 @@ Kalau account Google berbeda, set environment variable sebelum run:
 $env:GOG_ACCOUNT = "your-email@example.com"
 ```
 
+## Additional Docs
+
+- `docs/workflow.md`
+- `docs/spreadsheet-mapping.md`
+- `docs/setup-auth.md`
+
 ## Troubleshooting
 
 ### 1. Scrapling import failed
