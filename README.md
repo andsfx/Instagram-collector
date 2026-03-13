@@ -155,3 +155,13 @@ run-hybrid-master
 ```
 
 over any older manual collector flow.
+
+
+## Dashboard Deploy
+
+Dashboard frontend now lives in `dashboard/`.
+For Vercel, set the project **Root Directory** to:
+
+```text
+dashboard
+```

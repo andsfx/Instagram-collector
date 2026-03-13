@@ -1,22 +1,22 @@
 {
   "framework": null,
-  "builds": [
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "headers": [
     {
-      "src": "**",
-      "use": "@vercel/static"
+      "source": "/data.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
+      "source": "/",
+      "destination": "/index.html"
     }
   ]
 }
