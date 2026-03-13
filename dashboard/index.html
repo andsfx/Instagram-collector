@@ -911,64 +911,53 @@ async function fetchWithTimeout(url, timeoutMs) {
 }
 
 async function initDashboard() {
-  // TIER 1: localStorage cache (instant)
+  // LAYER 1: localStorage cache (instant)
   var cached = loadFromCache();
   if (cached) {
     setDataSource('cached', formatAge(cached.ageMs));
     onData(cached.data, 'cached');
-    // Silent refresh in background
+    var sub = document.getElementById('sub');
+    if (sub) sub.textContent = 'Menampilkan cache lokal, mengecek data terbaru…';
     silentRefresh();
     return;
   }
 
-  // TIER 2: Static data.json (fast, no cold start)
+  // LAYER 2: Static data.json (primary source of truth)
   setDataSource('loading');
   try {
     var res = await fetchWithTimeout(STATIC_JSON_URL, 5000);
-    if (res.ok) {
-      var raw = await res.json();
-      if (raw && raw.accounts && raw.accounts.length > 0) {
-        saveToCache(raw);
-        setDataSource('static');
-        onData(raw, 'static');
-        return;
-      }
+    if (!res.ok) throw new Error('Gagal memuat data.json (HTTP ' + res.status + ')');
+    var raw = await res.json();
+    if (!raw || !raw.accounts || raw.accounts.length === 0) {
+      throw new Error('data.json kosong atau tidak valid');
     }
-  } catch(e) { /* static file not available, fall through */ }
-
-  // TIER 3: Apps Script API (slow but always fresh)
-  try {
-    throw new Error('Static data.json not available');
+    saveToCache(raw);
+    setDataSource('static');
+    onData(raw, 'static');
+    return;
   } catch(e) {
     onError(e);
   }
 }
 
 async function silentRefresh() {
-  // Smart refresh: only re-render if data actually changed
   var currentLastUpdate = D && D.lastUpdate ? D.lastUpdate : null;
-
-  // Try static first, fallback to API
   try {
     var res = await fetchWithTimeout('./data.json?v=' + Date.now(), 5000);
-    if (res.ok) {
-      var raw = await res.json();
-      if (raw && raw.accounts && raw.accounts.length > 0) {
-        // Skip re-render if data hasn't changed
-        if (currentLastUpdate && raw.lastUpdate === currentLastUpdate) {
-          saveToCache(raw); // Still update cache timestamp
-          return;
-        }
-        saveToCache(raw);
-        setDataSource('static');
-        onData(raw, 'static');
-        return;
-      }
+    if (!res.ok) return;
+    var raw = await res.json();
+    if (!raw || !raw.accounts || raw.accounts.length === 0) return;
+    if (currentLastUpdate && raw.lastUpdate === currentLastUpdate) {
+      saveToCache(raw);
+      return;
     }
-  } catch(e) { /* fall through to API */ }
-  try {
-    return;
-  } catch(e) { /* silent fail — cached data still showing */ }
+    saveToCache(raw);
+    setDataSource('static');
+    onData(raw, 'static');
+  } catch(e) {
+    var sub = document.getElementById('sub');
+    if (sub && D) sub.textContent = 'Gagal mengambil data terbaru, menampilkan cache lokal.';
+  }
 }
 
 function adaptV2ToLegacyShape(raw){
