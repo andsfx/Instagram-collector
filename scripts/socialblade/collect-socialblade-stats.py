@@ -7,30 +7,69 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-def parse_number(value: str | None):
+def parse_number(value):
     if value is None:
         return None
-    text = str(value).strip().replace(',', '').replace('.', '', 0)
+    text = str(value).strip().replace(',', '')
     try:
-        return int(text)
+        return int(float(text))
     except ValueError:
         return None
 
 
-def extract_stat(html: str, label: str):
-    patterns = [
-        rf'{label}</span>\s*<span[^>]*>([^<]+)</span>',
-        rf'{label}</div>\s*<div[^>]*>([^<]+)</div>',
-        rf'{label}[^\d]*([\d,]+)'
-    ]
-    for pat in patterns:
-        m = re.search(pat, html, re.I)
-        if m:
-            raw = m.group(1).strip()
-            num = parse_number(raw)
-            if num is not None:
-                return num
-    return None
+def extract_from_embedded_json(html: str):
+    result = {
+        'followers': None,
+        'following': None,
+        'posts_count': None,
+    }
+
+    patterns = {
+        'followers': [r'"followers"\s*:\s*"?(\d+)"?'],
+        'following': [r'"following"\s*:\s*"?(\d+)"?'],
+        'posts_count': [r'"media_count"\s*:\s*"?(\d+)"?'],
+    }
+
+    for key, pats in patterns.items():
+        for pat in pats:
+            m = re.search(pat, html, re.I)
+            if m:
+                result[key] = parse_number(m.group(1))
+                break
+
+    return result
+
+
+def extract_from_html_blocks(html: str):
+    result = {
+        'followers': None,
+        'following': None,
+        'posts_count': None,
+    }
+
+    block_patterns = {
+        'followers': [
+            r'followers</p><p[^>]*>([\d,]+)</p>',
+            r'followers</p><p class="text-sm">([\d,.KMBkmb]+)</p>',
+        ],
+        'following': [
+            r'following</p><p[^>]*>([\d,]+)</p>',
+            r'following</p><p class="text-sm">([\d,.KMBkmb]+)</p>',
+        ],
+        'posts_count': [
+            r'media count</p><p[^>]*>([\d,]+)</p>',
+            r'media count</p><p class="text-sm">([\d,.KMBkmb]+)</p>',
+        ],
+    }
+
+    for key, pats in block_patterns.items():
+        for pat in pats:
+            m = re.search(pat, html, re.I)
+            if m:
+                result[key] = parse_number(m.group(1).replace('K', '000').replace('k', '000'))
+                break
+
+    return result
 
 
 def main():
@@ -46,6 +85,7 @@ def main():
 
     try:
         from scrapling import Fetcher
+        Fetcher.configure(auto_match=False)
     except Exception as exc:
         result = {
             'date': datetime.now(timezone.utc).date().isoformat(),
@@ -55,7 +95,7 @@ def main():
             'posts_count': None,
             'source': 'socialblade',
             'ok': False,
-            'warnings': [f'Scrapling import failed: {exc}']
+            'warnings': [f'Scrapling import/config failed: {exc}']
         }
         out_path.write_text(json.dumps(result, indent=2), encoding='utf-8')
         print(json.dumps(result, indent=2))
@@ -64,9 +104,9 @@ def main():
     url = f'https://socialblade.com/instagram/user/{username}'
     warnings = []
     try:
-        fetcher = Fetcher(auto_match=False)
+        fetcher = Fetcher()
         response = fetcher.get(url)
-        html = response.html if hasattr(response, 'html') else str(response)
+        html = response.html_content
     except Exception as exc:
         result = {
             'date': datetime.now(timezone.utc).date().isoformat(),
@@ -82,9 +122,12 @@ def main():
         print(json.dumps(result, indent=2))
         raise SystemExit(2)
 
-    followers = extract_stat(html, 'Followers')
-    following = extract_stat(html, 'Following')
-    posts_count = extract_stat(html, 'Posts')
+    embedded = extract_from_embedded_json(html)
+    blocks = extract_from_html_blocks(html)
+
+    followers = embedded['followers'] or blocks['followers']
+    following = embedded['following'] or blocks['following']
+    posts_count = embedded['posts_count'] or blocks['posts_count']
 
     if followers is None:
         warnings.append('followers not confidently extracted')
