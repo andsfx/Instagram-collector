@@ -173,7 +173,7 @@ scripts/sync/update-google-sheet.js
 
 Saat ini target utama:
 - Spreadsheet: **Instagram Follower Database**
-- Tab: **Follower History**
+- Tab: **Engagement / Content Breakdown**
 
 Default account untuk `gog` saat ini:
 - `andysafii9@gmail.com`

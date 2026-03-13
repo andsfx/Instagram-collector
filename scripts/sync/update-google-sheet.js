@@ -2,16 +2,41 @@ const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 
-const EXPECTED_HEADERS = [
-  "Date",
-  "Username",
-  "Followers",
-  "Following",
-  "Posts",
-  "Analyzed Posts",
-  "Avg Likes",
-  "Avg Comments",
-  "Engagement Rate"
+const ENGAGEMENT_HEADERS = [
+  "Tanggal",
+  "Akun",
+  "Posts_Analyzed",
+  "Avg_Likes",
+  "Avg_Comments",
+  "Engagement_Rate",
+  "Total_Likes_Last12",
+  "Total_Comments_Last12"
+];
+
+const CONTENT_BREAKDOWN_HEADERS = [
+  "Tanggal",
+  "Akun",
+  "Reels",
+  "Carousel",
+  "Image",
+  "Video",
+  "Total_Posts_Analyzed",
+  "Avg_Likes",
+  "Avg_Comments",
+  "Engagement_Rate",
+  "Reels_AvgLikes",
+  "Reels_AvgComments",
+  "Reels_ER",
+  "Carousel_AvgLikes",
+  "Carousel_AvgComments",
+  "Carousel_ER",
+  "Image_AvgLikes",
+  "Image_AvgComments",
+  "Image_ER",
+  "BestPost_URL",
+  "BestPost_Type",
+  "BestPost_Likes",
+  "BestPost_Comments"
 ];
 
 function safeReadJson(filePath) {
@@ -28,26 +53,11 @@ function loadConfig(repoRoot) {
   return { sheets, accounts };
 }
 
-function toSheetRow(merged) {
-  return [
-    merged.date ?? "",
-    merged.username ?? "",
-    merged.profile?.followers ?? "",
-    merged.profile?.following ?? "",
-    merged.profile?.posts_count ?? "",
-    merged.metrics?.analyzed_posts ?? "",
-    merged.metrics?.avg_likes ?? "",
-    merged.metrics?.avg_comments ?? "",
-    merged.metrics?.engagement_rate ?? ""
-  ];
-}
-
 function runGog(args, options = {}) {
-  const gogBin = process.env.GOG_BIN || "/root/.local/bin/gog";
   const env = { ...process.env };
-  if (!env.GOG_ACCOUNT) {
-    env.GOG_ACCOUNT = "andysafii9@gmail.com";
-  }
+  const platformBin = process.platform === "win32" ? "gog" : "/root/.local/bin/gog";
+  const gogBin = process.env.GOG_BIN || platformBin;
+  if (!env.GOG_ACCOUNT) env.GOG_ACCOUNT = "andysafii9@gmail.com";
   return execFileSync(gogBin, args, {
     cwd: options.cwd,
     env,
@@ -70,24 +80,26 @@ function getExistingRows(spreadsheetId, range) {
   return Array.isArray(parsed) ? parsed : [];
 }
 
-function updateRow(spreadsheetId, range, row) {
+function updateRowJson(spreadsheetId, range, row) {
   runGog([
     "sheets",
     "update",
     spreadsheetId,
     range,
-    ...row.map((v) => String(v ?? "")),
+    "--values-json",
+    JSON.stringify([row]),
     "--no-input"
   ]);
 }
 
-function appendRow(spreadsheetId, range, row) {
+function appendRowJson(spreadsheetId, range, row) {
   runGog([
     "sheets",
     "append",
     spreadsheetId,
     range,
-    ...row.map((v) => String(v ?? "")),
+    "--values-json",
+    JSON.stringify([row]),
     "--no-input"
   ]);
 }
@@ -101,45 +113,69 @@ function rowsEqual(a, b) {
   return true;
 }
 
-function ensureHeader(spreadsheetId, tabName) {
-  const rows = getExistingRows(spreadsheetId, `${tabName}!A1:I1`);
+function ensureHeader(spreadsheetId, tabName, expectedHeaders) {
+  const lastCol = String.fromCharCode(64 + expectedHeaders.length);
+  const rows = getExistingRows(spreadsheetId, `${tabName}!A1:${lastCol}1`);
   const header = rows[0] || [];
-  const expected = EXPECTED_HEADERS;
-
-  if (rowsEqual(header, expected)) {
-    return { changed: false, headerOk: true };
-  }
-
-  updateRow(spreadsheetId, `${tabName}!A1:I1`, expected);
-  return { changed: true, headerOk: true };
+  if (rowsEqual(header, expectedHeaders)) return { changed: false };
+  updateRowJson(spreadsheetId, `${tabName}!A1:${lastCol}1`, expectedHeaders);
+  return { changed: true };
 }
 
-function isMergedDataUsable(merged) {
+function isMergedDataUsable(merged, metrics) {
   if (!merged || typeof merged !== "object") return false;
   if (!merged.username || !merged.date) return false;
-
-  const profile = merged.profile || {};
-  const metrics = merged.metrics || {};
-
-  const hasProfileValue = [profile.followers, profile.following, profile.posts_count].some(
-    (v) => v !== null && v !== undefined && v !== ""
-  );
-  const hasMetricValue = [metrics.analyzed_posts, metrics.avg_likes, metrics.avg_comments, metrics.engagement_rate].some(
-    (v) => v !== null && v !== undefined && v !== ""
-  );
-
-  return hasProfileValue || hasMetricValue;
+  if (!metrics || typeof metrics !== "object") return false;
+  return true;
 }
 
-function upsertFollowerHistory(spreadsheetId, tabName, merged) {
-  ensureHeader(spreadsheetId, tabName);
+function buildEngagementRow(merged, metrics) {
+  return [
+    merged.date ?? "",
+    merged.username ?? "",
+    metrics.posts_analyzed ?? merged.metrics?.analyzed_posts ?? "",
+    metrics.avg_likes ?? merged.metrics?.avg_likes ?? "",
+    metrics.avg_comments ?? merged.metrics?.avg_comments ?? "",
+    metrics.engagement_rate ?? merged.metrics?.engagement_rate ?? "",
+    metrics.total_likes ?? metrics.engagement?.total_likes_last12 ?? merged.metrics?.total_likes ?? "",
+    metrics.total_comments ?? metrics.engagement?.total_comments_last12 ?? merged.metrics?.total_comments ?? ""
+  ].map((v) => (v == null ? "" : String(v)));
+}
 
-  const dataRange = `${tabName}!A2:I`;
-  const rows = getExistingRows(spreadsheetId, dataRange);
-  const keyDate = merged.date ?? "";
-  const keyUsername = merged.username ?? "";
-  const row = toSheetRow(merged);
+function buildContentBreakdownRow(merged, metrics) {
+  const cb = metrics.content_breakdown || {};
+  return [
+    merged.date ?? "",
+    merged.username ?? "",
+    cb.reels ?? "",
+    cb.carousel ?? "",
+    cb.image ?? "",
+    cb.video ?? "",
+    cb.total_posts_analyzed ?? metrics.posts_analyzed ?? "",
+    cb.avg_likes ?? metrics.avg_likes ?? "",
+    cb.avg_comments ?? metrics.avg_comments ?? "",
+    cb.engagement_rate ?? metrics.engagement_rate ?? "",
+    cb.reels_avg_likes ?? "",
+    cb.reels_avg_comments ?? "",
+    cb.reels_er ?? "",
+    cb.carousel_avg_likes ?? "",
+    cb.carousel_avg_comments ?? "",
+    cb.carousel_er ?? "",
+    cb.image_avg_likes ?? "",
+    cb.image_avg_comments ?? "",
+    cb.image_er ?? "",
+    cb.best_post_url ?? "",
+    cb.best_post_type ?? "",
+    cb.best_post_likes ?? "",
+    cb.best_post_comments ?? ""
+  ].map((v) => (v == null ? "" : String(v)));
+}
 
+function upsertByDateUsername(spreadsheetId, tabName, width, row) {
+  const endCol = String.fromCharCode(64 + width);
+  const rows = getExistingRows(spreadsheetId, `${tabName}!A2:${endCol}`);
+  const keyDate = row[0] ?? "";
+  const keyUsername = row[1] ?? "";
   let matchedIndex = -1;
   for (let i = 0; i < rows.length; i += 1) {
     const current = rows[i] || [];
@@ -148,37 +184,54 @@ function upsertFollowerHistory(spreadsheetId, tabName, merged) {
       break;
     }
   }
-
   if (matchedIndex === -1) {
-    appendRow(spreadsheetId, `${tabName}!A:I`, row);
-    console.log(`Appended ${keyUsername} on ${keyDate} to ${tabName}`);
+    appendRowJson(spreadsheetId, `${tabName}!A:${endCol}`, row);
     return { action: "append", row: null };
   }
-
-  updateRow(spreadsheetId, `${tabName}!A${matchedIndex}:I${matchedIndex}`, row);
-  console.log(`Updated ${keyUsername} on ${keyDate} at row ${matchedIndex}`);
+  updateRowJson(spreadsheetId, `${tabName}!A${matchedIndex}:${endCol}${matchedIndex}`, row);
   return { action: "update", row: matchedIndex };
 }
 
 function processOne(repoRoot, sheets, username) {
   const mergedPath = path.join(repoRoot, "data", "processed", "merged", `${username}.json`);
+  const metricsPath = path.join(repoRoot, "data", "processed", "metrics", `${username}-metrics.json`);
   const merged = safeReadJson(mergedPath);
+  const metrics = safeReadJson(metricsPath);
 
-  if (!merged) {
-    return { username, ok: false, skipped: true, reason: `Merged dataset not found: ${mergedPath}` };
+  if (!merged || !metrics) {
+    return { username, ok: false, skipped: true, reason: "Merged or metrics file missing" };
+  }
+  if (!isMergedDataUsable(merged, metrics)) {
+    return { username, ok: false, skipped: true, reason: "Merged/metrics data not usable" };
   }
 
-  if (!isMergedDataUsable(merged)) {
-    return { username, ok: false, skipped: true, reason: "Merged dataset missing required usable values" };
-  }
+  const engagementTab = sheets.tabs.engagement || "Engagement";
+  const contentTab = sheets.tabs.contentBreakdown || "Content Breakdown";
 
-  const result = upsertFollowerHistory(
+  ensureHeader(sheets.spreadsheetId, engagementTab, ENGAGEMENT_HEADERS);
+  ensureHeader(sheets.spreadsheetId, contentTab, CONTENT_BREAKDOWN_HEADERS);
+
+  const engagementResult = upsertByDateUsername(
     sheets.spreadsheetId,
-    sheets.tabs.followerHistory || "Follower History",
-    merged
+    engagementTab,
+    ENGAGEMENT_HEADERS.length,
+    buildEngagementRow(merged, metrics)
   );
 
-  return { username, ok: true, skipped: false, ...result };
+  const contentResult = upsertByDateUsername(
+    sheets.spreadsheetId,
+    contentTab,
+    CONTENT_BREAKDOWN_HEADERS.length,
+    buildContentBreakdownRow(merged, metrics)
+  );
+
+  return {
+    username,
+    ok: true,
+    skipped: false,
+    engagement: engagementResult,
+    contentBreakdown: contentResult
+  };
 }
 
 function main() {
@@ -195,7 +248,6 @@ function main() {
     const enabled = accounts.filter((a) => a.enabled).map((a) => a.username);
     const results = enabled.map((username) => processOne(repoRoot, sheets, username));
     console.log(JSON.stringify(results, null, 2));
-
     const hasFailure = results.some((r) => !r.ok && !r.skipped);
     process.exit(hasFailure ? 2 : 0);
   }

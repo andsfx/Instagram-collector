@@ -57,7 +57,7 @@ Script:
 - `scripts/sync/update-google-sheet.js`
 
 Target:
-- `Follower History`
+- `Engagement / Content Breakdown`
 
 ## Run Order
 

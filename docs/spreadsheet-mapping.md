@@ -4,12 +4,12 @@
 
 - **Spreadsheet Name:** Instagram Follower Database
 - **Spreadsheet ID:** `1MdTlen1rcq1ZplbTwfHzj-kHFBoQufgahzRAxZPqt7U`
-- **Primary Tab:** `Follower History`
+- **Primary Tab:** `Engagement / Content Breakdown`
 
 ## Current Sync Strategy
 
 Saat ini pipeline menulis ke tab:
-- `Follower History`
+- `Engagement / Content Breakdown`
 
 Mode update yang dipakai:
 - **upsert by `Date + Username`**
@@ -60,7 +60,7 @@ Contoh struktur merged file:
 }
 ```
 
-## Current Follower History Column Mapping
+## Current Engagement / Content Breakdown Column Mapping
 
 Updater saat ini menulis 9 kolom:
 
@@ -78,7 +78,7 @@ Updater saat ini menulis 9 kolom:
 
 ## Header Row Expected
 
-Header yang direkomendasikan untuk `Follower History`:
+Header yang direkomendasikan untuk `Engagement / Content Breakdown`:
 
 ```text
 Date | Username | Followers | Following | Posts | Analyzed Posts | Avg Likes | Avg Comments | Engagement Rate

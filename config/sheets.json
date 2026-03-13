@@ -2,9 +2,11 @@
   "spreadsheetName": "Instagram Follower Database",
   "spreadsheetId": "1MdTlen1rcq1ZplbTwfHzj-kHFBoQufgahzRAxZPqt7U",
   "tabs": {
-    "followerHistory": "Follower History"
+    "engagement": "Engagement",
+    "contentBreakdown": "Content Breakdown"
   },
   "mode": {
-    "followerHistory": "upsert"
+    "engagement": "upsert",
+    "contentBreakdown": "upsert"
   }
 }
