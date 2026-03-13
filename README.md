@@ -204,6 +204,7 @@ $env:GOG_ACCOUNT = "your-email@example.com"
 - `docs/daily-operations.md`
 - `docs/apify-transition.md`
 - `docs/apify-batch.md`
+- `docs/hybrid-flow.md`
 
 ## Troubleshooting
 
