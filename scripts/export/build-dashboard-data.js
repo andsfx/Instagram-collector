@@ -33,7 +33,13 @@ function getSheetRows(spreadsheetId, range) {
 function formatWib(isoUtc) {
   const d = new Date(isoUtc);
   const wib = new Date(d.getTime() + 7 * 60 * 60 * 1000);
-  return wib.toISOString().replace('.000Z', '+07:00');
+  const yyyy = wib.getUTCFullYear();
+  const mm = String(wib.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(wib.getUTCDate()).padStart(2, '0');
+  const hh = String(wib.getUTCHours()).padStart(2, '0');
+  const mi = String(wib.getUTCMinutes()).padStart(2, '0');
+  const ss = String(wib.getUTCSeconds()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}+07:00`;
 }
 
 function ratio(followers, following) {
@@ -167,9 +173,9 @@ function main() {
         followers: base.followers ?? null,
         following: base.following ?? null,
         posts: base.posts ?? null,
-        avg_likes: e.avg_likes ?? 0,
-        avg_comments: e.avg_comments ?? 0,
-        engagement_rate: e.engagement_rate ?? 0,
+        avg_likes: e.avg_likes ?? null,
+        avg_comments: e.avg_comments ?? null,
+        engagement_rate: e.engagement_rate ?? null,
         anomaly: false,
       };
     }
@@ -189,9 +195,9 @@ function main() {
       followers: last.followers ?? null,
       following: last.following ?? null,
       posts: last.posts ?? null,
-      avg_likes: last.avg_likes ?? 0,
-      avg_comments: last.avg_comments ?? 0,
-      engagement_rate: last.engagement_rate ?? 0,
+      avg_likes: last.avg_likes ?? null,
+      avg_comments: last.avg_comments ?? null,
+      engagement_rate: last.engagement_rate ?? null,
       ff_ratio: ratio(last.followers, last.following),
       verified: !!accountCfg.verified,
       sources: { stats: 'socialblade', engagement: 'apify' },
@@ -204,11 +210,11 @@ function main() {
     .sort((a, b) => (b.followers || 0) - (a.followers || 0))
     .map((a, i) => ({ rank: i + 1, account: a.username, followers: a.followers || 0 }));
   rankings.by_engagement_rate = [...latestAccounts]
-    .sort((a, b) => (b.engagement_rate || 0) - (a.engagement_rate || 0))
-    .map((a, i) => ({ rank: i + 1, account: a.username, engagement_rate: a.engagement_rate || 0 }));
+    .sort((a, b) => ((b.engagement_rate ?? -1) - (a.engagement_rate ?? -1)))
+    .map((a, i) => ({ rank: i + 1, account: a.username, engagement_rate: a.engagement_rate ?? null }));
   rankings.by_avg_likes = [...latestAccounts]
-    .sort((a, b) => (b.avg_likes || 0) - (a.avg_likes || 0))
-    .map((a, i) => ({ rank: i + 1, account: a.username, avg_likes: a.avg_likes || 0 }));
+    .sort((a, b) => ((b.avg_likes ?? -1) - (a.avg_likes ?? -1)))
+    .map((a, i) => ({ rank: i + 1, account: a.username, avg_likes: a.avg_likes ?? null }));
 
   const content_breakdown = {};
   for (const username of accounts) {
