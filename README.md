@@ -201,6 +201,7 @@ $env:GOG_ACCOUNT = "your-email@example.com"
 - `docs/workflow.md`
 - `docs/spreadsheet-mapping.md`
 - `docs/setup-auth.md`
+- `docs/daily-operations.md`
 
 ## Troubleshooting
 
