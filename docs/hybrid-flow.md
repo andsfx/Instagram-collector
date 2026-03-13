@@ -43,3 +43,8 @@ Target sheets:
 4. Transform Apify datasets to local metrics/merged files
 5. Upsert `Engagement`
 6. Upsert `Content Breakdown`
+
+## Dashboard export
+
+- `scripts/export/build-dashboard-data.js`
+- output: `dashboard/data.json`
