@@ -100,6 +100,14 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .hdr .live.src-static .dot{background:#3b82f6;box-shadow:0 0 6px rgba(59,130,246,0.5)}
 .hdr .live.src-cached .dot{background:#f59e0b;box-shadow:0 0 6px rgba(245,158,11,0.5);animation:none}
 .hdr .live.src-loading .dot{background:var(--t3);box-shadow:none}
+.source-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--t2);background:rgba(255,255,255,0.03)}
+.source-badge strong{color:var(--text);font-weight:700}
+.meta-note{font-size:12px;color:var(--t3)}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent}
+.status-badge.fresh{background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.28)}
+.status-badge.cached{background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.28)}
+.status-badge.error{background:rgba(239,68,68,0.12);color:#fca5a5;border-color:rgba(239,68,68,0.28)}
+.section-source{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* Header Actions (Dark Mode + Export) */
@@ -475,7 +483,7 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   <h1>Instagram Competitor Dashboard</h1>
   <p class="sub">Metropolitan Mall Bekasi vs Kompetitor</p>
   <p class="upd" id="lastUpdate">Memuat...</p>
-  <div class="live src-loading" id="dataSource"><span class="dot"></span> <span id="dataSourceText">Memuat...</span></div>
+  <div class="live src-loading" id="dataSource"><span class="dot"></span> <span id="dataSourceText">Memuat data...</span></div><div class="status-badge cached" id="freshnessBadge">Cached view</div>
   <div class="hdr-actions">
     <button class="hdr-btn" id="darkToggle" onclick="toggleDark()">
       <svg id="darkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -853,6 +861,42 @@ const STATIC_JSON_URL = './data.json?v=' + Date.now();
 const CACHE_KEY = 'ig-dash-data';
 const CACHE_TS_KEY = 'ig-dash-data-ts';
 const CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 jam
+
+function fmtInt(v){
+  if (v === null || v === undefined || v === '') return '—';
+  var n = Number(v);
+  if (Number.isNaN(n)) return String(v);
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
+}
+function fmtDec(v, digits=2){
+  if (v === null || v === undefined || v === '') return '—';
+  var n = Number(v);
+  if (Number.isNaN(n)) return String(v);
+  return new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: digits }).format(n);
+}
+function fmtPct(v, digits=2){
+  if (v === null || v === undefined || v === '') return '—';
+  var n = Number(v);
+  if (Number.isNaN(n)) return String(v);
+  return fmtDec(n, digits) + '%';
+}
+function prettyLastUpdate(v){
+  if (!v) return 'Unknown';
+  try {
+    var d = new Date(v);
+    return d.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Jakarta' }) + ' WIB';
+  } catch(_) {
+    return String(v);
+  }
+}
+function setFreshnessBadge(type){
+  var el = document.getElementById('freshnessBadge');
+  if (!el) return;
+  el.className = 'status-badge ' + type;
+  if (type === 'fresh') el.textContent = 'Fresh data';
+  else if (type === 'cached') el.textContent = 'Cached view';
+  else el.textContent = 'Load issue';
+}
 
 function setDataSource(type, extra) {
   var el = document.getElementById('dataSource');
