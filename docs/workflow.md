@@ -1,80 +1,68 @@
 # Workflow
 
-## Overview
+## Current default workflow
 
-Repo ini memakai 2 sumber data utama:
+Repo ini sekarang menggunakan **hybrid workflow**.
 
-1. **Profile/account stats**
-   - followers
-   - following
-   - posts_count
-   - diambil lewat Scrapling
+### Source A — SocialBlade + Scrapling
+Dipakai untuk:
+- followers
+- following
+- posts_count
 
-2. **Post-level metrics**
-   - likes
-   - comments
-   - tipe post
-   - diambil dari JSON hasil collector post
+Target sheet:
+- `Follower History`
 
-Kedua sumber ini digabung lalu dikirim ke spreadsheet.
+### Source B — Apify
+Dipakai untuk:
+- latest 12 posts
+- likes
+- comments
+- media type
+- permalink
+- timestamp
+
+Target sheets:
+- `Engagement`
+- `Content Breakdown`
 
 ## End-to-end Flow
 
-### Step 1 — collect profile stats
+### Step 1 — collect SocialBlade stats
 Script:
-- `scripts/collect/collect-profile-stats.py`
+- `scripts/socialblade/collect-socialblade-stats.py`
 
 Output:
-- `data/raw/profiles/<username>.json`
+- `data/raw/stats/<username>-stats.json`
 
-### Step 2 — collect latest posts
+### Step 2 — update Follower History
 Script:
-- `scripts/collect/collect-instagram-posts-full.js`
+- `scripts/socialblade/update-follower-history.js`
+
+### Step 3 — run Apify batch
+Script:
+- `scripts/apify/run-apify-batch.js`
 
 Output:
+- `incoming/apify/datasets/<username>.json`
 - `data/raw/posts/<username>-latest12-full.json`
-
-### Step 3 — calculate metrics
-Script:
-- `calc-instagram-metrics.js`
-
-Output:
 - `data/processed/metrics/<username>-metrics.json`
-
-### Step 4 — merge dataset
-Script:
-- `scripts/transform/merge-instagram-dataset.js`
-
-Output:
 - `data/processed/merged/<username>.json`
 
-### Step 5 — validate
-Script:
-- `scripts/transform/validate-output.js`
-
-### Step 6 — sync to sheet
+### Step 4 — sync sheets
 Script:
 - `scripts/sync/update-google-sheet.js`
 
-Target:
-- `Engagement / Content Breakdown`
+Targets:
+- `Engagement`
+- `Content Breakdown`
 
-## Run Order
+### Step 5 — easiest full run
+Script:
+- `scripts/run/run-hybrid-master.ps1`
+- `scripts/run/run-hybrid-master.js`
 
-### Single account
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run\run-instagram-account.ps1 -Account grandmetropolitan
-```
+## Deprecated legacy path
 
-### All accounts
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run\run-all-instagram-accounts.ps1
-```
-
-## Why this structure exists
-
-Pemisahan ini penting supaya:
-- raw data tetap bisa diaudit
-- metrics bisa dihitung ulang tanpa scrape ulang
-- sync spreadsheet tidak langsung bergantung pada scraping real-time
-- debugging lebih gampang per tahap
+The older browser-session Instagram scraping path is kept only for reference/backward compatibility.
+It is no longer the preferred default because it was unstable against login redirects and session issues.

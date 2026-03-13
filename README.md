@@ -1,93 +1,95 @@
 # Instagram Collector
 
-Pipeline untuk:
-- mengambil profile stats Instagram (`followers`, `following`, `posts_count`)
-- mengambil data post terbaru
-- menghitung metrics dari JSON post-level
-- menggabungkan hasil profile + metrics
-- mengirim hasil akhir ke Google Sheets
+Pipeline utama repo ini sekarang adalah **hybrid workflow**:
 
-## Workflow
+- **SocialBlade + Scrapling** → untuk `followers`, `following`, `posts_count`
+- **Apify** → untuk post-level data, `Engagement`, dan `Content Breakdown`
 
-Pipeline utama repo ini:
+## Current Recommended Flow
 
-1. **Collect profile stats** menggunakan Scrapling
-2. **Collect post data** menggunakan Playwright persistent profile
-3. **Calculate metrics** dari file JSON post-level
-4. **Merge dataset** menjadi format final per akun
-5. **Validate output**
-6. **Sync ke Google Sheets**
+### Source split
 
-## Current Structure
+#### 1. SocialBlade
+Dipakai untuk account-level stats:
+- followers
+- following
+- posts_count
 
-```text
-config/
-  accounts.json
-  pipeline.json
-  sheets.json
+Target sheet:
+- `Follower History`
 
-scripts/
-  collect/
-  transform/
-  sync/
-  run/
+#### 2. Apify
+Dipakai untuk post-level data:
+- latest posts
+- likes
+- comments
+- media type
+- permalink
+- timestamp
 
-data/
-  raw/
-  processed/
+Target sheets:
+- `Engagement`
+- `Content Breakdown`
+
+## Master Command
+
+Jalankan full workflow dari environment yang punya akses:
+- Apify
+- Google Sheets (`gog`)
+- Scrapling/Python
+
+```powershell
+$env:APIFY_TOKEN = "your_apify_token"
+powershell -ExecutionPolicy Bypass -File .\scripts\run\run-hybrid-master.ps1
 ```
 
-## Requirements
+## Required Environment
 
-### Windows runtime
-- Windows PowerShell
+### Runtime
 - Node.js + npm
 - Python 3
-- browser/profile Instagram yang sudah login
+- Scrapling
+- `gog`
 
-### Node package
-```powershell
-npm install
-```
-
-### Python package
-Untuk jalur profile stats:
+### Required environment variables
 
 ```powershell
-pip install scrapling
+$env:APIFY_TOKEN = "your_apify_token"
 ```
 
-Jika Scrapling belum terpasang, pipeline masih bisa jalan sebagian, tapi profile stats akan gagal dan memberi warning.
+If `gog` keyring requires it in the current environment:
 
-## Important Files
+```powershell
+$env:GOG_KEYRING_PASSWORD = "your_keyring_password"
+```
 
-### Config
-- `config/accounts.json` → daftar akun dan fallback followers
-- `config/sheets.json` → spreadsheet target dan tab target
-- `config/pipeline.json` → opsi pipeline
+## Main Scripts
 
-### Collect
-- `scripts/collect/collect-profile-stats.py`
-- `scripts/collect/collect-instagram-posts-full.js`
+### Master workflow
+- `scripts/run/run-hybrid-master.js`
+- `scripts/run/run-hybrid-master.ps1`
 
-### Transform
-- `calc-instagram-metrics.js`
-- `scripts/transform/merge-instagram-dataset.js`
-- `scripts/transform/validate-output.js`
+### SocialBlade side
+- `scripts/socialblade/collect-socialblade-stats.py`
+- `scripts/socialblade/update-follower-history.js`
 
-### Sync
+### Apify side
+- `scripts/apify/run-apify-batch.js`
+- `scripts/apify/transform-apify-posts.js`
+
+### Sheet sync
 - `scripts/sync/update-google-sheet.js`
-
-### Run
-- `scripts/run/run-instagram-account.ps1`
-- `scripts/run/run-all-instagram-accounts.ps1`
-- `scripts/run/run-full-pipeline.ps1`
 
 ## Output Files
 
-### Raw profile stats
+### SocialBlade stats
 ```text
-data/raw/profiles/<username>.json
+data/raw/stats/<username>-stats.json
+```
+
+### Apify raw datasets
+```text
+incoming/apify/datasets/<username>.json
 ```
 
 ### Raw posts
@@ -100,177 +102,56 @@ data/raw/posts/<username>-latest12-full.json
 data/processed/metrics/<username>-metrics.json
 ```
 
-### Merged final dataset
+### Merged
 ```text
 data/processed/merged/<username>.json
 ```
 
-## How To Run
+## Daily Operating Pattern
 
-### 1. Single account full pipeline
+1. run hybrid master command
+2. verify `Follower History` updated for today
+3. verify `Engagement` updated
+4. verify `Content Breakdown` updated
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run\run-instagram-account.ps1 -Account grandmetropolitan
-```
+## Documentation Index
 
-Flow yang dijalankan:
-1. collect profile stats
-2. collect posts
-3. calculate metrics
-4. merge dataset
-5. validate output
-6. update Google Sheet
-
-### 2. Single account without sheet sync
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run\run-instagram-account.ps1 -Account grandmetropolitan -SkipSheetSync
-```
-
-### 3. Single account without recollecting data
-Dipakai kalau raw data sudah ada dan hanya mau proses ulang:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run\run-instagram-account.ps1 -Account grandmetropolitan -SkipCollect -SkipSheetSync
-```
-
-### 4. All accounts
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run\run-all-instagram-accounts.ps1
-```
-
-### 4b. Drive batch sync (source baru)
-
-```powershell
-node .\scripts\sync\sync-drive-batch.js
-```
-
-Script ini akan:
-- scan Google Drive source baru (`processed/merged` + `processed/metrics`)
-- download pasangan file yang lengkap
-- validate JSON
-- upsert ke `Engagement` dan `Content Breakdown`
-
-### 5. Legacy commands
-Wrapper lama tetap ada:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\run-instagram-account.ps1 -Account grandmetropolitan -Followers 92455
-powershell -ExecutionPolicy Bypass -File .\run-all-instagram-accounts.ps1
-```
-
-## Configuration
-
-### Accounts
-Edit `config/accounts.json`:
-- `username`
-- `followers`
-- `enabled`
-
-### Sheets
-Edit `config/sheets.json`:
-- `spreadsheetName`
-- `spreadsheetId`
-- target tab
-- mode update
-
-## Google Sheets Sync
-
-Sync dilakukan oleh:
-
-```text
-scripts/sync/update-google-sheet.js
-```
-
-Saat ini target utama:
-- Spreadsheet: **Instagram Follower Database**
-- Tab: **Engagement / Content Breakdown**
-
-Default account untuk `gog` saat ini:
-- `andysafii9@gmail.com`
-
-Kalau account Google berbeda, set environment variable sebelum run:
-
-```powershell
-$env:GOG_ACCOUNT = "your-email@example.com"
-```
-
-## Additional Docs
-
-- `docs/workflow.md`
-- `docs/spreadsheet-mapping.md`
-- `docs/setup-auth.md`
-- `docs/daily-operations.md`
+- `docs/hybrid-flow.md`
+- `docs/hybrid-master.md`
 - `docs/apify-transition.md`
 - `docs/apify-batch.md`
-- `docs/hybrid-flow.md`
+- `docs/daily-operations.md`
+- `docs/spreadsheet-mapping.md`
+- `docs/setup-auth.md`
+- `docs/workflow.md`
 
-## Troubleshooting
+## Deprecated / Legacy Notes
 
-### 1. Scrapling import failed
-Install Scrapling:
+The following older flows are no longer the recommended default:
 
-```powershell
-pip install scrapling
-```
+### Legacy browser-based Instagram scraping
+The old Playwright/persistent-profile collector path is considered **legacy** because it was prone to:
+- redirects to Instagram login
+- unstable sessions
+- zero-post outputs
+- hard-to-repeat runs
 
-### 2. Redirected to login / challenge
-Artinya Instagram menolak akses public/plain fetch atau session browser belum valid.
+Those scripts remain in the repo for reference/backward compatibility, but they are **not the primary workflow** anymore.
 
-Cek:
-- browser profile masih login
-- tidak kena challenge/checkpoint
-- collector Playwright memakai profile yang benar
+### Legacy direct `Follower History` assumptions for post metrics
+`Follower History` should **not** be used as the target for post-level engagement/content metrics.
 
-### 3. Metrics file not found
-Pastikan raw post JSON sudah berhasil dibuat di:
+Current sheet mapping is:
+- `Follower History` ← SocialBlade stats
+- `Engagement` ← Apify metrics
+- `Content Breakdown` ← Apify content breakdown
+
+## Recommended Direction
+
+If unsure, always prefer:
 
 ```text
-data/raw/posts/
+run-hybrid-master
 ```
 
-### 4. Merged file missing fields
-Jalankan validasi:
-
-```powershell
-node .\scripts\transform\validate-output.js grandmetropolitan
-```
-
-### 5. Google Sheets sync gagal
-Cek:
-- `gog` sudah login
-- account Google benar
-- spreadsheet ID benar
-- permission spreadsheet ada
-
-## Recommended Operating Pattern
-
-Untuk run harian paling aman:
-
-1. test 1 akun dulu
-2. pastikan raw + metrics + merged file valid
-3. cek hasil sheet update
-4. baru jalankan semua akun
-
-## Notes
-
-- Repo ini masih menjaga backward compatibility untuk beberapa file root lama
-- File sensitif dan cache di-ignore lewat `.gitignore`
-- Output data di `data/raw/` dan `data/processed/` saat ini di-ignore dari Git
-
-
-## Apify Batch Runner
-
-```powershell
-$env:APIFY_TOKEN = "your_apify_token"
-node .\scripts\apify\run-apify-batch.js
-```
-
-
-## Hybrid Master Command
-
-```powershell
-$env:APIFY_TOKEN = "your_apify_token"
-powershell -ExecutionPolicy Bypass -File .\scripts\run\run-hybrid-master.ps1
-```
+over any older manual collector flow.
