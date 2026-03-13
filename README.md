@@ -202,6 +202,7 @@ $env:GOG_ACCOUNT = "your-email@example.com"
 - `docs/spreadsheet-mapping.md`
 - `docs/setup-auth.md`
 - `docs/daily-operations.md`
+- `docs/apify-transition.md`
 
 ## Troubleshooting
 
