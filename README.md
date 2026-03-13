@@ -266,3 +266,11 @@ Untuk run harian paling aman:
 $env:APIFY_TOKEN = "your_apify_token"
 node .\scripts\apify\run-apify-batch.js
 ```
+
+
+## Hybrid Master Command
+
+```powershell
+$env:APIFY_TOKEN = "your_apify_token"
+powershell -ExecutionPolicy Bypass -File .\scripts\run\run-hybrid-master.ps1
+```
