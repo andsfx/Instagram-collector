@@ -140,6 +140,18 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run\run-instagram-account.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\run\run-all-instagram-accounts.ps1
 ```
 
+### 4b. Drive batch sync (source baru)
+
+```powershell
+node .\scripts\sync\sync-drive-batch.js
+```
+
+Script ini akan:
+- scan Google Drive source baru (`processed/merged` + `processed/metrics`)
+- download pasangan file yang lengkap
+- validate JSON
+- upsert ke `Engagement` dan `Content Breakdown`
+
 ### 5. Legacy commands
 Wrapper lama tetap ada:
 
