@@ -699,6 +699,7 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 </div><!-- end .wrap -->
 
 <script src="./js/data-core.js"></script>
+<script src="./js/ui-utils.js"></script>
 <script src="./js/render-sections.js"></script>
 <script>
 /* =============================================
@@ -805,71 +806,6 @@ function saveSettings(){
 function toggleSettings(){
   const panel = document.getElementById('settingsPanel');
   panel.classList.toggle('open');
-}
-
-// ===== HELPERS =====
-function fmt(n){
-  if(n == null) return '-';
-  if(n >= 1e6) return (n/1e6).toFixed(1)+'M';
-  if(n >= 1e3) return (n/1e3).toFixed(1)+'K';
-  return n.toLocaleString('id-ID');
-}
-function fmtFull(n){
-  if(n == null) return '-';
-  return Math.round(n).toLocaleString('id-ID');
-}
-
-function pct(n){
-  if(n == null) return '-';
-  return n >= 0 ? '+'+n.toFixed(3)+'%' : n.toFixed(3)+'%';
-}
-function num(n){
-  if(n == null || n === 0) return '0';
-  return Number(n).toLocaleString('id-ID',{maximumFractionDigits:1});
-}
-
-function getChartTextColor(){
-  return document.documentElement.getAttribute('data-theme') === 'dark' ? '#B0B0B0' : '#555555';
-}
-
-function getChartGridColor(){
-  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-}
-
-function destroyChart(key){
-  if(chartInstances[key]){ chartInstances[key].destroy(); delete chartInstances[key]; }
-}
-
-// ===== DOM OPTIMIZATION HELPER =====
-// Build HTML off-DOM via DocumentFragment, then single append (1 reflow)
-function replaceWithFragment(container, htmlStr){
-  var frag = document.createDocumentFragment();
-  var temp;
-  // Table elements (<tr>, <td>) are invalid inside <div> — browser strips them.
-  // Use a proper table context so parsed DOM keeps row/cell structure.
-  var tag = container.tagName;
-  if(tag === 'TBODY' || tag === 'THEAD' || tag === 'TFOOT'){
-    temp = document.createElement('table');
-    temp.innerHTML = '<tbody>' + htmlStr + '</tbody>';
-    temp = temp.querySelector('tbody');
-  } else if(tag === 'TABLE'){
-    temp = document.createElement('table');
-    temp.innerHTML = htmlStr;
-  } else {
-    temp = document.createElement('div');
-    temp.innerHTML = htmlStr;
-  }
-  while(temp.firstChild) frag.appendChild(temp.firstChild);
-  container.textContent = '';
-  container.appendChild(frag);
-}
-
-function getBrand(){
-  return D.accounts.find(a => a.b) || D.accounts[0];
-}
-
-function getCompetitors(){
-  return D.accounts.filter(a => !a.b);
 }
 
 // ===== DATA LOADING (3-Tier: Cache -> Static JSON -> Apps Script API) =====

@@ -91,6 +91,8 @@ assert.ok(normalized.contentBreakdown.metmalbekasi, 'contentBreakdown should inc
 assert.ok(Object.prototype.hasOwnProperty.call(normalized.contentBreakdown.metmalbekasi, 'video'), 'contentBreakdown should map video count');
 assert.ok(normalized.trend.metmalbekasi.length === data.history.length, 'trend length should match history length');
 assert.ok(normalized.engTrend.metmalbekasi.length === data.history.length, 'engagement trend length should match history length');
+assert.equal(typeof sandbox.fmtFull, 'function', 'fmtFull should be loaded from ui utils module');
+assert.equal(typeof sandbox.getBrand, 'function', 'getBrand should be loaded from ui utils module');
 assert.equal(typeof sandbox.renderCards, 'function', 'renderCards should be loaded from render module');
 assert.equal(typeof sandbox.renderContentBreakdown, 'function', 'renderContentBreakdown should be loaded from render module');
 

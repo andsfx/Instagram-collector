@@ -5,6 +5,7 @@ const assert = require('assert');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const coreScript = fs.readFileSync(path.join(repoRoot, 'dashboard', 'js', 'data-core.js'), 'utf8');
+const uiUtilsScript = fs.readFileSync(path.join(repoRoot, 'dashboard', 'js', 'ui-utils.js'), 'utf8');
 const data = JSON.parse(fs.readFileSync(path.join(repoRoot, 'dashboard', 'data.json'), 'utf8'));
 
 const sandbox = {
@@ -24,6 +25,7 @@ const sandbox = {
 sandbox.window = sandbox;
 vm.createContext(sandbox);
 vm.runInContext(coreScript, sandbox);
+vm.runInContext(uiUtilsScript, sandbox);
 
 const validation = sandbox.validateDashboardRaw(data);
 assert.equal(validation.ok, true, 'v2 data should pass validation');
@@ -40,6 +42,8 @@ const cached = sandbox.loadFromCache();
 assert.ok(cached && cached.data, 'cache should load back saved payload');
 assert.equal(sandbox.isStaleLegacyCache({ version: 2 }), true, 'legacy payload should be stale');
 assert.equal(sandbox.shouldUseFreshPayload({ generated_at: 'A' }, { generated_at: 'A' }), false, 'same payload should not rerender');
+assert.equal(typeof sandbox.fmtFull, 'function', 'ui utils should expose fmtFull');
+assert.equal(typeof sandbox.getBrand, 'function', 'ui utils should expose getBrand');
 assert.equal(sandbox.shouldUseFreshPayload({ generated_at: 'A' }, { generated_at: 'B' }), true, 'new payload should rerender');
 
 console.log(JSON.stringify({
@@ -48,6 +52,7 @@ console.log(JSON.stringify({
     'data-core validation passes',
     'normalizeDashboardData maps accounts/dates/trend/engTrend/contentBreakdown',
     'cache helpers work',
+    'ui utils load correctly',
     'fresh payload comparison works'
   ]
 }, null, 2));
