@@ -922,13 +922,15 @@ function loadFromCache() {
     var raw = localStorage.getItem(CACHE_KEY);
     var ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0', 10);
     if (!raw || !ts) return null;
+    var parsed = JSON.parse(raw);
     var age = Date.now() - ts;
-    if (age > CACHE_MAX_AGE) {
+    var invalidLegacyV2 = parsed && parsed.version === 2 && !parsed.content_breakdown;
+    if (age > CACHE_MAX_AGE || invalidLegacyV2) {
       localStorage.removeItem(CACHE_KEY);
       localStorage.removeItem(CACHE_TS_KEY);
       return null;
     }
-    return { data: JSON.parse(raw), ageMs: age };
+    return { data: parsed, ageMs: age };
   } catch(e) { return null; }
 }
 
@@ -943,7 +945,7 @@ async function fetchWithTimeout(url, timeoutMs) {
   var controller = new AbortController();
   var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
   try {
-    var res = await fetch(url, { signal: controller.signal });
+    var res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
     clearTimeout(timer);
     return res;
   } catch(e) {
@@ -967,7 +969,7 @@ async function initDashboard() {
   // LAYER 2: Static data.json (primary source of truth)
   setDataSource('loading');
   try {
-    var res = await fetchWithTimeout(STATIC_JSON_URL, 5000);
+    var res = await fetchWithTimeout(STATIC_JSON_URL + '?v=' + Date.now(), 5000);
     if (!res.ok) throw new Error('Gagal memuat data.json (HTTP ' + res.status + ')');
     var raw = await res.json();
     if (!raw || !raw.accounts || raw.accounts.length === 0) {
