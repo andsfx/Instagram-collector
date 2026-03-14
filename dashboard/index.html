@@ -1789,15 +1789,15 @@ function renderH2H(){
 function renderContentBreakdown(){
   var el = document.getElementById('cbContent');
   if(!el) return;
-  if(!D.contentBreakdown){
+  if(!D.contentBreakdown || Object.keys(D.contentBreakdown).length === 0){
     el.innerHTML = '<div class="neo" style="padding:24px;text-align:center;color:var(--t3);font-size:13px">' +
       '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.5" style="margin-bottom:8px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><br>' +
       'Data content performance belum tersedia.<br><small>Data akan muncul setelah scraper berjalan dengan content_performance tracking.</small></div>';
     return;
   }
 
-  var types = ['reels','carousel','image'];
-  var typeLabels = {reels:'Reels',carousel:'Carousel',image:'Image'};
+  var types = ['reels','carousel','image','video'];
+  var typeLabels = {reels:'Reels',carousel:'Carousel',image:'Image',video:'Video'};
   var html = '<div class="cp-grid">';
 
   D.accounts.forEach(function(a){
@@ -2228,5 +2228,3 @@ function initRevealAnimations(){
 </html>
 
 
-function renderContentPerformance(){ return buildContentPerformance();
-  try { renderContentPerformance(); } catch(_) {} }
