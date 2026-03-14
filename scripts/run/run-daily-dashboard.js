@@ -14,6 +14,17 @@ function run(cmd, args, options = {}) {
   return out;
 }
 
+function extractTrailingJson(output) {
+  const text = String(output || '').trim();
+  for (let i = text.lastIndexOf('{'); i >= 0; i = text.lastIndexOf('{', i - 1)) {
+    const candidate = text.slice(i);
+    try {
+      return JSON.parse(candidate);
+    } catch (_) {}
+  }
+  return null;
+}
+
 function hasChanges(repoRoot, paths) {
   const out = execFileSync('git', ['status', '--porcelain', '--', ...paths], {
     cwd: repoRoot,
@@ -42,13 +53,15 @@ function main() {
   };
 
   if (!skipCollect) {
-    summary.hybridMaster = JSON.parse(run('node', [path.join(repoRoot, 'scripts', 'run', 'run-hybrid-master.js')], { cwd: repoRoot }).split('\n').slice(-1)[0] || '{}');
+    const hybridOut = run('node', [path.join(repoRoot, 'scripts', 'run', 'run-hybrid-master.js')], { cwd: repoRoot });
+    summary.hybridMaster = extractTrailingJson(hybridOut) || { status: 'unknown' };
   } else {
     console.log('\n>>> skip hybrid master (--skip-collect)');
     summary.hybridMaster = { status: 'skipped' };
   }
 
-  summary.dashboardBuild = JSON.parse(run('node', [path.join(repoRoot, 'scripts', 'export', 'build-dashboard-data.js')], { cwd: repoRoot }));
+  const buildOut = run('node', [path.join(repoRoot, 'scripts', 'export', 'build-dashboard-data.js')], { cwd: repoRoot });
+  summary.dashboardBuild = extractTrailingJson(buildOut) || { status: 'unknown' };
 
   const trackedPaths = ['dashboard/data.json'];
   summary.git.changed = hasChanges(repoRoot, trackedPaths);
