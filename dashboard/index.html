@@ -1026,6 +1026,7 @@ function adaptV2ToLegacyShape(raw){
       growthPct: g.pct_change_7d ?? 0
     };
   });
+  const dates = history.map((h) => h.date || '-');
   const trend = {};
   (raw.accounts || []).forEach((u) => { trend[u] = history.map((h) => (h[u] && h[u].followers) || 0); });
   const contentBreakdown = {};
@@ -1070,6 +1071,7 @@ function adaptV2ToLegacyShape(raw){
     ...raw,
     lastUpdate: raw.generated_at_wib || raw.generated_at || '-',
     accounts,
+    dates,
     trend,
     contentBreakdown
   };
