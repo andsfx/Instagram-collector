@@ -1,6 +1,22 @@
 const path = require('path');
 const { execFileSync } = require('child_process');
 
+function loadEnvFile(filePath) {
+  const fs = require('fs');
+  if (!fs.existsSync(filePath)) return;
+  const lines = fs.readFileSync(filePath, 'utf8').split(/\r?\n/);
+  for (const line of lines) {
+    if (!line || /^\s*#/.test(line)) continue;
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!m) continue;
+    let [, key, value] = m;
+    if ((value.startsWith(') && value.endsWith(')) || (value.startsWith(") && value.endsWith("))) {
+      value = value.slice(1, -1);
+    }
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
+
 function run(cmd, args, options = {}) {
   const label = [cmd, ...args].join(' ');
   console.log(`\n>>> ${label}`);
@@ -35,6 +51,9 @@ function hasChanges(repoRoot, paths) {
 
 function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
+  loadEnvFile(path.join(repoRoot, '.env.daily-dashboard'));
+  loadEnvFile(path.join(repoRoot, '.env'));
+
   const today = new Date().toISOString().slice(0, 10);
   const skipCollect = process.argv.includes('--skip-collect');
   const skipCommit = process.argv.includes('--skip-commit');
