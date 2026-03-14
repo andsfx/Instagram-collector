@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:dashboard",
-    "test:dashboard": "node ./scripts/test/dashboard-smoke.js"
+    "test:dashboard": "node ./scripts/test/dashboard-smoke.js && node ./scripts/test/dashboard-phase3-smoke.js"
   },
   "keywords": [],
   "author": "",

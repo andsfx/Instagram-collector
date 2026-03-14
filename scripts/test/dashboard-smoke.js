@@ -5,7 +5,9 @@ const assert = require('assert');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const html = fs.readFileSync(path.join(repoRoot, 'dashboard', 'index.html'), 'utf8');
-const script = html.split('<script>')[1].split('</script>')[0];
+const scripts = [...html.matchAll(/<script(?: src="([^"]+)")?>([\s\S]*?)<\/script>/g)];
+const coreScript = fs.readFileSync(path.join(repoRoot, 'dashboard', 'js', 'data-core.js'), 'utf8');
+const inlineScript = scripts[scripts.length - 1][2];
 const data = JSON.parse(fs.readFileSync(path.join(repoRoot, 'dashboard', 'data.json'), 'utf8'));
 
 function elementStub() {
@@ -21,6 +23,8 @@ function elementStub() {
     querySelectorAll() { return []; },
     getContext() { return {}; },
     addEventListener() {},
+    closest() { return elementStub(); },
+    parentElement: elementStub.__p || null,
     classList: { add() {}, remove() {}, toggle() {} }
   };
 }
@@ -61,32 +65,33 @@ const sandbox = {
   html2canvas: async () => ({}),
   jspdf: { jsPDF: function() {} }
 };
+sandbox.window = sandbox;
+sandbox.location = { search: '' };
+sandbox.window.location = sandbox.location;
+sandbox.addEventListener = function() {};
+sandbox.window.addEventListener = sandbox.addEventListener;
 sandbox.global = sandbox;
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
-vm.runInContext(script, sandbox);
+vm.runInContext(coreScript, sandbox);
+vm.runInContext(inlineScript, sandbox);
 
 const validation = sandbox.validateDashboardRaw(data);
 assert.equal(validation.ok, true, 'dashboard/data.json should pass frontend validation');
 
-const adapted = sandbox.adaptV2ToLegacyShape(data);
-assert.ok(Array.isArray(adapted.accounts), 'adapted.accounts should be array');
-assert.ok(Array.isArray(adapted.dates), 'adapted.dates should be array');
-assert.equal(adapted.dates.length, data.history.length, 'dates length should match history length');
-assert.ok(adapted.contentBreakdown.metmalbekasi, 'contentBreakdown should include metmalbekasi');
-assert.ok(Object.prototype.hasOwnProperty.call(adapted.contentBreakdown.metmalbekasi, 'video'), 'contentBreakdown should map video count');
-assert.ok(adapted.trend.metmalbekasi.length === data.history.length, 'trend length should match history length');
-assert.equal(sandbox.isStaleLegacyCache({ version: 2 }), true, 'legacy v2 cache without content_breakdown should be stale');
-assert.equal(sandbox.isStaleLegacyCache(data), false, 'current v2 payload should not be stale');
-assert.equal(sandbox.shouldUseFreshPayload({ generated_at: '2026-01-01T00:00:00Z' }, { generated_at: '2026-01-01T00:00:00Z' }), false, 'same generated_at should not force rerender');
-assert.equal(sandbox.shouldUseFreshPayload({ generated_at: '2026-01-01T00:00:00Z' }, { generated_at: '2026-01-02T00:00:00Z' }), true, 'different generated_at should rerender');
+const normalized = sandbox.normalizeDashboardData(data);
+assert.ok(Array.isArray(normalized.accounts), 'normalized.accounts should be array');
+assert.ok(Array.isArray(normalized.dates), 'normalized.dates should be array');
+assert.equal(normalized.dates.length, data.history.length, 'dates length should match history length');
+assert.ok(normalized.contentBreakdown.metmalbekasi, 'contentBreakdown should include metmalbekasi');
+assert.ok(Object.prototype.hasOwnProperty.call(normalized.contentBreakdown.metmalbekasi, 'video'), 'contentBreakdown should map video count');
+assert.ok(normalized.trend.metmalbekasi.length === data.history.length, 'trend length should match history length');
+assert.ok(normalized.engTrend.metmalbekasi.length === data.history.length, 'engagement trend length should match history length');
 
 console.log(JSON.stringify({
   ok: true,
   checks: [
     'frontend validation passes for current data.json',
-    'adapter maps dates/trend/contentBreakdown correctly',
-    'cache stale detection works',
-    'fresh payload comparison works'
+    'normalizeDashboardData maps dates/trend/engTrend/contentBreakdown correctly'
   ]
 }, null, 2));
