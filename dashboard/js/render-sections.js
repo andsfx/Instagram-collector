@@ -1,3 +1,31 @@
+function renderSummaryStrip(){
+  var el = document.getElementById('summaryStrip');
+  if(!el || !D || !D.accounts || !D.accounts.length) return;
+  var rankedFollowers = [...D.accounts].sort((a,b) => b.f - a.f);
+  var rankedER = [...D.accounts].sort((a,b) => (b.er||0) - (a.er||0));
+  var rankedGrowth = [...D.accounts].sort((a,b) => (b.growthAbs||0) - (a.growthAbs||0));
+  var topFollowers = rankedFollowers[0];
+  var topER = rankedER[0];
+  var topGrowth = rankedGrowth[0];
+  var formatTotals = { reels:0, carousel:0, image:0, video:0 };
+  Object.values(D.contentBreakdown || {}).forEach(function(cb){
+    ['reels','carousel','image','video'].forEach(function(t){
+      formatTotals[t] += Number(cb[t] || 0);
+    });
+  });
+  var topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0] || ['reels',0];
+  var cards = [
+    { k:'Top Followers', v:'@' + topFollowers.u, s: fmtFull(topFollowers.f) + ' followers', cls:'highlight' },
+    { k:'Top Engagement', v:'@' + topER.u, s: pct(topER.er || 0) + ' engagement rate' },
+    { k:'Fastest Growth', v:'@' + topGrowth.u, s: (topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(topGrowth.growthAbs || 0) + ' hari ini' },
+    { k:'Top Content Format', v: (topFormat[0] || 'reels').charAt(0).toUpperCase() + (topFormat[0] || 'reels').slice(1), s: fmtFull(topFormat[1] || 0) + ' post pada dataset terbaru' },
+    { k:'Freshness', v: D.latest && D.latest.date ? D.latest.date : '-', s: 'Sync ' + prettyLastUpdate(D.lastUpdate || '-') }
+  ];
+  el.innerHTML = cards.map(function(card){
+    return '<div class="summary-card ' + (card.cls || '') + '"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>';
+  }).join('');
+}
+
 // ===== OVERVIEW CARDS =====
 function renderCards(){
   const el = document.getElementById('cards');
@@ -525,7 +553,18 @@ function renderH2H(){
   ];
 
   var gap = Math.abs(aA.f - aB.f);
-  var html = '<table class="h2h-table"><tbody>';
+  var winsA = 0, winsB = 0;
+  metrics.forEach(function(m){ if (m.vA > m.vB) winsA += 1; else if (m.vB > m.vA) winsB += 1; });
+  var winner = winsA === winsB ? null : (winsA > winsB ? aA : aB);
+  var loser = winsA === winsB ? null : (winsA > winsB ? aB : aA);
+  var verdictHtml = '<div class="h2h-verdict"><div class="ttl">Quick Verdict</div><div class="txt">';
+  if (winner) {
+    verdictHtml += '@' + winner.u + ' unggul keseluruhan atas @' + loser.u + ' (' + (winsA > winsB ? winsA : winsB) + ' dari ' + metrics.length + ' metrik).';
+  } else {
+    verdictHtml += '@' + aA.u + ' dan @' + aB.u + ' masih berimbang pada metrik utama.';
+  }
+  verdictHtml += '</div><div class="sub">Selisih followers saat ini: ' + fmtFull(gap) + '. Periksa tren untuk melihat apakah gap sedang melebar atau menyempit.</div></div>';
+  var html = verdictHtml + '<table class="h2h-table"><tbody>';
   metrics.forEach(function(m){
     var winA = m.vA > m.vB;
     var winB = m.vB > m.vA;
@@ -566,8 +605,10 @@ function renderH2H(){
 // ===== CONTENT PERFORMANCE (Feature 3) =====
 function renderContentBreakdown(){
   var el = document.getElementById('cbContent');
+  var highlights = document.getElementById('contentHighlights');
   if(!el) return;
   if(!D.contentBreakdown || Object.keys(D.contentBreakdown).length === 0){
+    if (highlights) highlights.innerHTML = '';
     el.innerHTML = '<div class="neo" style="padding:24px;text-align:center;color:var(--t3);font-size:13px">' +
       '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.5" style="margin-bottom:8px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><br>' +
       'Data content performance belum tersedia.<br><small>Data belum tersedia pada dataset terbaru.</small></div>';
@@ -576,6 +617,27 @@ function renderContentBreakdown(){
 
   var types = ['reels','carousel','image','video'];
   var typeLabels = {reels:'Reels',carousel:'Carousel',image:'Image',video:'Video'};
+  var formatTotals = { reels:0, carousel:0, image:0, video:0 };
+  var bestOwner = null;
+  Object.entries(D.contentBreakdown).forEach(function(entry){
+    var username = entry[0];
+    var cb = entry[1] || {};
+    types.forEach(function(t){ formatTotals[t] += Number(cb[t] || 0); });
+    if (cb.bestPost && cb.bestPost.likes > 0) {
+      if (!bestOwner || (cb.bestPost.likes || 0) > (bestOwner.likes || 0)) {
+        bestOwner = { username: username, likes: cb.bestPost.likes || 0, type: cb.bestPost.type || '' };
+      }
+    }
+  });
+  var topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0] || ['reels',0];
+  var mostEfficient = Object.entries(D.contentBreakdown).sort(function(a,b){ return (b[1].avgER || 0) - (a[1].avgER || 0); })[0];
+  if (highlights) {
+    highlights.innerHTML = [
+      { k:'Format Terbanyak', v:typeLabels[topFormat[0]] || topFormat[0], s:fmtFull(topFormat[1]) + ' post' },
+      { k:'ER Tertinggi', v:mostEfficient ? ('@' + mostEfficient[0]) : '—', s:mostEfficient ? pct(mostEfficient[1].avgER || 0) : '—' },
+      { k:'Best Post Owner', v:bestOwner ? ('@' + bestOwner.username) : '—', s:bestOwner ? (fmtFull(bestOwner.likes) + ' likes · ' + ((typeLabels[bestOwner.type] || bestOwner.type || 'Post'))) : '—' }
+    ].map(function(card){ return '<div class="cp-mini"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>'; }).join('');
+  }
   var html = '<div class="cp-grid">';
 
   D.accounts.forEach(function(a){
@@ -592,10 +654,11 @@ function renderContentBreakdown(){
     if(maxER === 0) maxER = 1;
 
     html += '<div class="cp-card">';
+    var topType = types.slice().sort(function(x,y){ return (cb[y] || 0) - (cb[x] || 0); })[0];
     // Header
     html += '<div class="cp-hdr">' +
       '<span class="cp-user">@' + a.u + '</span>' +
-      '<span class="cp-er-badge">ER ' + pct(cb.avgER || 0) + '</span>' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cp-topformat">Top Format: ' + (typeLabels[topType] || topType) + '</span><span class="cp-er-badge">ER ' + pct(cb.avgER || 0) + '</span></div>' +
       '</div>';
     // Body: per-type table
     html += '<div class="cp-body">';
@@ -619,6 +682,8 @@ function renderContentBreakdown(){
         '</tr>';
     });
     html += '</tbody></table>';
+
+    html += '<div class="cp-insight">Format paling aktif: <strong>' + (typeLabels[topType] || topType) + '</strong> · total ' + fmtFull(cb[topType] || 0) + ' post</div>';
 
     // Best post
     if(bp.url && bp.likes > 0){

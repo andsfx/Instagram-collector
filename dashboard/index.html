@@ -121,6 +121,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .debug-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
 .debug-item .k{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .debug-item .v{font-size:13px;color:var(--t1);font-weight:700;word-break:break-word}
+.summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}.summary-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}.summary-card .k{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700}.summary-card .v{font-size:18px;color:var(--t1);font-weight:800;line-height:1.25}.summary-card .s{font-size:12px;color:var(--t2);margin-top:6px}.summary-card.highlight{background:linear-gradient(135deg,rgba(225,48,108,.06),rgba(131,58,180,.05))}.summary-card .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(225,48,108,.08);color:var(--ig-pink);font-size:11px;font-weight:700;margin-top:8px}
+.h2h-verdict{margin-bottom:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(64,93,230,.06),rgba(225,48,108,.06));border:1px solid rgba(131,58,180,.14);border-radius:var(--radius);box-shadow:var(--shadow)}.h2h-verdict .ttl{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);font-weight:700;margin-bottom:6px}.h2h-verdict .txt{font-size:14px;color:var(--t1);font-weight:700;line-height:1.5}.h2h-verdict .sub{font-size:12px;color:var(--t2);margin-top:6px}
+.cp-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:16px}.cp-mini{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}.cp-mini .k{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700}.cp-mini .v{font-size:16px;color:var(--t1);font-weight:800}.cp-mini .s{font-size:12px;color:var(--t2);margin-top:4px}.cp-topformat{font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:rgba(64,93,230,.08);color:#405DE6}.cp-insight{margin-top:10px;font-size:12px;color:var(--t2);font-weight:600}
 
 /* Filter */
 .fbar{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px;flex-wrap:wrap}
@@ -551,6 +554,7 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 <!-- ===== SECTION 1: OVERVIEW ===== -->
 <div class="sec-group" id="sec-overview">
 <div class="sec-group-header reveal rv-left"><div class="sec-num">1</div><div class="sec-label">Overview</div><div class="sec-desc">Ringkasan followers, growth velocity & ranking</div></div>
+<section class="summary-strip reveal rv-up" id="summaryStrip"></section>
 
 <!-- OVERVIEW CARDS -->
 <section class="cards-s reveal rv-up">
@@ -664,6 +668,7 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 <section class="cb-sec reveal rv-up">
   <div class="stitle"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FCAF45" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>Content Performance</div>
   <p style="margin:-8px 0 16px 0;font-size:12px;color:var(--t3)">Berdasarkan analisis 12 post terakhir dari masing-masing akun</p>
+  <div class="cp-strip" id="contentHighlights"></div>
   <div id="cbContent"></div>
 </section>
 
@@ -913,6 +918,7 @@ function setF(f){
 // Splits render into sequential batches to avoid blocking the main thread
 function render(){
   // Batch 1: Critical above-the-fold content (immediate)
+  renderSummaryStrip();
   renderCards();
   renderGrowthVelocity();
 
