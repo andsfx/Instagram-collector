@@ -114,6 +114,13 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .hdr-btn:hover{box-shadow:var(--shadow-md);color:var(--t1);transform:translateY(-1px)}
 .hdr-btn svg{width:16px;height:16px;flex-shrink:0}
 .hdr-btn.active{background:var(--ig-gradient);color:#FFF;border-color:transparent}
+.hdr-btn.debug-only{display:none}
+.debug-panel{display:none;max-width:780px;margin:14px auto 0;text-align:left;background:var(--card);border:1px dashed var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.debug-panel.open{display:block}
+.debug-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.debug-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+.debug-item .k{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.debug-item .v{font-size:13px;color:var(--t1);font-weight:700;word-break:break-word}
 
 /* Filter */
 .fbar{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px;flex-wrap:wrap}
@@ -487,6 +494,10 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
       <svg id="darkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <span id="darkLabel">Dark Mode</span>
     </button>
+    <button class="hdr-btn" onclick="forceRefreshData()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"/></svg>
+      Refresh Data
+    </button>
     <button class="hdr-btn" onclick="exportPNG()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Export PNG
@@ -495,7 +506,12 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Export PDF
     </button>
+    <button class="hdr-btn debug-only" id="debugToggleBtn" onclick="toggleDebugPanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 4 12.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26A7 7 0 0 1 12 2z"/></svg>
+      Debug Info
+    </button>
   </div>
+  <div class="debug-panel" id="debugPanel"></div>
 </header>
 
 <div id="dashboard" style="display:none">
@@ -698,6 +714,8 @@ let sortAsc = false;
 let chartInstances = {};
 const COLORS = ['#E1306C','#833AB4','#405DE6','#F77737','#FCAF45','#5B51D8','#FD1D1D','#2ecc71','#00376B','#C13584'];
 const DEFAULTS = {gapFollow:500, erDrop:20, growthSpike:5, followChange:3};
+const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
+const REQUIRED_ACCOUNTS = ['metmalbekasi','grandmetropolitan','metmalcileungsi','summareconmal.bekasi','pakuwonmallbekasi'];
 
 // ===== DYNAMIC SCRIPT LOADER =====
 var _scriptCache = {};
@@ -887,13 +905,71 @@ function prettyLastUpdate(v){
     return String(v);
   }
 }
-function setFreshnessBadge(type){
+function setFreshnessBadge(type, extra){
   var el = document.getElementById('freshnessBadge');
   if (!el) return;
   el.className = 'status-badge ' + type;
-  if (type === 'fresh') el.textContent = 'Fresh data';
-  else if (type === 'cached') el.textContent = 'Cached view';
-  else el.textContent = 'Load issue';
+  if (type === 'fresh') el.textContent = extra ? ('Live • ' + extra) : 'Live';
+  else if (type === 'cached') el.textContent = extra ? ('Cache • ' + extra) : 'Cache';
+  else el.textContent = extra ? ('Issue • ' + extra) : 'Load issue';
+}
+
+function clearDashboardCache() {
+  try {
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(CACHE_TS_KEY);
+  } catch(e) {}
+}
+
+function todayWibDate(){
+  var now = new Date();
+  var wib = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+  var yyyy = wib.getUTCFullYear();
+  var mm = String(wib.getUTCMonth() + 1).padStart(2, '0');
+  var dd = String(wib.getUTCDate()).padStart(2, '0');
+  return yyyy + '-' + mm + '-' + dd;
+}
+
+function validateDashboardRaw(raw){
+  var issues = [];
+  if (!raw || typeof raw !== 'object') issues.push('Payload bukan object');
+  if (!raw || raw.version !== 2) issues.push('Schema version bukan v2');
+  if (!raw || !Array.isArray(raw.accounts) || raw.accounts.length === 0) issues.push('accounts kosong');
+  if (!raw || !raw.latest || !raw.latest.date) issues.push('latest.date tidak ada');
+  if (!raw || !raw.generated_at_wib) issues.push('generated_at_wib tidak ada');
+  var accounts = raw && Array.isArray(raw.accounts) ? raw.accounts : [];
+  REQUIRED_ACCOUNTS.forEach(function(u){ if (accounts.indexOf(u) === -1) issues.push('akun wajib hilang: ' + u); });
+  return { ok: issues.length === 0, issues: issues };
+}
+
+function renderDebugPanel(source, raw, extra){
+  var panel = document.getElementById('debugPanel');
+  var btn = document.getElementById('debugToggleBtn');
+  if (!panel || !btn) return;
+  if (!DEBUG_MODE) {
+    panel.classList.remove('open');
+    btn.style.display = 'none';
+    return;
+  }
+  btn.style.display = 'inline-flex';
+  var payload = raw || {};
+  var accounts = Array.isArray(payload.accounts) ? payload.accounts : [];
+  var validation = validateDashboardRaw(payload);
+  panel.innerHTML = '<div class="debug-grid">' +
+    '<div class="debug-item"><div class="k">Source</div><div class="v">' + (source || 'unknown') + '</div></div>' +
+    '<div class="debug-item"><div class="k">Generated WIB</div><div class="v">' + (payload.generated_at_wib || '—') + '</div></div>' +
+    '<div class="debug-item"><div class="k">Latest Date</div><div class="v">' + ((payload.latest && payload.latest.date) || '—') + '</div></div>' +
+    '<div class="debug-item"><div class="k">Accounts Loaded</div><div class="v">' + accounts.length + '</div></div>' +
+    '<div class="debug-item"><div class="k">Schema</div><div class="v">v' + (payload.version || '—') + '</div></div>' +
+    '<div class="debug-item"><div class="k">Validation</div><div class="v">' + (validation.ok ? 'ok' : validation.issues.join('; ')) + '</div></div>' +
+    '<div class="debug-item"><div class="k">Expected Today (WIB)</div><div class="v">' + todayWibDate() + '</div></div>' +
+    '<div class="debug-item"><div class="k">Note</div><div class="v">' + (extra || '—') + '</div></div>' +
+    '</div>';
+}
+
+function toggleDebugPanel(){
+  var panel = document.getElementById('debugPanel');
+  if (panel) panel.classList.toggle('open');
 }
 
 function setDataSource(type, extra) {
@@ -904,7 +980,7 @@ function setDataSource(type, extra) {
   var labels = {
     loading: 'Memuat...',
     cached: 'Cache lokal' + (extra ? ' (' + extra + ')' : ''),
-    static: 'Static JSON (fast)',
+    static: 'Data terbaru',
     live: 'Live source (deprecated)'
   };
   txt.textContent = labels[type] || type;
@@ -954,12 +1030,32 @@ async function fetchWithTimeout(url, timeoutMs) {
   }
 }
 
+async function forceRefreshData() {
+  clearDashboardCache();
+  setDataSource('loading');
+  setFreshnessBadge('fresh', 'refreshing');
+  document.getElementById('lastUpdate').textContent = 'Menyegarkan data terbaru…';
+  try {
+    var res = await fetchWithTimeout('./data.json?v=' + Date.now(), 8000);
+    if (!res.ok) throw new Error('Gagal memuat data.json (HTTP ' + res.status + ')');
+    var raw = await res.json();
+    var validation = validateDashboardRaw(raw);
+    if (!validation.ok) throw new Error('Schema dashboard tidak valid: ' + validation.issues.join('; '));
+    saveToCache(raw);
+    setDataSource('static');
+    onData(raw, 'static');
+  } catch(e) {
+    onError(e);
+  }
+}
+
 async function initDashboard() {
   // LAYER 1: localStorage cache (instant)
   var cached = loadFromCache();
   if (cached) {
     setDataSource('cached', formatAge(cached.ageMs));
     onData(cached.data, 'cached');
+    renderDebugPanel('cached', cached.data, 'loaded from local cache');
     var sub = document.getElementById('sub');
     if (sub) sub.textContent = 'Menampilkan cache lokal, mengecek data terbaru…';
     silentRefresh();
@@ -972,8 +1068,9 @@ async function initDashboard() {
     var res = await fetchWithTimeout(STATIC_JSON_URL + '?v=' + Date.now(), 5000);
     if (!res.ok) throw new Error('Gagal memuat data.json (HTTP ' + res.status + ')');
     var raw = await res.json();
-    if (!raw || !raw.accounts || raw.accounts.length === 0) {
-      throw new Error('data.json kosong atau tidak valid');
+    var validation = validateDashboardRaw(raw);
+    if (!validation.ok) {
+      throw new Error('Schema dashboard tidak valid: ' + validation.issues.join('; '));
     }
     saveToCache(raw);
     setDataSource('static');
@@ -985,22 +1082,24 @@ async function initDashboard() {
 }
 
 async function silentRefresh() {
-  var currentLastUpdate = D && D.lastUpdate ? D.lastUpdate : null;
+  var currentGeneratedAt = D && D.generated_at ? D.generated_at : null;
   try {
     var res = await fetchWithTimeout('./data.json?v=' + Date.now(), 5000);
     if (!res.ok) return;
     var raw = await res.json();
-    if (!raw || !raw.accounts || raw.accounts.length === 0) return;
-    if (currentLastUpdate && raw.lastUpdate === currentLastUpdate) {
+    var validation = validateDashboardRaw(raw);
+    if (!validation.ok) return;
+    if (currentGeneratedAt && raw.generated_at === currentGeneratedAt) {
       saveToCache(raw);
+      setFreshnessBadge('fresh', raw.latest && raw.latest.date ? raw.latest.date : todayWibDate());
+      renderDebugPanel('static', raw, 'no data change detected');
       return;
     }
     saveToCache(raw);
     setDataSource('static');
     onData(raw, 'static');
   } catch(e) {
-    var sub = document.getElementById('sub');
-    if (sub && D) sub.textContent = 'Gagal mengambil data terbaru, menampilkan cache lokal.';
+    setFreshnessBadge('cached', 'fallback');
   }
 }
 
@@ -1070,6 +1169,7 @@ function adaptV2ToLegacyShape(raw){
   return {
     ...raw,
     lastUpdate: raw.generated_at_wib || raw.generated_at || '-',
+    generated_at: raw.generated_at || null,
     accounts,
     dates,
     trend,
@@ -1078,10 +1178,16 @@ function adaptV2ToLegacyShape(raw){
 }
 
 function onData(raw, source){
+  var parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  var validation = validateDashboardRaw(parsed);
+  if (!validation.ok) {
+    onError(new Error('Schema dashboard tidak valid: ' + validation.issues.join('; ')), parsed);
+    return;
+  }
   try {
-    D = adaptV2ToLegacyShape(typeof raw === 'string' ? JSON.parse(raw) : raw);
+    D = adaptV2ToLegacyShape(parsed);
   } catch(e){
-    onError(e);
+    onError(e, parsed);
     return;
   }
   document.getElementById('loadingState').style.display = 'none';
@@ -1091,17 +1197,22 @@ function onData(raw, source){
   updateDarkBtn(document.documentElement.getAttribute('data-theme') || 'light');
 
   // Last update
-  document.getElementById('lastUpdate').textContent = 'Terakhir diperbarui: ' + (D.lastUpdate || '-');
+  document.getElementById('lastUpdate').textContent = 'Terakhir diperbarui: ' + prettyLastUpdate(D.lastUpdate || '-');
+  if (source === 'cached') setFreshnessBadge('cached', formatAge(Date.now() - parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10)));
+  else setFreshnessBadge('fresh', parsed.latest && parsed.latest.date ? parsed.latest.date : todayWibDate());
+  renderDebugPanel(source, parsed, validation.ok ? 'schema ok' : validation.issues.join('; '));
 
   render();
 }
 
-function onError(e){
+function onError(e, raw){
   document.getElementById('loadingState').innerHTML =
     '<div class="error-box"><strong>Gagal memuat data</strong><br><br>'+
     (e && e.message ? e.message : 'Terjadi kesalahan. Silakan refresh halaman.')+
-    '<br><br><button onclick="location.reload()" style="padding:8px 20px;border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:var(--radius-pill);cursor:pointer;font-weight:600;font-family:inherit">Refresh</button></div>';
+    '<br><br><button onclick="forceRefreshData()" style="padding:8px 20px;border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:var(--radius-pill);cursor:pointer;font-weight:600;font-family:inherit">Force refresh</button></div>';
+  setFreshnessBadge('error', 'perlu refresh');
   setDataSource('loading');
+  renderDebugPanel('error', raw || null, e && e.message ? e.message : 'unknown error');
 }
 
 // ===== FILTER =====
@@ -2110,6 +2221,10 @@ window.addEventListener('DOMContentLoaded', function(){
   if(saved === 'dark'){
     document.documentElement.setAttribute('data-theme', 'dark');
     updateDarkBtn('dark');
+  }
+  if (DEBUG_MODE) {
+    var debugBtn = document.getElementById('debugToggleBtn');
+    if (debugBtn) debugBtn.style.display = 'inline-flex';
   }
   // Load data
   initDashboard();
