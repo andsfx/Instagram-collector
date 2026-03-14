@@ -500,9 +500,44 @@ function mkProjection(){
 }
 
 // ===== HEAD-TO-HEAD (Feature 5) =====
+function getH2HMetricOptions(){
+  return {
+    followers: { label: 'Followers', value: function(a){ return a.f || 0; }, series: function(u){ return (D.trend && D.trend[u]) || []; }, formatter: fmtFull, sub: 'Perbandingan followers seiring waktu' },
+    engagement: { label: 'Engagement Rate', value: function(a){ return a.er || 0; }, series: function(u){ return (D.engTrend && D.engTrend[u]) || []; }, formatter: function(v){ return fmtPct(v, 3); }, sub: 'Perbandingan engagement rate seiring waktu' },
+    avgLikes: { label: 'Avg Likes', value: function(a){ return a.al || 0; }, series: function(){ return []; }, formatter: fmtFull, sub: 'Metrik perbandingan ringkas untuk rata-rata likes' },
+    growth: { label: 'Growth', value: function(a){ return a.growthPct || 0; }, series: function(){ return []; }, formatter: function(v){ return pct(v || 0); }, sub: 'Metrik perbandingan ringkas untuk growth periodik' }
+  };
+}
+
+function setH2HPreset(kind){
+  var brand = getBrand();
+  var comps = getCompetitors();
+  var selA = document.getElementById('h2hA');
+  var selB = document.getElementById('h2hB');
+  if (!selA || !selB || !brand) return;
+  if (kind === 'brand-top-followers') {
+    var topFollowers = comps.slice().sort(function(a,b){ return (b.f||0) - (a.f||0); })[0];
+    if (topFollowers) { selA.value = brand.u; selB.value = topFollowers.u; }
+  } else if (kind === 'brand-top-er') {
+    var topER = comps.slice().sort(function(a,b){ return (b.er||0) - (a.er||0); })[0];
+    if (topER) { selA.value = brand.u; selB.value = topER.u; }
+  } else if (kind === 'top-two') {
+    var ranked = D.accounts.slice().sort(function(a,b){ return (b.f||0) - (a.f||0); });
+    if (ranked[0] && ranked[1]) { selA.value = ranked[0].u; selB.value = ranked[1].u; }
+  }
+  renderH2H();
+}
+
+function setH2HMetric(metric){
+  h2hMetric = metric;
+  renderH2H();
+}
+
 function renderH2HSelectors(){
   var selA = document.getElementById('h2hA');
   var selB = document.getElementById('h2hB');
+  var presetsEl = document.getElementById('h2hPresets');
+  var metricsEl = document.getElementById('h2hMetrics');
   if(!selA || !selB) return;
   var prev = [selA.value, selB.value];
   selA.innerHTML = '';
@@ -514,7 +549,6 @@ function renderH2HSelectors(){
     selA.appendChild(optA);
     selB.appendChild(optB);
   });
-  // Default: brand vs first competitor
   if(prev[0] && Array.from(selA.options).some(function(o){ return o.value === prev[0]; })){
     selA.value = prev[0];
   } else {
@@ -527,6 +561,26 @@ function renderH2HSelectors(){
     var comps = getCompetitors();
     if(comps.length > 0) selB.value = comps[0].u;
   }
+  if (presetsEl) {
+    var presets = [
+      { id: 'brand-top-followers', label: 'Brand vs Top Followers' },
+      { id: 'brand-top-er', label: 'Brand vs Top ER' },
+      { id: 'top-two', label: 'Top 2 Accounts' }
+    ];
+    presetsEl.innerHTML = presets.map(function(p){ return '<button class="h2h-chip" data-preset="' + p.id + '">' + p.label + '</button>'; }).join('');
+    Array.from(presetsEl.querySelectorAll('.h2h-chip')).forEach(function(btn){
+      btn.addEventListener('click', function(){ setH2HPreset(btn.getAttribute('data-preset')); });
+    });
+  }
+  if (metricsEl) {
+    var metricOptions = getH2HMetricOptions();
+    metricsEl.innerHTML = Object.keys(metricOptions).map(function(key){
+      return '<button class="h2h-chip ' + (h2hMetric === key ? 'active' : '') + '" data-metric="' + key + '">' + metricOptions[key].label + '</button>';
+    }).join('');
+    Array.from(metricsEl.querySelectorAll('.h2h-chip')).forEach(function(btn){
+      btn.addEventListener('click', function(){ setH2HMetric(btn.getAttribute('data-metric')); });
+    });
+  }
 }
 
 function renderH2H(){
@@ -534,16 +588,24 @@ function renderH2H(){
   var uB = document.getElementById('h2hB').value;
   var grid = document.getElementById('h2hGrid');
   var header = document.getElementById('h2hHeader');
+  var metricSub = document.getElementById('h2hTrendSub');
+  var metricsEl = document.getElementById('h2hMetrics');
   if(!uA || !uB || !grid) return;
   var aA = D.accounts.find(function(a){ return a.u === uA; });
   var aB = D.accounts.find(function(a){ return a.u === uB; });
   if(!aA || !aB){ grid.innerHTML = ''; if(header) header.innerHTML = ''; return; }
+  if (metricsEl) {
+    Array.from(metricsEl.querySelectorAll('.h2h-chip')).forEach(function(btn){
+      btn.classList.toggle('active', btn.textContent === getH2HMetricOptions()[h2hMetric].label);
+    });
+  }
 
-  // Render header with account names
   if(header){
     header.innerHTML = '<div class="h2h-name">@' + uA + '</div><div class="h2h-badge">VS</div><div class="h2h-name">@' + uB + '</div>';
   }
 
+  var metricOptions = getH2HMetricOptions();
+  var activeMetric = metricOptions[h2hMetric] || metricOptions.followers;
   var metrics = [
     { label: 'Followers', vA: aA.f, vB: aB.f, fmt: fmtFull },
     { label: 'Following', vA: aA.fo || 0, vB: aB.fo || 0, fmt: fmtFull },
@@ -557,13 +619,15 @@ function renderH2H(){
   metrics.forEach(function(m){ if (m.vA > m.vB) winsA += 1; else if (m.vB > m.vA) winsB += 1; });
   var winner = winsA === winsB ? null : (winsA > winsB ? aA : aB);
   var loser = winsA === winsB ? null : (winsA > winsB ? aB : aA);
+  var activeA = activeMetric.value(aA);
+  var activeB = activeMetric.value(aB);
   var verdictHtml = '<div class="h2h-verdict"><div class="ttl">Quick Verdict</div><div class="txt">';
   if (winner) {
     verdictHtml += '@' + winner.u + ' unggul keseluruhan atas @' + loser.u + ' (' + (winsA > winsB ? winsA : winsB) + ' dari ' + metrics.length + ' metrik).';
   } else {
     verdictHtml += '@' + aA.u + ' dan @' + aB.u + ' masih berimbang pada metrik utama.';
   }
-  verdictHtml += '</div><div class="sub">Selisih followers saat ini: ' + fmtFull(gap) + '. Periksa tren untuk melihat apakah gap sedang melebar atau menyempit.</div></div>';
+  verdictHtml += '</div><div class="sub">Pada metrik aktif <strong>' + activeMetric.label + '</strong>, ' + (activeA === activeB ? 'keduanya masih imbang.' : ('@' + (activeA > activeB ? aA.u : aB.u) + ' lebih unggul dengan nilai ' + activeMetric.formatter((activeA > activeB ? activeA : activeB)))) + '</div></div>';
   var html = verdictHtml + '<table class="h2h-table"><tbody>';
   metrics.forEach(function(m){
     var winA = m.vA > m.vB;
@@ -575,16 +639,17 @@ function renderH2H(){
       '<td class="' + (winB ? 'h2h-win' : '') + '">' + m.fmt(m.vB) + '</td>' +
     '</tr>';
   });
-  // Gap row
   html += '<tr class="h2h-gap"><td colspan="3">Selisih Followers: ' + fmtFull(gap) + '</td></tr>';
   html += '</tbody></table>';
   replaceWithFragment(grid, html);
 
-  // H2H Trend Chart
   destroyChart('h2h');
   var ctx = document.getElementById('chH2H').getContext('2d');
-  if(!D.trend || !D.trend[uA] || !D.trend[uB]){
-    ctx.canvas.parentElement.querySelector('.chcon').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px">Data trend belum tersedia</div>';
+  var seriesA = activeMetric.series(uA);
+  var seriesB = activeMetric.series(uB);
+  if (metricSub) metricSub.textContent = activeMetric.sub;
+  if(!seriesA || !seriesA.length || !seriesB || !seriesB.length){
+    ctx.canvas.parentElement.querySelector('.chcon').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px">Trend untuk metrik ini belum tersedia</div>';
     return;
   }
   var idxA = D.accounts.indexOf(aA);
@@ -594,8 +659,8 @@ function renderH2H(){
     data: {
       labels: D.dates,
       datasets: [
-        { label: '@'+uA, data: D.trend[uA], borderColor: COLORS[idxA % COLORS.length], borderWidth: 3, fill: false, tension: 0.3, pointRadius: 3 },
-        { label: '@'+uB, data: D.trend[uB], borderColor: COLORS[idxB % COLORS.length], borderWidth: 3, fill: false, tension: 0.3, pointRadius: 3 }
+        { label: '@'+uA, data: seriesA, borderColor: COLORS[idxA % COLORS.length], borderWidth: 3, fill: false, tension: 0.3, pointRadius: 3 },
+        { label: '@'+uB, data: seriesB, borderColor: COLORS[idxB % COLORS.length], borderWidth: 3, fill: false, tension: 0.3, pointRadius: 3 }
       ]
     },
     options: chartDefaults()
