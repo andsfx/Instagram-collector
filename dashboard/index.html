@@ -1026,11 +1026,50 @@ function adaptV2ToLegacyShape(raw){
   });
   const trend = {};
   (raw.accounts || []).forEach((u) => { trend[u] = history.map((h) => (h[u] && h[u].followers) || 0); });
+  const contentBreakdown = {};
+  Object.entries(raw.content_breakdown || {}).forEach(([u, cb]) => {
+    contentBreakdown[u] = {
+      reels: cb.reels ?? 0,
+      carousel: cb.carousel ?? 0,
+      image: cb.image ?? 0,
+      video: cb.video ?? 0,
+      avgER: cb.engagement_rate ?? 0,
+      typePerf: {
+        reels: {
+          avgLikes: cb.reels_avg_likes ?? 0,
+          avgComments: cb.reels_avg_comments ?? 0,
+          er: cb.reels_er ?? 0
+        },
+        carousel: {
+          avgLikes: cb.carousel_avg_likes ?? 0,
+          avgComments: cb.carousel_avg_comments ?? 0,
+          er: cb.carousel_er ?? 0
+        },
+        image: {
+          avgLikes: cb.image_avg_likes ?? 0,
+          avgComments: cb.image_avg_comments ?? 0,
+          er: cb.image_er ?? 0
+        },
+        video: {
+          avgLikes: cb.video_avg_likes ?? 0,
+          avgComments: cb.video_avg_comments ?? 0,
+          er: cb.video_er ?? 0
+        }
+      },
+      bestPost: {
+        url: cb.best_post_url || '',
+        type: cb.best_post_type || '',
+        likes: cb.best_post_likes ?? 0,
+        comments: cb.best_post_comments ?? 0
+      }
+    };
+  });
   return {
     ...raw,
     lastUpdate: raw.generated_at_wib || raw.generated_at || '-',
     accounts,
-    trend
+    trend,
+    contentBreakdown
   };
 }
 
