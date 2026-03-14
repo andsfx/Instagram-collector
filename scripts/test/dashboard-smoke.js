@@ -6,8 +6,6 @@ const assert = require('assert');
 const repoRoot = path.resolve(__dirname, '..', '..');
 const html = fs.readFileSync(path.join(repoRoot, 'dashboard', 'index.html'), 'utf8');
 const scripts = [...html.matchAll(/<script(?: src="([^"]+)")?>([\s\S]*?)<\/script>/g)];
-const coreScript = fs.readFileSync(path.join(repoRoot, 'dashboard', 'js', 'data-core.js'), 'utf8');
-const inlineScript = scripts[scripts.length - 1][2];
 const data = JSON.parse(fs.readFileSync(path.join(repoRoot, 'dashboard', 'data.json'), 'utf8'));
 
 function elementStub() {
@@ -18,13 +16,15 @@ function elementStub() {
     style: {},
     dataset: {},
     value: '',
-    appendChild() {},
+    options: [],
+    appendChild(node) { this.options.push(node); },
     querySelector() { return elementStub(); },
     querySelectorAll() { return []; },
     getContext() { return {}; },
     addEventListener() {},
     closest() { return elementStub(); },
-    parentElement: elementStub.__p || null,
+    cloneNode() { return elementStub(); },
+    parentElement: null,
     classList: { add() {}, remove() {}, toggle() {} }
   };
 }
@@ -37,20 +37,9 @@ const sandbox = {
     setItem(k, v) { this._s[k] = String(v); },
     removeItem(k) { delete this._s[k]; }
   },
-  window: {
-    location: { search: '' },
-    addEventListener() {},
-    scrollY: 0
-  },
-  document: {
-    body: { classList: { add() {} } },
-    documentElement: { setAttribute() {}, getAttribute() { return 'light'; } },
-    head: { appendChild() {} },
-    createElement() { return elementStub(); },
-    getElementById() { return elementStub(); },
-    querySelector() { return elementStub(); },
-    querySelectorAll() { return []; }
-  },
+  location: { search: '' },
+  addEventListener() {},
+  scrollY: 0,
   URLSearchParams,
   Date,
   Math,
@@ -65,16 +54,31 @@ const sandbox = {
   html2canvas: async () => ({}),
   jspdf: { jsPDF: function() {} }
 };
+sandbox.document = {
+  body: { classList: { add() {} } },
+  documentElement: { setAttribute() {}, getAttribute() { return 'light'; } },
+  head: { appendChild() {} },
+  createElement() { return elementStub(); },
+  getElementById() { return elementStub(); },
+  querySelector() { return elementStub(); },
+  querySelectorAll() { return []; }
+};
 sandbox.window = sandbox;
-sandbox.location = { search: '' };
 sandbox.window.location = sandbox.location;
-sandbox.addEventListener = function() {};
 sandbox.window.addEventListener = sandbox.addEventListener;
 sandbox.global = sandbox;
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
-vm.runInContext(coreScript, sandbox);
-vm.runInContext(inlineScript, sandbox);
+
+for (const match of scripts) {
+  const src = match[1];
+  const inline = match[2];
+  let code = '';
+  if (src) code = fs.readFileSync(path.join(repoRoot, 'dashboard', src.replace(/^\.\//, '')), 'utf8');
+  else code = inline;
+  if (!code.trim()) continue;
+  vm.runInContext(code, sandbox);
+}
 
 const validation = sandbox.validateDashboardRaw(data);
 assert.equal(validation.ok, true, 'dashboard/data.json should pass frontend validation');
@@ -87,11 +91,14 @@ assert.ok(normalized.contentBreakdown.metmalbekasi, 'contentBreakdown should inc
 assert.ok(Object.prototype.hasOwnProperty.call(normalized.contentBreakdown.metmalbekasi, 'video'), 'contentBreakdown should map video count');
 assert.ok(normalized.trend.metmalbekasi.length === data.history.length, 'trend length should match history length');
 assert.ok(normalized.engTrend.metmalbekasi.length === data.history.length, 'engagement trend length should match history length');
+assert.equal(typeof sandbox.renderCards, 'function', 'renderCards should be loaded from render module');
+assert.equal(typeof sandbox.renderContentBreakdown, 'function', 'renderContentBreakdown should be loaded from render module');
 
 console.log(JSON.stringify({
   ok: true,
   checks: [
     'frontend validation passes for current data.json',
-    'normalizeDashboardData maps dates/trend/engTrend/contentBreakdown correctly'
+    'normalizeDashboardData maps dates/trend/engTrend/contentBreakdown correctly',
+    'render module functions are loaded from external script'
   ]
 }, null, 2));
