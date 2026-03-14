@@ -930,6 +930,20 @@ function todayWibDate(){
   return yyyy + '-' + mm + '-' + dd;
 }
 
+function getCacheAgeMs(ts){
+  return Date.now() - ts;
+}
+
+function isStaleLegacyCache(parsed){
+  return !!(parsed && parsed.version === 2 && !parsed.content_breakdown);
+}
+
+function shouldUseFreshPayload(currentRaw, nextRaw){
+  if (!currentRaw || !currentRaw.generated_at) return true;
+  if (!nextRaw || !nextRaw.generated_at) return true;
+  return nextRaw.generated_at !== currentRaw.generated_at;
+}
+
 function validateDashboardRaw(raw){
   var issues = [];
   if (!raw || typeof raw !== 'object') issues.push('Payload bukan object');
@@ -937,8 +951,14 @@ function validateDashboardRaw(raw){
   if (!raw || !Array.isArray(raw.accounts) || raw.accounts.length === 0) issues.push('accounts kosong');
   if (!raw || !raw.latest || !raw.latest.date) issues.push('latest.date tidak ada');
   if (!raw || !raw.generated_at_wib) issues.push('generated_at_wib tidak ada');
+  if (!raw || !Array.isArray(raw.history) || raw.history.length === 0) issues.push('history kosong');
+  if (!raw || typeof raw.content_breakdown !== 'object' || raw.content_breakdown === null) issues.push('content_breakdown tidak ada');
   var accounts = raw && Array.isArray(raw.accounts) ? raw.accounts : [];
   REQUIRED_ACCOUNTS.forEach(function(u){ if (accounts.indexOf(u) === -1) issues.push('akun wajib hilang: ' + u); });
+  if (raw && raw.latest && raw.latest.date && raw.history && raw.history.length) {
+    var lastHistoryDate = raw.history[raw.history.length - 1] && raw.history[raw.history.length - 1].date;
+    if (lastHistoryDate && raw.latest.date !== lastHistoryDate) issues.push('latest.date tidak sinkron dengan history terakhir');
+  }
   return { ok: issues.length === 0, issues: issues };
 }
 
@@ -999,8 +1019,8 @@ function loadFromCache() {
     var ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0', 10);
     if (!raw || !ts) return null;
     var parsed = JSON.parse(raw);
-    var age = Date.now() - ts;
-    var invalidLegacyV2 = parsed && parsed.version === 2 && !parsed.content_breakdown;
+    var age = getCacheAgeMs(ts);
+    var invalidLegacyV2 = isStaleLegacyCache(parsed);
     if (age > CACHE_MAX_AGE || invalidLegacyV2) {
       localStorage.removeItem(CACHE_KEY);
       localStorage.removeItem(CACHE_TS_KEY);
@@ -1089,7 +1109,7 @@ async function silentRefresh() {
     var raw = await res.json();
     var validation = validateDashboardRaw(raw);
     if (!validation.ok) return;
-    if (currentGeneratedAt && raw.generated_at === currentGeneratedAt) {
+    if (!shouldUseFreshPayload({ generated_at: currentGeneratedAt }, raw)) {
       saveToCache(raw);
       setFreshnessBadge('fresh', raw.latest && raw.latest.date ? raw.latest.date : todayWibDate());
       renderDebugPanel('static', raw, 'no data change detected');
