@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-15T05:57:35.573Z",
-  "generated_at_wib": "2026-03-15T12:57:35+07:00",
+  "generated_at": "2026-03-15T14:10:10.826Z",
+  "generated_at_wib": "2026-03-15T21:10:10+07:00",
   "version": 2,
   "sources": {
     "stats": "socialblade",
@@ -1972,6 +1972,618 @@
       ],
       "viral_posts": 4,
       "underperform_posts": 3
+    }
+  },
+  "presentation_report": {
+    "meta": {
+      "generatedAt": "2026-03-15T14:10:10.826Z",
+      "generatedAtWib": "2026-03-15T21:10:10+07:00",
+      "accountCount": 5,
+      "historyDays": 17,
+      "source": [
+        "SocialBlade",
+        "Apify",
+        "Google Sheets"
+      ],
+      "version": "presentation-v1"
+    },
+    "cover": {
+      "title": "Instagram Performance Dashboard Report",
+      "subtitle": "Report Performa Kompetitor Instagram",
+      "periodLabel": "Update: 15 Mar 2026",
+      "scopeLabel": "5 akun dipantau · 17 hari histori",
+      "brand": {
+        "name": "Metropolitan Mall Bekasi",
+        "theme": {
+          "primary": "#21beb0",
+          "accent": "#e1306c"
+        },
+        "logoPath": "dashboard/assets/metropolitan-mall-logo.png"
+      }
+    },
+    "executiveSummary": {
+      "kpis": [
+        {
+          "key": "top_followers",
+          "label": "Top Followers",
+          "account": "summareconmal.bekasi",
+          "value": "333.2K"
+        },
+        {
+          "key": "top_engagement",
+          "label": "Top Engagement",
+          "account": "pakuwonmallbekasi",
+          "value": "0.36%"
+        },
+        {
+          "key": "fastest_growth",
+          "label": "Fastest Growth",
+          "account": "metmalbekasi",
+          "value": "+0.22%"
+        },
+        {
+          "key": "top_content_format",
+          "label": "Top Content Format",
+          "account": null,
+          "value": "Carousel"
+        },
+        {
+          "key": "top_campaign",
+          "label": "Tema Campaign Teratas",
+          "account": null,
+          "value": "promo"
+        },
+        {
+          "key": "most_viral_account",
+          "label": "Akun Paling Viral",
+          "account": "metmalbekasi",
+          "value": "4 post viral"
+        },
+        {
+          "key": "best_avg_post_er",
+          "label": "Avg Post ER Tertinggi",
+          "account": "pakuwonmallbekasi",
+          "value": "0.36%"
+        }
+      ],
+      "bullets": [
+        "@summareconmal.bekasi masih memimpin dari sisi ukuran audiens dan menjadi patokan awareness di periode ini.",
+        "Meski skalanya tidak terbesar, @pakuwonmallbekasi mencatat kualitas interaksi terbaik di periode ini.",
+        "Tema promo paling sering muncul, dengan format Carousel terlihat paling konsisten dipakai."
+      ]
+    },
+    "competitiveOverview": [
+      {
+        "account": "metmalbekasi",
+        "followers": 93630,
+        "followersLabel": "93.6K",
+        "growth": 0.22,
+        "growthLabel": "+0.22%",
+        "engagementRate": 0.07,
+        "engagementRateLabel": "0.07%",
+        "avgPostEr": 0.0679,
+        "avgPostErLabel": "0.07%",
+        "dominantType": "carousel",
+        "viralPosts": 4,
+        "positioningTag": "Challenger"
+      },
+      {
+        "account": "grandmetropolitan",
+        "followers": 92508,
+        "followersLabel": "92.5K",
+        "growth": 0.21,
+        "growthLabel": "+0.21%",
+        "engagementRate": 0.06,
+        "engagementRateLabel": "0.06%",
+        "avgPostEr": 0.0556,
+        "avgPostErLabel": "0.06%",
+        "dominantType": "carousel",
+        "viralPosts": 4,
+        "positioningTag": "Challenger"
+      },
+      {
+        "account": "metmalcileungsi",
+        "followers": 83307,
+        "followersLabel": "83.3K",
+        "growth": 0.08,
+        "growthLabel": "+0.08%",
+        "engagementRate": 0.22,
+        "engagementRateLabel": "0.22%",
+        "avgPostEr": 0.2218,
+        "avgPostErLabel": "0.22%",
+        "dominantType": "carousel",
+        "viralPosts": 4,
+        "positioningTag": "Watchlist"
+      },
+      {
+        "account": "summareconmal.bekasi",
+        "followers": 333211,
+        "followersLabel": "333.2K",
+        "growth": 0.13,
+        "growthLabel": "+0.13%",
+        "engagementRate": 0.06,
+        "engagementRateLabel": "0.06%",
+        "avgPostEr": 0.0641,
+        "avgPostErLabel": "0.06%",
+        "dominantType": "carousel",
+        "viralPosts": 4,
+        "positioningTag": "Leader"
+      },
+      {
+        "account": "pakuwonmallbekasi",
+        "followers": 72204,
+        "followersLabel": "72.2K",
+        "growth": -0.18,
+        "growthLabel": "-0.18%",
+        "engagementRate": 0.36,
+        "engagementRateLabel": "0.36%",
+        "avgPostEr": 0.357,
+        "avgPostErLabel": "0.36%",
+        "dominantType": "carousel",
+        "viralPosts": 4,
+        "positioningTag": "High Engagement"
+      }
+    ],
+    "growthPositioning": {
+      "followersRanking": [
+        {
+          "account": "summareconmal.bekasi",
+          "value": 333211,
+          "label": "333.2K"
+        },
+        {
+          "account": "metmalbekasi",
+          "value": 93630,
+          "label": "93.6K"
+        },
+        {
+          "account": "grandmetropolitan",
+          "value": 92508,
+          "label": "92.5K"
+        },
+        {
+          "account": "metmalcileungsi",
+          "value": 83307,
+          "label": "83.3K"
+        },
+        {
+          "account": "pakuwonmallbekasi",
+          "value": 72204,
+          "label": "72.2K"
+        }
+      ],
+      "growthRanking": [
+        {
+          "account": "metmalbekasi",
+          "value": 0.22,
+          "label": "+0.22%"
+        },
+        {
+          "account": "grandmetropolitan",
+          "value": 0.21,
+          "label": "+0.21%"
+        },
+        {
+          "account": "summareconmal.bekasi",
+          "value": 0.13,
+          "label": "+0.13%"
+        },
+        {
+          "account": "metmalcileungsi",
+          "value": 0.08,
+          "label": "+0.08%"
+        },
+        {
+          "account": "pakuwonmallbekasi",
+          "value": -0.18,
+          "label": "-0.18%"
+        }
+      ],
+      "roles": [
+        {
+          "account": "metmalbekasi",
+          "role": "Challenger",
+          "reason": "Pertumbuhan termasuk paling cepat dibanding akun lain."
+        },
+        {
+          "account": "grandmetropolitan",
+          "role": "Challenger",
+          "reason": "Pertumbuhan termasuk paling cepat dibanding akun lain."
+        },
+        {
+          "account": "metmalcileungsi",
+          "role": "Watchlist",
+          "reason": "Perlu dipantau karena menunjukkan sinyal performa yang bisa mengubah dinamika kompetisi."
+        },
+        {
+          "account": "summareconmal.bekasi",
+          "role": "Leader",
+          "reason": "Memimpin dari sisi ukuran audiens."
+        },
+        {
+          "account": "pakuwonmallbekasi",
+          "role": "High Engagement",
+          "reason": "Kualitas interaksi paling kuat di antara kompetitor."
+        }
+      ],
+      "overviewRows": [
+        {
+          "account": "metmalbekasi",
+          "followers": 93630,
+          "followersLabel": "93.6K",
+          "growth": 0.22,
+          "growthLabel": "+0.22%",
+          "engagementRate": 0.07,
+          "engagementRateLabel": "0.07%",
+          "avgPostEr": 0.0679,
+          "avgPostErLabel": "0.07%",
+          "dominantType": "carousel",
+          "viralPosts": 4,
+          "positioningTag": "Challenger"
+        },
+        {
+          "account": "grandmetropolitan",
+          "followers": 92508,
+          "followersLabel": "92.5K",
+          "growth": 0.21,
+          "growthLabel": "+0.21%",
+          "engagementRate": 0.06,
+          "engagementRateLabel": "0.06%",
+          "avgPostEr": 0.0556,
+          "avgPostErLabel": "0.06%",
+          "dominantType": "carousel",
+          "viralPosts": 4,
+          "positioningTag": "Challenger"
+        },
+        {
+          "account": "metmalcileungsi",
+          "followers": 83307,
+          "followersLabel": "83.3K",
+          "growth": 0.08,
+          "growthLabel": "+0.08%",
+          "engagementRate": 0.22,
+          "engagementRateLabel": "0.22%",
+          "avgPostEr": 0.2218,
+          "avgPostErLabel": "0.22%",
+          "dominantType": "carousel",
+          "viralPosts": 4,
+          "positioningTag": "Watchlist"
+        },
+        {
+          "account": "summareconmal.bekasi",
+          "followers": 333211,
+          "followersLabel": "333.2K",
+          "growth": 0.13,
+          "growthLabel": "+0.13%",
+          "engagementRate": 0.06,
+          "engagementRateLabel": "0.06%",
+          "avgPostEr": 0.0641,
+          "avgPostErLabel": "0.06%",
+          "dominantType": "carousel",
+          "viralPosts": 4,
+          "positioningTag": "Leader"
+        },
+        {
+          "account": "pakuwonmallbekasi",
+          "followers": 72204,
+          "followersLabel": "72.2K",
+          "growth": -0.18,
+          "growthLabel": "-0.18%",
+          "engagementRate": 0.36,
+          "engagementRateLabel": "0.36%",
+          "avgPostEr": 0.357,
+          "avgPostErLabel": "0.36%",
+          "dominantType": "carousel",
+          "viralPosts": 4,
+          "positioningTag": "High Engagement"
+        }
+      ]
+    },
+    "campaignAnalysis": {
+      "topCampaignTerm": "promo",
+      "topHashtag": "#metropolitanmallbekasi",
+      "topContentFormat": "carousel",
+      "accounts": [
+        {
+          "account": "metmalbekasi",
+          "campaignTerms": [
+            "diskon",
+            "event",
+            "new tenant"
+          ],
+          "topHashtags": [
+            "#metropolitanmallbekasi",
+            "#paylessid",
+            "#newtenant"
+          ],
+          "dominantType": "carousel",
+          "campaignIntensity": 7
+        },
+        {
+          "account": "grandmetropolitan",
+          "campaignTerms": [
+            "event",
+            "special",
+            "promo"
+          ],
+          "topHashtags": [
+            "#grandmetropolitan",
+            "#latenightsale",
+            "#thegrandblessingoframadan"
+          ],
+          "dominantType": "carousel",
+          "campaignIntensity": 3
+        },
+        {
+          "account": "metmalcileungsi",
+          "campaignTerms": [
+            "promo",
+            "promo menarik",
+            "diskon"
+          ],
+          "topHashtags": [
+            "#metropolitanmallcileungsi",
+            "#cileungsi",
+            "#metmallcileungsi"
+          ],
+          "dominantType": "carousel",
+          "campaignIntensity": 3
+        },
+        {
+          "account": "summareconmal.bekasi",
+          "campaignTerms": [
+            "promo",
+            "special",
+            "limited"
+          ],
+          "topHashtags": [
+            "#summareconmallbekasi",
+            "#yourmallyourhome",
+            "#thenextlevellifestyle"
+          ],
+          "dominantType": "carousel",
+          "campaignIntensity": 5
+        },
+        {
+          "account": "pakuwonmallbekasi",
+          "campaignTerms": [
+            "promo",
+            "diskon",
+            "event"
+          ],
+          "topHashtags": [
+            "#pakuwonmallbekasi",
+            "#sanctuaryoframadan",
+            "#jktgo"
+          ],
+          "dominantType": "carousel",
+          "campaignIntensity": 3
+        }
+      ],
+      "summary": [
+        "Tema promo muncul paling sering lintas akun.",
+        "Format Carousel menjadi format paling konsisten dipakai."
+      ]
+    },
+    "contentSnapshot": [
+      {
+        "account": "metmalbekasi",
+        "averageLikes": 61.83,
+        "averageLikesLabel": "61.83",
+        "averageComments": 1.75,
+        "averageCommentsLabel": "1.75",
+        "averagePostEr": 0.0679,
+        "averagePostErLabel": "0.07%",
+        "viralPosts": 4,
+        "underperformPosts": 3,
+        "dominantType": "carousel",
+        "qualityTag": "Strong"
+      },
+      {
+        "account": "grandmetropolitan",
+        "averageLikes": 50.42,
+        "averageLikesLabel": "50.42",
+        "averageComments": 1,
+        "averageCommentsLabel": "1",
+        "averagePostEr": 0.0556,
+        "averagePostErLabel": "0.06%",
+        "viralPosts": 4,
+        "underperformPosts": 3,
+        "dominantType": "carousel",
+        "qualityTag": "Strong"
+      },
+      {
+        "account": "metmalcileungsi",
+        "averageLikes": 179,
+        "averageLikesLabel": "179",
+        "averageComments": 5.75,
+        "averageCommentsLabel": "5.75",
+        "averagePostEr": 0.2218,
+        "averagePostErLabel": "0.22%",
+        "viralPosts": 4,
+        "underperformPosts": 3,
+        "dominantType": "carousel",
+        "qualityTag": "Strong"
+      },
+      {
+        "account": "summareconmal.bekasi",
+        "averageLikes": 206.42,
+        "averageLikesLabel": "206.42",
+        "averageComments": 7.08,
+        "averageCommentsLabel": "7.08",
+        "averagePostEr": 0.0641,
+        "averagePostErLabel": "0.06%",
+        "viralPosts": 4,
+        "underperformPosts": 3,
+        "dominantType": "carousel",
+        "qualityTag": "Strong"
+      },
+      {
+        "account": "pakuwonmallbekasi",
+        "averageLikes": 242.5,
+        "averageLikesLabel": "242.5",
+        "averageComments": 15.25,
+        "averageCommentsLabel": "15.25",
+        "averagePostEr": 0.357,
+        "averagePostErLabel": "0.36%",
+        "viralPosts": 4,
+        "underperformPosts": 3,
+        "dominantType": "carousel",
+        "qualityTag": "Strong"
+      }
+    ],
+    "viralHighlights": [
+      {
+        "rank": 1,
+        "account": "pakuwonmallbekasi",
+        "captionSnippet": "✨𝐒𝐀𝐍𝐂𝐓𝐔𝐀𝐑𝐘 𝐎𝐅 𝐑𝐀𝐌𝐀𝐃𝐀𝐍 𝐢𝐬 𝐇𝐄𝐑𝐄!✨ Sambut bulan suci ramadan dengan s...",
+        "type": "carousel",
+        "likes": 1255,
+        "comments": 162,
+        "postEr": 1.9625,
+        "postErLabel": "1.96%",
+        "publishedAt": "2026-02-24T04:06:55.000Z",
+        "publishedAtLabel": "24 Feb 2026",
+        "performanceLabel": "viral",
+        "campaignTerms": [
+          "promo",
+          "diskon",
+          "event"
+        ],
+        "url": "https://www.instagram.com/p/DVIGwSakUl2/"
+      },
+      {
+        "rank": 2,
+        "account": "pakuwonmallbekasi",
+        "captionSnippet": "KONDISI MALL DI BEKASI YANG LAGI NGADAIN DISCOUNT UP TO 80%🔥 Sebelum THR nya habis mendin...",
+        "type": "video",
+        "likes": 1232,
+        "comments": 12,
+        "postEr": 1.7229,
+        "postErLabel": "1.72%",
+        "publishedAt": "2026-03-14T08:13:32.000Z",
+        "publishedAtLabel": "14 Mar 2026",
+        "performanceLabel": "viral",
+        "campaignTerms": [
+          "promo",
+          "diskon",
+          "event"
+        ],
+        "url": "https://www.instagram.com/p/DV25IdKk7ra/"
+      },
+      {
+        "rank": 3,
+        "account": "metmalcileungsi",
+        "captionSnippet": "What a Night to Remember! 🌙✨ Terpukau banget sama suara merdu @nabilataqiyyah dan karya-k...",
+        "type": "video",
+        "likes": 1135,
+        "comments": 27,
+        "postEr": 1.3948,
+        "postErLabel": "1.39%",
+        "publishedAt": "2026-03-14T19:46:05.000Z",
+        "publishedAtLabel": "15 Mar 2026",
+        "performanceLabel": "viral",
+        "campaignTerms": [
+          "promo",
+          "promo menarik",
+          "diskon"
+        ],
+        "url": "https://www.instagram.com/p/DV4IJI9k4ex/"
+      },
+      {
+        "rank": 4,
+        "account": "metmalcileungsi",
+        "captionSnippet": "FREE ENTRY! Nabila Taqiyyah is coming to MetMall Cileungsi! 🎶 Catat tanggalnya dan jangan...",
+        "type": "carousel",
+        "likes": 414,
+        "comments": 19,
+        "postEr": 0.5198,
+        "postErLabel": "0.52%",
+        "publishedAt": "2026-03-12T13:47:10.000Z",
+        "publishedAtLabel": "12 Mar 2026",
+        "performanceLabel": "viral",
+        "campaignTerms": [
+          "promo",
+          "promo menarik",
+          "diskon"
+        ],
+        "url": "https://www.instagram.com/p/DVyV4KoE5sE/"
+      },
+      {
+        "rank": 5,
+        "account": "metmalbekasi",
+        "captionSnippet": "Ngobrol bareng dengan hati yang penuh syukur dan keberkahan bersama Ust. Derry Sulaiman da...",
+        "type": "video",
+        "likes": 409,
+        "comments": 9,
+        "postEr": 0.4464,
+        "postErLabel": "0.45%",
+        "publishedAt": "2026-03-09T14:06:52.000Z",
+        "publishedAtLabel": "09 Mar 2026",
+        "performanceLabel": "viral",
+        "campaignTerms": [
+          "diskon",
+          "event",
+          "new tenant",
+          "promo",
+          "grand opening",
+          "special",
+          "opening"
+        ],
+        "url": "https://www.instagram.com/p/DVqpPvokgPH/"
+      }
+    ],
+    "opportunities": {
+      "accountsNeedingAttention": [
+        {
+          "account": "metmalbekasi",
+          "reason": "Jumlah post perlu optimasi termasuk tinggi (3 post)."
+        },
+        {
+          "account": "grandmetropolitan",
+          "reason": "Jumlah post perlu optimasi termasuk tinggi (3 post)."
+        }
+      ],
+      "weakPatterns": [
+        "@metmalbekasi memiliki post perlu optimasi paling banyak di periode ini.",
+        "Intensitas campaign belum selalu diikuti performa interaksi yang kuat."
+      ],
+      "opportunityAreas": [
+        "Perbanyak format Carousel karena paling sering muncul pada konten dengan performa tinggi.",
+        "Gunakan @pakuwonmallbekasi sebagai benchmark kualitas konten."
+      ]
+    },
+    "strategicTakeaways": [
+      {
+        "title": "Awareness leader tidak otomatis jadi engagement leader",
+        "detail": "Ukuran audiens besar belum tentu menghasilkan kualitas interaksi terbaik."
+      },
+      {
+        "title": "Ada akun yang perlu dipantau dari sisi pertumbuhan",
+        "detail": "@metmalbekasi mencatat pertumbuhan tercepat di periode ini."
+      },
+      {
+        "title": "Ada format konten yang terlihat paling efektif",
+        "detail": "Format Carousel paling konsisten muncul di performa konten saat ini."
+      },
+      {
+        "title": "Tema campaign mulai terkonsentrasi",
+        "detail": "Tema promo paling sering muncul lintas akun."
+      }
+    ],
+    "recommendations": {
+      "scale": [
+        "Perbanyak format Carousel karena paling sering muncul pada konten yang kuat.",
+        "Jadikan @pakuwonmallbekasi sebagai benchmark kualitas engagement."
+      ],
+      "improve": [
+        "Prioritaskan evaluasi konten @metmalbekasi.",
+        "Pastikan campaign yang sering diulang juga punya hook interaksi yang kuat."
+      ],
+      "watchlist": [
+        "Pantau @metmalbekasi karena pertumbuhannya paling cepat.",
+        "Pantau pola konten @metmalbekasi karena punya post viral terbanyak."
+      ]
     }
   },
   "meta": {

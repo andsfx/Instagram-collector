@@ -266,6 +266,275 @@ function computeGrowth(history, username) {
   };
 }
 
+function formatCompactNumber(value) {
+  if (value == null || !Number.isFinite(value)) return '-';
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
+  return String(Math.round(value * 100) / 100);
+}
+
+function formatSignedPercent(value) {
+  if (value == null || !Number.isFinite(value)) return '-';
+  return `${value > 0 ? '+' : ''}${Number(value).toFixed(2).replace(/\.00$/, '')}%`;
+}
+
+function formatPercent(value, digits = 2) {
+  if (value == null || !Number.isFinite(value)) return '-';
+  return `${Number(value).toFixed(digits).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '')}%`;
+}
+
+function formatDateLabel(isoOrDate) {
+  if (!isoOrDate) return '-';
+  const d = new Date(isoOrDate);
+  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function titleCase(value) {
+  if (!value) return '-';
+  return String(value).split(/[_\s-]+/).filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+}
+
+function countTerms(postInsights, selector) {
+  const counts = {};
+  Object.values(postInsights || {}).forEach((insight) => {
+    if (!insight) return;
+    (selector(insight) || []).forEach((item) => {
+      counts[item] = (counts[item] || 0) + 1;
+    });
+  });
+  return counts;
+}
+
+function pickTopEntry(counts) {
+  const entries = Object.entries(counts || {}).sort((a, b) => b[1] - a[1]);
+  return entries.length ? { key: entries[0][0], count: entries[0][1] } : null;
+}
+
+function deriveMetrics(data) {
+  const accounts = data.accounts || [];
+  const latest = data.latest || {};
+  const growth = data.growth || {};
+  const postInsights = data.post_insights || {};
+
+  const accountRows = accounts.map((username) => {
+    const latestRow = latest[username] || {};
+    const post = postInsights[username] || {};
+    return {
+      account: username,
+      followers: Number(latestRow.followers || 0),
+      growthPct: Number(growth[username]?.pct_change_7d || 0),
+      engagementRate: Number(latestRow.engagement_rate || 0),
+      avgLikes: Number(latestRow.avg_likes || 0),
+      avgComments: Number(latestRow.avg_comments || 0),
+      avgPostEr: Number(post.average_post_er || 0),
+      viralPosts: Number(post.viral_posts || 0),
+      underperformPosts: Number(post.underperform_posts || 0),
+      dominantType: post.dominant_type || 'unknown',
+      campaignTerms: post.campaign_terms || [],
+      topHashtags: post.top_hashtags || [],
+      posts: post.posts || []
+    };
+  });
+
+  const rankings = {
+    followers: [...accountRows].sort((a, b) => b.followers - a.followers),
+    growth: [...accountRows].sort((a, b) => b.growthPct - a.growthPct),
+    engagement: [...accountRows].sort((a, b) => b.engagementRate - a.engagementRate),
+    avgPostEr: [...accountRows].sort((a, b) => b.avgPostEr - a.avgPostEr),
+    viralPosts: [...accountRows].sort((a, b) => b.viralPosts - a.viralPosts),
+    underperformPosts: [...accountRows].sort((a, b) => b.underperformPosts - a.underperformPosts),
+  };
+
+  const formatCounts = accountRows.reduce((acc, row) => {
+    const key = row.dominantType || 'unknown';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const campaignCounts = countTerms(postInsights, (insight) => insight.campaign_terms);
+  const hashtagCounts = countTerms(postInsights, (insight) => insight.top_hashtags);
+
+  const winners = {
+    topFollowers: rankings.followers[0] || null,
+    topEngagement: rankings.engagement[0] || null,
+    fastestGrowth: rankings.growth[0] || null,
+    bestAvgPostEr: rankings.avgPostEr[0] || null,
+    mostViralAccount: rankings.viralPosts[0] || null,
+    topFormat: pickTopEntry(formatCounts),
+    topCampaign: pickTopEntry(campaignCounts),
+    topHashtag: pickTopEntry(hashtagCounts),
+  };
+
+  const allPosts = accountRows.flatMap((row) => (row.posts || []).map((post) => ({ ...post, account: row.account, campaignTerms: row.campaignTerms || [] })));
+  const viralPosts = allPosts.filter((post) => post.performance_label === 'viral').sort((a, b) => (b.post_er || 0) - (a.post_er || 0) || (b.likes || 0) - (a.likes || 0));
+
+  return {
+    generatedAt: data.generated_at,
+    generatedAtWib: data.generated_at_wib,
+    accountRows,
+    rankings,
+    winners,
+    globalCounts: {
+      totalPosts: allPosts.length,
+      totalViral: viralPosts.length,
+      totalUnderperform: accountRows.reduce((sum, row) => sum + row.underperformPosts, 0),
+      topCampaignTerm: winners.topCampaign?.key || null,
+      topHashtag: winners.topHashtag?.key || null,
+      topFormat: winners.topFormat?.key || null,
+    },
+    viralHighlights: viralPosts.slice(0, 5),
+    formatCounts,
+    campaignCounts,
+    hashtagCounts,
+  };
+}
+
+function buildExecutiveSummary(metrics) {
+  const kpis = [
+    metrics.winners.topFollowers && { key: 'top_followers', label: 'Top Followers', account: metrics.winners.topFollowers.account, value: formatCompactNumber(metrics.winners.topFollowers.followers) },
+    metrics.winners.topEngagement && { key: 'top_engagement', label: 'Top Engagement', account: metrics.winners.topEngagement.account, value: formatPercent(metrics.winners.topEngagement.engagementRate) },
+    metrics.winners.fastestGrowth && { key: 'fastest_growth', label: 'Fastest Growth', account: metrics.winners.fastestGrowth.account, value: formatSignedPercent(metrics.winners.fastestGrowth.growthPct) },
+    metrics.winners.topFormat && { key: 'top_content_format', label: 'Top Content Format', account: null, value: titleCase(metrics.winners.topFormat.key) },
+    { key: 'top_campaign', label: 'Tema Campaign Teratas', account: null, value: metrics.globalCounts.topCampaignTerm || 'Belum dominan' },
+    metrics.winners.mostViralAccount && { key: 'most_viral_account', label: 'Akun Paling Viral', account: metrics.winners.mostViralAccount.account, value: `${metrics.winners.mostViralAccount.viralPosts} post viral` },
+    metrics.winners.bestAvgPostEr && { key: 'best_avg_post_er', label: 'Avg Post ER Tertinggi', account: metrics.winners.bestAvgPostEr.account, value: formatPercent(metrics.winners.bestAvgPostEr.avgPostEr) },
+  ].filter(Boolean);
+
+  const bullets = [];
+  if (metrics.winners.topFollowers) bullets.push(`@${metrics.winners.topFollowers.account} masih memimpin dari sisi ukuran audiens dan menjadi patokan awareness di periode ini.`);
+  if (metrics.winners.bestAvgPostEr) {
+    const account = metrics.winners.bestAvgPostEr.account;
+    if (metrics.winners.topFollowers && account !== metrics.winners.topFollowers.account) bullets.push(`Meski skalanya tidak terbesar, @${account} mencatat kualitas interaksi terbaik di periode ini.`);
+    else bullets.push(`@${account} unggul dari sisi kualitas interaksi dan efisiensi konten.`);
+  }
+  if (metrics.globalCounts.topCampaignTerm || metrics.globalCounts.topFormat) bullets.push(`Tema ${metrics.globalCounts.topCampaignTerm || 'campaign'} paling sering muncul, dengan format ${titleCase(metrics.globalCounts.topFormat || 'konten')} terlihat paling konsisten dipakai.`);
+
+  return { kpis, bullets: bullets.slice(0, 3) };
+}
+
+function buildCompetitiveOverview(metrics) {
+  return metrics.accountRows.map((row) => ({
+    account: row.account,
+    followers: row.followers,
+    followersLabel: formatCompactNumber(row.followers),
+    growth: row.growthPct,
+    growthLabel: formatSignedPercent(row.growthPct),
+    engagementRate: row.engagementRate,
+    engagementRateLabel: formatPercent(row.engagementRate),
+    avgPostEr: row.avgPostEr,
+    avgPostErLabel: formatPercent(row.avgPostEr),
+    dominantType: row.dominantType,
+    viralPosts: row.viralPosts,
+    positioningTag: 'Stable Player'
+  }));
+}
+
+function buildGrowthPositioning(metrics, overviewRows) {
+  const roles = overviewRows.map((row) => {
+    let role = 'Stable Player';
+    let reason = 'Performa relatif stabil tanpa lonjakan ekstrem.';
+    if (metrics.winners.topFollowers && row.account === metrics.winners.topFollowers.account) {
+      role = 'Leader';
+      reason = 'Memimpin dari sisi ukuran audiens.';
+    } else if (metrics.rankings.growth.slice(0, 2).some((item) => item.account === row.account)) {
+      role = 'Challenger';
+      reason = 'Pertumbuhan termasuk paling cepat dibanding akun lain.';
+    } else if (metrics.winners.topEngagement && row.account === metrics.winners.topEngagement.account) {
+      role = 'High Engagement';
+      reason = 'Kualitas interaksi paling kuat di antara kompetitor.';
+    } else if ((row.viralPosts >= 3 && row.followers < (metrics.winners.topFollowers?.followers || 0)) || row.underperformPosts >= 3) {
+      role = 'Watchlist';
+      reason = 'Perlu dipantau karena menunjukkan sinyal performa yang bisa mengubah dinamika kompetisi.';
+    }
+    return { account: row.account, role, reason };
+  });
+
+  const updatedRows = overviewRows.map((row) => ({ ...row, positioningTag: roles.find((item) => item.account === row.account)?.role || row.positioningTag }));
+
+  return {
+    followersRanking: metrics.rankings.followers.slice(0, 5).map((row) => ({ account: row.account, value: row.followers, label: formatCompactNumber(row.followers) })),
+    growthRanking: metrics.rankings.growth.slice(0, 5).map((row) => ({ account: row.account, value: row.growthPct, label: formatSignedPercent(row.growthPct) })),
+    roles,
+    overviewRows: updatedRows,
+  };
+}
+
+function buildPresentationReport(data) {
+  const metrics = deriveMetrics(data);
+  const executiveSummary = buildExecutiveSummary(metrics);
+  const competitiveOverview = buildCompetitiveOverview(metrics);
+  const growthPositioning = buildGrowthPositioning(metrics, competitiveOverview);
+
+  return {
+    meta: {
+      generatedAt: metrics.generatedAt,
+      generatedAtWib: metrics.generatedAtWib,
+      accountCount: data.accounts.length,
+      historyDays: data.meta?.history_days || 0,
+      source: ['SocialBlade', 'Apify', 'Google Sheets'],
+      version: 'presentation-v1'
+    },
+    cover: {
+      title: 'Instagram Performance Dashboard Report',
+      subtitle: 'Report Performa Kompetitor Instagram',
+      periodLabel: `Update: ${formatDateLabel(metrics.generatedAtWib || metrics.generatedAt)}`,
+      scopeLabel: `${data.accounts.length} akun dipantau · ${data.meta?.history_days || 0} hari histori`,
+      brand: {
+        name: 'Metropolitan Mall Bekasi',
+        theme: { primary: '#21beb0', accent: '#e1306c' },
+        logoPath: 'dashboard/assets/metropolitan-mall-logo.png'
+      }
+    },
+    executiveSummary,
+    competitiveOverview: growthPositioning.overviewRows,
+    growthPositioning,
+    campaignAnalysis: {
+      topCampaignTerm: metrics.globalCounts.topCampaignTerm,
+      topHashtag: metrics.globalCounts.topHashtag,
+      topContentFormat: metrics.globalCounts.topFormat,
+      accounts: metrics.accountRows.map((row) => ({ account: row.account, campaignTerms: row.campaignTerms.slice(0, 3), topHashtags: row.topHashtags.slice(0, 3), dominantType: row.dominantType, campaignIntensity: row.campaignTerms.length })),
+      summary: [
+        metrics.globalCounts.topCampaignTerm ? `Tema ${metrics.globalCounts.topCampaignTerm} muncul paling sering lintas akun.` : 'Belum ada satu tema campaign yang sangat dominan lintas akun.',
+        metrics.globalCounts.topFormat ? `Format ${titleCase(metrics.globalCounts.topFormat)} menjadi format paling konsisten dipakai.` : 'Belum ada satu format yang benar-benar dominan lintas akun.'
+      ]
+    },
+    contentSnapshot: metrics.accountRows.map((row) => ({ account: row.account, averageLikes: row.avgLikes, averageLikesLabel: formatCompactNumber(row.avgLikes), averageComments: row.avgComments, averageCommentsLabel: formatCompactNumber(row.avgComments), averagePostEr: row.avgPostEr, averagePostErLabel: formatPercent(row.avgPostEr), viralPosts: row.viralPosts, underperformPosts: row.underperformPosts, dominantType: row.dominantType, qualityTag: row.viralPosts > row.underperformPosts ? 'Strong' : row.underperformPosts >= 3 ? 'Needs Attention' : 'Mixed' })),
+    viralHighlights: metrics.viralHighlights.map((post, index) => ({ rank: index + 1, account: post.account, captionSnippet: post.caption_snippet, type: post.type, likes: post.likes, comments: post.comments, postEr: post.post_er, postErLabel: formatPercent(post.post_er), publishedAt: post.published_at, publishedAtLabel: formatDateLabel(post.published_at), performanceLabel: post.performance_label, campaignTerms: post.campaignTerms || [], url: post.url })),
+    opportunities: {
+      accountsNeedingAttention: metrics.rankings.underperformPosts.slice(0, 2).filter((row) => row.underperformPosts > 0).map((row) => ({ account: row.account, reason: `Jumlah post perlu optimasi termasuk tinggi (${row.underperformPosts} post).` })),
+      weakPatterns: [
+        metrics.rankings.underperformPosts[0]?.underperformPosts >= 3 ? `@${metrics.rankings.underperformPosts[0].account} memiliki post perlu optimasi paling banyak di periode ini.` : null,
+        metrics.globalCounts.topCampaignTerm && metrics.globalCounts.totalViral < metrics.globalCounts.totalPosts / 2 ? 'Intensitas campaign belum selalu diikuti performa interaksi yang kuat.' : null
+      ].filter(Boolean),
+      opportunityAreas: [
+        metrics.globalCounts.topFormat ? `Perbanyak format ${titleCase(metrics.globalCounts.topFormat)} karena paling sering muncul pada konten dengan performa tinggi.` : null,
+        metrics.winners.bestAvgPostEr ? `Gunakan @${metrics.winners.bestAvgPostEr.account} sebagai benchmark kualitas konten.` : null
+      ].filter(Boolean)
+    },
+    strategicTakeaways: [
+      metrics.winners.topFollowers && metrics.winners.topEngagement && metrics.winners.topFollowers.account !== metrics.winners.topEngagement.account ? { title: 'Awareness leader tidak otomatis jadi engagement leader', detail: 'Ukuran audiens besar belum tentu menghasilkan kualitas interaksi terbaik.' } : null,
+      metrics.winners.fastestGrowth ? { title: 'Ada akun yang perlu dipantau dari sisi pertumbuhan', detail: `@${metrics.winners.fastestGrowth.account} mencatat pertumbuhan tercepat di periode ini.` } : null,
+      metrics.globalCounts.topFormat ? { title: 'Ada format konten yang terlihat paling efektif', detail: `Format ${titleCase(metrics.globalCounts.topFormat)} paling konsisten muncul di performa konten saat ini.` } : null,
+      metrics.globalCounts.topCampaignTerm ? { title: 'Tema campaign mulai terkonsentrasi', detail: `Tema ${metrics.globalCounts.topCampaignTerm} paling sering muncul lintas akun.` } : null,
+    ].filter(Boolean),
+    recommendations: {
+      scale: [
+        metrics.globalCounts.topFormat ? `Perbanyak format ${titleCase(metrics.globalCounts.topFormat)} karena paling sering muncul pada konten yang kuat.` : null,
+        metrics.winners.bestAvgPostEr ? `Jadikan @${metrics.winners.bestAvgPostEr.account} sebagai benchmark kualitas engagement.` : null
+      ].filter(Boolean),
+      improve: [
+        metrics.rankings.underperformPosts[0]?.underperformPosts > 0 ? `Prioritaskan evaluasi konten @${metrics.rankings.underperformPosts[0].account}.` : null,
+        metrics.globalCounts.topCampaignTerm ? 'Pastikan campaign yang sering diulang juga punya hook interaksi yang kuat.' : null
+      ].filter(Boolean),
+      watchlist: [
+        metrics.winners.fastestGrowth ? `Pantau @${metrics.winners.fastestGrowth.account} karena pertumbuhannya paling cepat.` : null,
+        metrics.winners.mostViralAccount ? `Pantau pola konten @${metrics.winners.mostViralAccount.account} karena punya post viral terbanyak.` : null
+      ].filter(Boolean)
+    }
+  };
+}
+
 function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   const accountsCfg = readJson(path.join(repoRoot, 'config', 'accounts.json')).filter((a) => a.enabled);
@@ -359,11 +628,14 @@ const now = new Date();
     rankings,
     content_breakdown,
     post_insights,
+    presentation_report: null,
     meta: {
       brand_account: accounts[0] || null,
       history_days: history.length,
     },
   };
+
+  output.presentation_report = buildPresentationReport(output);
 
   const outPath = path.join(repoRoot, 'dashboard', 'data.json');
   ensureDir(path.dirname(outPath));
