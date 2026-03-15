@@ -101,6 +101,7 @@ assert.equal(typeof sandbox.IG_DASH_STATE, 'object', 'IG_DASH_STATE namespace sh
 assert.equal(typeof sandbox.getDashboardState, 'function', 'getDashboardState helper should exist');
 assert.equal(typeof sandbox.getDashboardData, 'function', 'getDashboardData helper should exist');
 assert.equal(typeof sandbox.queueChartBootstrap, 'function', 'queueChartBootstrap helper should exist');
+assert.equal(typeof sandbox.initChartVisibilityBootstrap, 'function', 'initChartVisibilityBootstrap helper should exist');
 assert.equal(sandbox.IG_DASH_STATE.sortCol, 'followers', 'IG_DASH_STATE should track default sort');
 assert.equal(sandbox.D, undefined, 'legacy D global should not be required anymore');
 assert.equal(sandbox.STATIC_JSON_URL, './data.json', 'STATIC_JSON_URL should be stable for HTTP caching');
@@ -115,6 +116,8 @@ console.log(JSON.stringify({
     'IG_DASH_STATE namespace is initialized',
     'legacy D global is no longer required',
     'data URL is stable for HTTP caching',
-    'chart bootstrap is deferred via runtime helper'
+    'chart bootstrap is deferred via runtime helper',
+    'chart loading can be triggered by viewport bootstrap helper',
+    'dashboard no longer depends on Google Fonts'
   ]
 }, null, 2));

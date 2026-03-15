@@ -186,7 +186,7 @@ function render(){
     requestAnimationFrame(function(){
       renderH2HSelectors();
       renderH2H();
-      queueChartBootstrap();
+      initChartVisibilityBootstrap();
       requestAnimationFrame(function(){
         renderContentBreakdown();
         renderHeatmapSelectors();
@@ -201,6 +201,9 @@ window.render = render;
 
 // ===== LAZY CHART RENDERING =====
 var lazyChartObserver = null;
+var chartVisibilityObserver = null;
+var chartVisibilityBootstrapStarted = false;
+var chartLibraryLoading = false;
 var lazyChartMap = {
   'chBar': mkFollowersBar,
   'chER': mkERBar,
@@ -210,32 +213,30 @@ var lazyChartMap = {
   'chERTrend': mkERTrend,
   'chProjection': mkProjection
 };
-var eagerCharts = ['chBar', 'chER'];
-var chartBootstrapScheduled = false;
+
+function ensureChartLibrary(){
+  if(typeof Chart !== 'undefined') return Promise.resolve();
+  if(chartLibraryLoading) return chartLibraryLoading;
+  chartLibraryLoading = loadChartJS().catch(function(err){
+    chartLibraryLoading = false;
+    throw err;
+  });
+  return chartLibraryLoading;
+}
 
 function queueChartBootstrap(){
-  if(chartBootstrapScheduled) return;
-  chartBootstrapScheduled = true;
-  var run = function(){
-    chartBootstrapScheduled = false;
-    renderAllCharts();
+  return ensureChartLibrary().then(function(){
+    setupLazyCharts();
     if (typeof renderH2H === 'function') renderH2H();
-  };
-  if(typeof requestIdleCallback === 'function'){
-    requestIdleCallback(run, { timeout: 1200 });
-  } else {
-    setTimeout(run, 250);
-  }
+  }).catch(function(err){
+    console.error('Chart.js load failed:', err);
+  });
 }
 
 function setupLazyCharts(){
-  eagerCharts.forEach(function(id){
-    if(lazyChartMap[id]) lazyChartMap[id]();
-  });
-
   if(!('IntersectionObserver' in window)){
     Object.keys(lazyChartMap).forEach(function(id){
-      if(eagerCharts.indexOf(id) === -1 && lazyChartMap[id]) lazyChartMap[id]();
+      if(lazyChartMap[id]) lazyChartMap[id]();
     });
     return;
   }
@@ -255,7 +256,6 @@ function setupLazyCharts(){
   }, { rootMargin: '200px 0px' });
 
   Object.keys(lazyChartMap).forEach(function(id){
-    if(eagerCharts.indexOf(id) !== -1) return;
     var el = document.getElementById(id);
     if(el){
       var container = el.closest('.chcon') || el.parentElement;
@@ -264,20 +264,48 @@ function setupLazyCharts(){
   });
 }
 
-function renderAllCharts(){
-  if(typeof Chart !== 'undefined'){
-    setupLazyCharts();
+function initChartVisibilityBootstrap(){
+  if(chartVisibilityBootstrapStarted) return;
+  chartVisibilityBootstrapStarted = true;
+
+  var targets = [];
+  ['chBar','chER','chShare','chRadar','chTrend','chERTrend','chProjection','chH2H'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    var container = el.closest('.chcon') || el.parentElement;
+    if(container) targets.push(container);
+  });
+
+  if(!targets.length){
+    chartVisibilityBootstrapStarted = false;
     return;
   }
-  loadChartJS().then(function(){
-    setupLazyCharts();
-  }).catch(function(err){
-    console.error('Chart.js load failed:', err);
-  });
+
+  if(!('IntersectionObserver' in window)){
+    queueChartBootstrap();
+    return;
+  }
+
+  if(chartVisibilityObserver) chartVisibilityObserver.disconnect();
+  chartVisibilityObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        queueChartBootstrap();
+        chartVisibilityObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px' });
+
+  targets.forEach(function(target){ chartVisibilityObserver.observe(target); });
+}
+
+function renderAllCharts(){
+  return queueChartBootstrap();
 }
 window.setupLazyCharts = setupLazyCharts;
 window.renderAllCharts = renderAllCharts;
 window.queueChartBootstrap = queueChartBootstrap;
+window.initChartVisibilityBootstrap = initChartVisibilityBootstrap;
 
 // ===== EXPORT =====
 function _doCanvasExport(callback){
