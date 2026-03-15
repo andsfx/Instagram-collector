@@ -63,9 +63,9 @@ function toggleDebugPanel(){
 }
 
 function syncRuntimeState(parsed){
-  D = normalizeDashboardData(parsed);
-  window.D = D;
-  window.chartInstances = chartInstances;
+  setDashboardData(normalizeDashboardData(parsed));
+  IG_DASH_STATE.chartInstances = chartInstances;
+  syncLegacyGlobalsFromState();
 }
 
 function onData(raw, source){
@@ -84,7 +84,7 @@ function onData(raw, source){
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
   updateDarkBtn(document.documentElement.getAttribute('data-theme') || 'light');
-  document.getElementById('lastUpdate').textContent = 'Update terakhir: ' + prettyLastUpdate(D.lastUpdate || '-');
+  document.getElementById('lastUpdate').textContent = 'Update terakhir: ' + prettyLastUpdate(IG_DASH_STATE.data.lastUpdate || '-');
   if (source === 'cached') setFreshnessBadge('cached', formatAge(Date.now() - parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10)));
   else setFreshnessBadge('fresh', parsed.latest && parsed.latest.date ? parsed.latest.date : todayWibDate());
   renderDebugPanel(source, parsed, validation.ok ? 'schema ok' : validation.issues.join('; '));
@@ -115,14 +115,14 @@ async function fetchWithTimeout(url, timeoutMs){
 }
 
 async function silentRefresh(){
-  if(!D || !D.generated_at) return;
+  if(!IG_DASH_STATE.data || !IG_DASH_STATE.data.generated_at) return;
   try {
     var res = await fetchWithTimeout(STATIC_JSON_URL, 5000);
     if(!res.ok) return;
     var raw = await res.json();
     var validation = validateDashboardRaw(raw);
     if(!validation.ok) return;
-    if(!shouldUseFreshPayload(D, raw)) return;
+    if(!shouldUseFreshPayload(IG_DASH_STATE.data, raw)) return;
     saveToCache(raw);
     setDataSource('static', raw.latest && raw.latest.date ? raw.latest.date : todayWibDate());
     onData(raw, 'static');

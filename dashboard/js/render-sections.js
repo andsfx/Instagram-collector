@@ -159,8 +159,8 @@ function renderTable(){
 document.querySelectorAll('.rtbl thead th').forEach(th => {
   th.addEventListener('click', () => {
     const col = th.getAttribute('data-s');
-    if(sortCol === col) sortAsc = !sortAsc;
-    else { sortCol = col; sortAsc = false; }
+    if(sortCol === col) setDashboardSort(col, !sortAsc);
+    else setDashboardSort(col, false);
     renderTable();
   });
 });
@@ -529,7 +529,7 @@ function setH2HPreset(kind){
 }
 
 function setH2HMetric(metric){
-  h2hMetric = metric;
+  setDashboardH2HMetric(metric);
   renderH2H();
 }
 

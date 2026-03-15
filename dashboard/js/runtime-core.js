@@ -1,20 +1,69 @@
 /* Runtime core: globals, loaders, theme/settings, render orchestration, export */
 
 // ===== GLOBALS =====
-let D = null;
-let curFilter = 'day';
-let sortCol = 'followers';
-let sortAsc = false;
-let h2hMetric = 'followers';
-let chartInstances = {};
+const IG_DASH_STATE = window.IG_DASH_STATE || {
+  data: null,
+  curFilter: 'day',
+  sortCol: 'followers',
+  sortAsc: false,
+  h2hMetric: 'followers',
+  chartInstances: {}
+};
+window.IG_DASH_STATE = IG_DASH_STATE;
+
+let D = IG_DASH_STATE.data;
+let curFilter = IG_DASH_STATE.curFilter;
+let sortCol = IG_DASH_STATE.sortCol;
+let sortAsc = IG_DASH_STATE.sortAsc;
+let h2hMetric = IG_DASH_STATE.h2hMetric;
+let chartInstances = IG_DASH_STATE.chartInstances;
 window.D = D;
 window.chartInstances = chartInstances;
+
+function syncLegacyGlobalsFromState(){
+  D = IG_DASH_STATE.data;
+  curFilter = IG_DASH_STATE.curFilter;
+  sortCol = IG_DASH_STATE.sortCol;
+  sortAsc = IG_DASH_STATE.sortAsc;
+  h2hMetric = IG_DASH_STATE.h2hMetric;
+  chartInstances = IG_DASH_STATE.chartInstances;
+  window.D = D;
+  window.chartInstances = chartInstances;
+}
+
+function setDashboardData(data){
+  IG_DASH_STATE.data = data;
+  syncLegacyGlobalsFromState();
+}
+
+function setDashboardFilter(filter){
+  IG_DASH_STATE.curFilter = filter;
+  syncLegacyGlobalsFromState();
+}
+
+function setDashboardSort(col, asc){
+  IG_DASH_STATE.sortCol = col;
+  IG_DASH_STATE.sortAsc = asc;
+  syncLegacyGlobalsFromState();
+}
+
+function setDashboardH2HMetric(metric){
+  IG_DASH_STATE.h2hMetric = metric;
+  syncLegacyGlobalsFromState();
+}
+
 const COLORS = ['#E1306C','#833AB4','#405DE6','#F77737','#FCAF45','#5B51D8','#FD1D1D','#2ecc71','#00376B','#C13584'];
 const DEFAULTS = {gapFollow:500, erDrop:20, growthSpike:5, followChange:3};
 const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
 window.COLORS = COLORS;
 window.DEFAULTS = DEFAULTS;
 window.DEBUG_MODE = DEBUG_MODE;
+window.syncLegacyGlobalsFromState = syncLegacyGlobalsFromState;
+window.setDashboardData = setDashboardData;
+window.setDashboardFilter = setDashboardFilter;
+window.setDashboardSort = setDashboardSort;
+window.setDashboardH2HMetric = setDashboardH2HMetric;
+syncLegacyGlobalsFromState();
 
 // ===== DYNAMIC SCRIPT LOADER =====
 var _scriptCache = {};
@@ -55,7 +104,7 @@ function toggleDark(){
   html.setAttribute('data-theme', next);
   localStorage.setItem('ig-dash-theme', next);
   updateDarkBtn(next);
-  if(D) renderAllCharts();
+  if(IG_DASH_STATE.data) renderAllCharts();
 }
 
 function updateDarkBtn(theme){
@@ -115,7 +164,7 @@ window.toggleSettings = toggleSettings;
 
 // ===== FILTER =====
 function setF(f){
-  curFilter = f;
+  setDashboardFilter(f);
   document.querySelectorAll('.fbtn').forEach(b => b.classList.toggle('on', b.getAttribute('data-p') === f));
   const fn = document.getElementById('fn');
   const fnt = document.getElementById('fnt');

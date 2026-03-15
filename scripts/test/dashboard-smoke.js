@@ -97,6 +97,8 @@ assert.equal(typeof sandbox.renderCards, 'function', 'renderCards should be load
 assert.equal(typeof sandbox.renderContentBreakdown, 'function', 'renderContentBreakdown should be loaded from render module');
 assert.equal(typeof sandbox.initDashboard, 'function', 'initDashboard should be loaded from runtime data loader module');
 assert.equal(typeof sandbox.forceRefreshData, 'function', 'forceRefreshData should be loaded from runtime data loader module');
+assert.equal(typeof sandbox.IG_DASH_STATE, 'object', 'IG_DASH_STATE namespace should exist');
+assert.equal(sandbox.IG_DASH_STATE.sortCol, 'followers', 'IG_DASH_STATE should track default sort');
 
 console.log(JSON.stringify({
   ok: true,
@@ -104,6 +106,7 @@ console.log(JSON.stringify({
     'frontend validation passes for current data.json',
     'normalizeDashboardData maps dates/trend/engTrend/contentBreakdown correctly',
     'render module functions are loaded from external script',
-    'runtime loader/init functions are loaded from external scripts'
+    'runtime loader/init functions are loaded from external scripts',
+    'IG_DASH_STATE namespace is initialized'
   ]
 }, null, 2));
