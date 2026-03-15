@@ -164,7 +164,22 @@ function formatCaptionSnippet(text) {
 
 function buildPostInsight(raw, followers) {
   if (!raw || !Array.isArray(raw.posts) || !raw.posts.length) return null;
-  const posts = raw.posts.slice(0, 12).map((post) => {
+  const rawPosts = raw.posts.slice(0, 12);
+
+  const hashtagCounts = {};
+  const campaignTermHits = new Set();
+  rawPosts.forEach((post) => {
+    const caption = String(post.caption || '');
+    extractHashtags(caption).forEach((tag) => {
+      hashtagCounts[tag] = (hashtagCounts[tag] || 0) + 1;
+    });
+    const lcCaption = caption.toLowerCase();
+    POST_CAMPAIGN_TERMS.forEach((term) => {
+      if (lcCaption.includes(term)) campaignTermHits.add(term);
+    });
+  });
+
+  const posts = rawPosts.map((post) => {
     const caption = post.caption || '';
     return {
       shortcode: post.shortcode || null,
@@ -173,9 +188,7 @@ function buildPostInsight(raw, followers) {
       likes: Number(post.likes || 0),
       comments: Number(post.comments || 0),
       published_at: post.published_at || null,
-      caption,
       caption_snippet: formatCaptionSnippet(caption),
-      apify_type: post.apify_type || post.type || 'unknown',
     };
   }).map((post) => {
     const interactions = Number(post.likes || 0) + Number(post.comments || 0);
@@ -191,18 +204,11 @@ function buildPostInsight(raw, followers) {
     return acc;
   }, {});
   const dominant_type = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown';
-  const hashtagCounts = posts.reduce((acc, item) => {
-    const tags = extractHashtags(item.caption);
-    tags.forEach((tag) => {
-      acc[tag] = (acc[tag] || 0) + 1;
-    });
-    return acc;
-  }, {});
   const top_hashtags = Object.entries(hashtagCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
     .map(([tag]) => tag);
-  const campaign_terms = POST_CAMPAIGN_TERMS.filter((term) => posts.some((item) => item.caption.toLowerCase().includes(term)));
+  const campaign_terms = Array.from(campaignTermHits);
 
   const erValues = posts.map((post) => post.post_er).filter((value) => Number.isFinite(value));
   let q1 = null;
