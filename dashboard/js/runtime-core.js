@@ -421,8 +421,10 @@ function exportPDF(){
       var logoDataURL = await _loadBrandLogoDataURL();
 
       var BRAND = {
-        pink: [225, 48, 108],
-        tosca: [33, 190, 176],
+        pink: [225, 55, 125],
+        pinkSoft: [246, 213, 226],
+        tosca: [31, 184, 176],
+        toscaSoft: [214, 244, 240],
         dark: [24, 34, 52],
         bg: [246, 248, 251],
         muted: [96, 108, 126]
@@ -457,9 +459,13 @@ function exportPDF(){
         pdf.setFillColor(BRAND.bg[0], BRAND.bg[1], BRAND.bg[2]);
         pdf.rect(0, 0, pageW, 82, 'F');
         pdf.setFillColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
-        pdf.rect(0, 0, pageW * 0.42, 8, 'F');
+        pdf.rect(0, 0, pageW * 0.34, 8, 'F');
+        pdf.setFillColor(95, 205, 191);
+        pdf.rect(pageW * 0.34, 0, pageW * 0.18, 8, 'F');
+        pdf.setFillColor(198, 108, 162);
+        pdf.rect(pageW * 0.52, 0, pageW * 0.18, 8, 'F');
         pdf.setFillColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
-        pdf.rect(pageW * 0.42, 0, pageW * 0.58, 8, 'F');
+        pdf.rect(pageW * 0.70, 0, pageW * 0.30, 8, 'F');
         pdf.setFillColor(255, 255, 255);
         pdf.roundedRect(marginX, 16, 92, 44, 8, 8, 'F');
         if(logoDataURL){
@@ -542,9 +548,13 @@ function exportPDF(){
       pdf.setFillColor(BRAND.bg[0], BRAND.bg[1], BRAND.bg[2]);
       pdf.rect(0, 0, pageW, pageH, 'F');
       pdf.setFillColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
-      pdf.rect(0, 0, pageW * 0.65, 16, 'F');
+      pdf.rect(0, 0, pageW * 0.4, 16, 'F');
+      pdf.setFillColor(95, 205, 191);
+      pdf.rect(pageW * 0.4, 0, pageW * 0.2, 16, 'F');
+      pdf.setFillColor(198, 108, 162);
+      pdf.rect(pageW * 0.6, 0, pageW * 0.18, 16, 'F');
       pdf.setFillColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
-      pdf.rect(pageW * 0.65, 0, pageW * 0.35, 16, 'F');
+      pdf.rect(pageW * 0.78, 0, pageW * 0.22, 16, 'F');
       pdf.setFillColor(255, 255, 255);
       pdf.roundedRect(marginX, 36, 180, 74, 12, 12, 'F');
       if(logoDataURL){
@@ -602,7 +612,7 @@ function exportPDF(){
           pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
           pdf.text(String(card.value || '-'), x + 18, y + 40);
           if(card.account){
-            pdf.setFillColor(248, 233, 239);
+            pdf.setFillColor(BRAND.pinkSoft[0], BRAND.pinkSoft[1], BRAND.pinkSoft[2]);
             pdf.roundedRect(x + 16, y + 50, 86, 18, 8, 8, 'F');
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(9);
@@ -709,7 +719,7 @@ function exportPDF(){
         (ca?.accounts || []).slice(0,5).forEach(function(item){
           pdf.setFillColor(255,255,255); pdf.roundedRect(marginX, y, contentW, 48, 8, 8, 'F');
           pdf.setDrawColor(232,236,242); pdf.roundedRect(marginX, y, contentW, 48, 8, 8, 'S');
-          pdf.setFillColor(238, 250, 248); pdf.roundedRect(marginX, y, 84, 48, 8, 8, 'F');
+          pdf.setFillColor(BRAND.toscaSoft[0], BRAND.toscaSoft[1], BRAND.toscaSoft[2]); pdf.roundedRect(marginX, y, 84, 48, 8, 8, 'F');
           pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
           pdf.text('@'+item.account, marginX+10, y+20);
           pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
@@ -735,7 +745,7 @@ function exportPDF(){
           var y = contentTop + row * (cardH + 12);
           pdf.setFillColor(255,255,255); pdf.roundedRect(x, y, cardW, cardH, 10, 10, 'F');
           pdf.setDrawColor(232,236,242); pdf.roundedRect(x, y, cardW, cardH, 10, 10, 'S');
-          pdf.setFillColor(241, 252, 249); pdf.roundedRect(x, y, cardW, 24, 10, 10, 'F');
+          pdf.setFillColor(BRAND.toscaSoft[0], BRAND.toscaSoft[1], BRAND.toscaSoft[2]); pdf.roundedRect(x, y, cardW, 24, 10, 10, 'F');
           pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
           pdf.text('@'+item.account, x+10, y+16);
           pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
@@ -746,7 +756,7 @@ function exportPDF(){
           pdf.text('Avg komentar: ' + item.averageCommentsLabel, x+10, y+56);
           pdf.text('Format dominan: ' + titleCase(item.dominantType), x+10, y+70);
           pdf.setFillColor(248,233,239); pdf.roundedRect(x+10, y+80, 78, 18, 8, 8, 'F');
-          pdf.setFillColor(235,250,247); pdf.roundedRect(x+96, y+80, 104, 18, 8, 8, 'F');
+          pdf.setFillColor(BRAND.toscaSoft[0], BRAND.toscaSoft[1], BRAND.toscaSoft[2]); pdf.roundedRect(x+96, y+80, 104, 18, 8, 8, 'F');
           pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
           pdf.text('Post viral: ' + item.viralPosts, x+18, y+92);
           pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
