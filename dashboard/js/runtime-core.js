@@ -487,11 +487,11 @@ function exportPDF(){
         pdf.setDrawColor(226, 231, 239);
         pdf.line(marginX, pageH - 24, pageW - marginX, pageH - 24);
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-        pdf.text('Competitor Performance Report · Metropolitan Mall Bekasi', marginX, pageH - 11);
-        pdf.setTextColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
-        pdf.text('Halaman ' + pageCount, pageW - marginX - 44, pageH - 11);
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 156, 166);
+        pdf.text('Metropolitan Mall Bekasi', marginX, pageH - 11);
+        pdf.setTextColor(170, 175, 184);
+        pdf.text('Hal. ' + pageCount, pageW - marginX - 28, pageH - 11);
       }
 
       function header(title, subtitle){
@@ -506,7 +506,8 @@ function exportPDF(){
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(10.5);
         pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-        pdf.text(subtitle || '', pageW - marginX - 220, 30);
+        var subLines = pdf.splitTextToSize(String(subtitle || ''), 220);
+        pdf.text(subLines.slice(0,2), pageW - marginX - 220, 28);
       }
 
       function startNewPage(title, subtitle){
@@ -857,8 +858,8 @@ function exportPDF(){
 
       if(report){
         startNewPage('Executive Summary', _formatPresentationDate(report.meta?.generatedAtWib || report.meta?.generatedAt));
-        var y1 = drawKpiCards(report.executiveSummary?.kpis || [], contentTop + 4);
-        drawBullets(report.executiveSummary?.bullets || [], y1 + 10, 'Key Takeaways');
+        var y1 = drawKpiCards((report.executiveSummary?.kpis || []).slice(0, 6), contentTop + 4, { cols: 2, cardH: 74, gap: 14 });
+        drawBullets(report.executiveSummary?.bullets || [], y1 + 8, 'Key Takeaways');
         drawOverviewTable(report.competitiveOverview || []);
         drawGrowthPositioning(report.growthPositioning || {});
         drawCampaignAnalysis(report.campaignAnalysis || {});
