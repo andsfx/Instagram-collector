@@ -129,11 +129,12 @@ function renderPostSnapshot(){
   if(!container) return;
   const insights = (dashData() && dashData().post_insights) || {};
   const accounts = dashData().accounts || [];
-  if(!accounts.length){
+  const usernames = accounts.map((acc) => typeof acc === 'string' ? acc : acc.u).filter(Boolean);
+  if(!usernames.length){
     container.innerHTML = '<div class="ps-empty">Data akun belum tersedia.</div>';
     return;
   }
-  const html = accounts.map((username) => {
+  const html = usernames.map((username) => {
     const insight = insights[username];
     if(!insight){
       return `<div class="ps-card"><div class="ps-card-title">@${username}</div><div class="ps-empty">Data postingan belum tersedia.</div></div>`;
