@@ -345,16 +345,149 @@ function exportPNG(){
   });
 }
 
+function _collectPresentationInsights(){
+  var summaryPairs = [];
+  document.querySelectorAll('#summaryStrip .summary-card').forEach(function(card){
+    var k = (card.querySelector('.k') && card.querySelector('.k').textContent || '').trim();
+    var v = (card.querySelector('.v') && card.querySelector('.v').textContent || '').trim();
+    if(k && v) summaryPairs.push({ key: k, value: v });
+  });
+
+  var campaignPairs = [];
+  document.querySelectorAll('#postCampaignSummary .ps-summary-card').forEach(function(card){
+    var k = (card.querySelector('.ps-summary-k') && card.querySelector('.ps-summary-k').textContent || '').trim();
+    var v = (card.querySelector('.ps-summary-v') && card.querySelector('.ps-summary-v').textContent || '').trim();
+    if(k && v) campaignPairs.push({ key: k, value: v });
+  });
+
+  return {
+    updatedAt: (document.getElementById('lastUpdate') && document.getElementById('lastUpdate').textContent || '').trim(),
+    summaryPairs: summaryPairs,
+    campaignPairs: campaignPairs
+  };
+}
+
 function exportPDF(){
-  _doCanvasExport(function(canvas){
-    var imgData = canvas.toDataURL('image/png');
-    var pdf = new jspdf.jsPDF({
-      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height]
-    });
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    pdf.save('instagram-dashboard-' + new Date().toISOString().slice(0,10) + '.pdf');
+  var overlay = document.getElementById('exportOverlay');
+  var msg = document.getElementById('exportMsg');
+  overlay.style.display = 'flex';
+  msg.textContent = 'Loading export libraries...';
+
+  loadExportLibs().then(async function(){
+    try {
+      msg.textContent = 'Menyiapkan template presentasi...';
+      await queueChartBootstrap();
+      await new Promise(function(resolve){ setTimeout(resolve, 500); });
+
+      var pdf = new jspdf.jsPDF({
+        orientation: 'landscape',
+        unit: 'pt',
+        format: 'a4'
+      });
+      var pageW = pdf.internal.pageSize.getWidth();
+      var pageH = pdf.internal.pageSize.getHeight();
+      var marginX = 34;
+      var marginTop = 30;
+      var contentTop = 96;
+      var contentW = pageW - marginX * 2;
+      var contentH = pageH - contentTop - 28;
+
+      function header(title, subtitle){
+        pdf.setFillColor(246, 247, 251);
+        pdf.rect(0, 0, pageW, 78, 'F');
+        pdf.setTextColor(25, 28, 35);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(18);
+        pdf.text(title, marginX, 36);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(11);
+        pdf.setTextColor(92, 101, 115);
+        pdf.text(subtitle || '', marginX, 56);
+      }
+
+      function drawInsightsTable(title, pairs, startY){
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.setTextColor(35, 40, 48);
+        pdf.text(title, marginX, startY);
+        var y = startY + 14;
+        pairs.slice(0, 6).forEach(function(item){
+          pdf.setDrawColor(228, 232, 240);
+          pdf.rect(marginX, y, contentW, 24);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(10);
+          pdf.setTextColor(76, 85, 101);
+          pdf.text(item.key, marginX + 8, y + 15);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(31, 41, 55);
+          var val = String(item.value || '-');
+          if (val.length > 72) val = val.slice(0, 69) + '...';
+          pdf.text(val, marginX + 210, y + 15);
+          y += 28;
+        });
+        return y;
+      }
+
+      function addSectionCapture(sectionId, sectionTitle, subtitle){
+        var section = document.getElementById(sectionId);
+        if(!section) return Promise.resolve();
+        msg.textContent = 'Menyusun slide: ' + sectionTitle + '...';
+        return html2canvas(section, {
+          backgroundColor: '#f4f5f7',
+          scale: 2,
+          useCORS: true,
+          logging: false
+        }).then(function(canvas){
+          pdf.addPage();
+          header(sectionTitle, subtitle);
+          var ratio = Math.min(contentW / canvas.width, contentH / canvas.height);
+          var imgW = canvas.width * ratio;
+          var imgH = canvas.height * ratio;
+          var x = marginX + (contentW - imgW) / 2;
+          var y = contentTop + (contentH - imgH) / 2;
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imgW, imgH, undefined, 'FAST');
+        });
+      }
+
+      // Cover page
+      pdf.setFillColor(244, 245, 247);
+      pdf.rect(0, 0, pageW, pageH, 'F');
+      pdf.setFillColor(225, 48, 108);
+      pdf.rect(0, 0, pageW, 10, 'F');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(25, 28, 35);
+      pdf.setFontSize(26);
+      pdf.text('Instagram Dashboard Report', marginX, 96);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(14);
+      pdf.setTextColor(92, 101, 115);
+      pdf.text('Template siap presentasi (auto-generated)', marginX, 124);
+      pdf.setFontSize(11);
+      var dateLabel = 'Generated: ' + new Date().toLocaleString('id-ID');
+      pdf.text(dateLabel, marginX, 154);
+
+      // Executive summary page
+      var insight = _collectPresentationInsights();
+      pdf.addPage();
+      header('Executive Summary', insight.updatedAt || 'Ringkasan performa terbaru');
+      var y1 = drawInsightsTable('Ringkasan Umum', insight.summaryPairs, contentTop + 4);
+      drawInsightsTable('Ringkasan Campaign', insight.campaignPairs, y1 + 14);
+
+      // Visual pages
+      await addSectionCapture('sec-overview', '1) Ringkasan', 'Overview akun, growth, snapshot, dan ranking');
+      await addSectionCapture('sec-engagement', '2) Interaksi', 'Grafik performa dan perbandingan head-to-head');
+      await addSectionCapture('sec-content', '3) Performa Konten', 'Breakdown konten dan heatmap posting');
+      await addSectionCapture('sec-history', '4) Riwayat & Insight', 'Insight utama dari data historis');
+
+      pdf.save('instagram-dashboard-report-' + new Date().toISOString().slice(0,10) + '.pdf');
+      overlay.style.display = 'none';
+    } catch (err) {
+      msg.textContent = 'Gagal export PDF: ' + (err && err.message ? err.message : err);
+      setTimeout(function(){ overlay.style.display = 'none'; }, 2500);
+    }
+  }).catch(function(err){
+    msg.textContent = 'Gagal load library: ' + err.message;
+    setTimeout(function(){ overlay.style.display = 'none'; }, 2000);
   });
 }
 window.exportPNG = exportPNG;
