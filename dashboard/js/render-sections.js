@@ -643,6 +643,10 @@ function renderH2H(){
   html += '</tbody></table>';
   replaceWithFragment(grid, html);
 
+  if(typeof Chart === 'undefined'){
+    loadChartJS().then(function(){ renderH2H(); }).catch(function(err){ console.error('Chart.js load failed for H2H:', err); });
+    return;
+  }
   destroyChart('h2h');
   var ctx = document.getElementById('chH2H').getContext('2d');
   var seriesA = activeMetric.series(uA);
