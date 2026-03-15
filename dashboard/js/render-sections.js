@@ -37,7 +37,7 @@ function renderSummaryStrip(){
 // ===== OVERVIEW CARDS =====
 function renderCards(){
   const el = document.getElementById('cards');
-  const accs = dashData().accounts.sort((a,b) => b.f - a.f);
+  const accs = [...dashData().accounts].sort((a,b) => b.f - a.f);
   const cardClasses = ['cc','cg','ca','cr'];
   replaceWithFragment(el, accs.map((a, i) => {
     const cls = a.b ? 'acard brand' : 'acard ' + cardClasses[i % cardClasses.length];

@@ -1,6 +1,6 @@
 /* Runtime data loader: status UI, data fetch/cache, debug panel */
 
-const STATIC_JSON_URL = './data.json?v=' + Date.now();
+const STATIC_JSON_URL = './data.json';
 window.STATIC_JSON_URL = STATIC_JSON_URL;
 
 function setFreshnessBadge(type, extra){
@@ -100,12 +100,12 @@ function onError(e, raw){
   renderDebugPanel('error', raw || null, e && e.message ? e.message : 'unknown error');
 }
 
-async function fetchWithTimeout(url, timeoutMs){
+async function fetchWithTimeout(url, timeoutMs, cacheMode){
   var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   var timer = null;
   try {
     if(controller) timer = setTimeout(function(){ controller.abort(); }, timeoutMs || 5000);
-    var options = { cache: 'no-store' };
+    var options = { cache: cacheMode || 'default' };
     if(controller) options.signal = controller.signal;
     return await fetch(url, options);
   } finally {
@@ -117,7 +117,7 @@ async function silentRefresh(){
   var data = getDashboardData();
   if(!data || !data.generated_at) return;
   try {
-    var res = await fetchWithTimeout(STATIC_JSON_URL, 5000);
+    var res = await fetchWithTimeout(STATIC_JSON_URL, 5000, 'no-cache');
     if(!res.ok) return;
     var raw = await res.json();
     var validation = validateDashboardRaw(raw);
@@ -139,7 +139,7 @@ async function initDashboard(){
     return;
   }
   try {
-    var res = await fetchWithTimeout(STATIC_JSON_URL, 5000);
+    var res = await fetchWithTimeout(STATIC_JSON_URL, 5000, 'default');
     if(!res.ok) throw new Error('Gagal memuat data.json (HTTP ' + res.status + ')');
     var raw = await res.json();
     var validation = validateDashboardRaw(raw);
