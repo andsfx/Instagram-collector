@@ -390,11 +390,24 @@ function exportPDF(){
       var marginTop = 30;
       var contentTop = 96;
       var contentW = pageW - marginX * 2;
-      var contentH = pageH - contentTop - 28;
+      var contentH = pageH - contentTop - 34;
+      var pageCount = 1;
+
+      function drawFooter(){
+        pdf.setDrawColor(232, 236, 242);
+        pdf.line(marginX, pageH - 24, pageW - marginX, pageH - 24);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(120, 128, 140);
+        pdf.text('Instagram Dashboard · Metropolitan Mall Bekasi', marginX, pageH - 11);
+        pdf.text('Halaman ' + pageCount, pageW - marginX - 44, pageH - 11);
+      }
 
       function header(title, subtitle){
         pdf.setFillColor(246, 247, 251);
         pdf.rect(0, 0, pageW, 78, 'F');
+        pdf.setFillColor(225, 48, 108);
+        pdf.rect(0, 0, pageW, 6, 'F');
         pdf.setTextColor(25, 28, 35);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(18);
@@ -403,6 +416,13 @@ function exportPDF(){
         pdf.setFontSize(11);
         pdf.setTextColor(92, 101, 115);
         pdf.text(subtitle || '', marginX, 56);
+      }
+
+      function startNewPage(title, subtitle){
+        pdf.addPage();
+        pageCount += 1;
+        header(title, subtitle);
+        drawFooter();
       }
 
       function drawInsightsTable(title, pairs, startY){
@@ -438,17 +458,29 @@ function exportPDF(){
           useCORS: true,
           logging: false
         }).then(function(canvas){
-          pdf.addPage();
-          header(sectionTitle, subtitle);
-          var ratio = Math.min(contentW / canvas.width, contentH / canvas.height);
-          var imgW = canvas.width * ratio;
-          var imgH = canvas.height * ratio;
-          var x = marginX + (contentW - imgW) / 2;
-          var y = contentTop + (contentH - imgH) / 2;
-          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imgW, imgH, undefined, 'FAST');
+          var ratio = contentW / canvas.width;
+          var slicePixelHeight = Math.max(1, Math.floor(contentH / ratio));
+          var totalSlices = Math.max(1, Math.ceil(canvas.height / slicePixelHeight));
+
+          for (var i = 0; i < totalSlices; i++) {
+            startNewPage(sectionTitle + (totalSlices > 1 ? ' (' + (i + 1) + '/' + totalSlices + ')' : ''), subtitle);
+            var sy = i * slicePixelHeight;
+            var sh = Math.min(slicePixelHeight, canvas.height - sy);
+
+            var temp = document.createElement('canvas');
+            temp.width = canvas.width;
+            temp.height = sh;
+            var ctx = temp.getContext('2d');
+            ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+
+            var imgW = contentW;
+            var imgH = sh * ratio;
+            var x = marginX;
+            var y = contentTop;
+            pdf.addImage(temp.toDataURL('image/png'), 'PNG', x, y, imgW, imgH, undefined, 'FAST');
+          }
         });
       }
-
       // Cover page
       pdf.setFillColor(244, 245, 247);
       pdf.rect(0, 0, pageW, pageH, 'F');
@@ -465,11 +497,11 @@ function exportPDF(){
       pdf.setFontSize(11);
       var dateLabel = 'Generated: ' + new Date().toLocaleString('id-ID');
       pdf.text(dateLabel, marginX, 154);
+      drawFooter();
 
       // Executive summary page
       var insight = _collectPresentationInsights();
-      pdf.addPage();
-      header('Executive Summary', insight.updatedAt || 'Ringkasan performa terbaru');
+      startNewPage('Executive Summary', insight.updatedAt || 'Ringkasan performa terbaru');
       var y1 = drawInsightsTable('Ringkasan Umum', insight.summaryPairs, contentTop + 4);
       drawInsightsTable('Ringkasan Campaign', insight.campaignPairs, y1 + 14);
 
