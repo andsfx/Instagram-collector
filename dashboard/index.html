@@ -449,10 +449,16 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 .ps-card-meta { font-size: 12px; color: var(--t3); margin-top: 4px; }
 .ps-card-badge { font-size: 11px; color: var(--t2); background: rgba(52, 152, 219, 0.12); padding: 2px 8px; border-radius: 999px; }
 .ps-card-hashtags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-card-stats { display: flex; flex-wrap: wrap; gap: 6px; }
 .ps-chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; color: var(--t3); background: var(--card); }
 .ps-chip.muted { opacity: 0.6; }
 .ps-card-posts { display: flex; flex-direction: column; gap: 8px; }
 .ps-post { border-top: 1px solid rgba(0, 0, 0, 0.08); padding-top: 8px; }
+.ps-post-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+.ps-post-tag { font-size:10px; padding:2px 8px; border-radius:999px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
+.ps-post-tag.viral { background: rgba(46, 204, 113, 0.16); color: #1e8449; }
+.ps-post-tag.normal { background: rgba(52, 152, 219, 0.14); color: #21618c; }
+.ps-post-tag.underperform { background: rgba(231, 76, 60, 0.14); color: #922b21; }
 .ps-post-link { font-weight: 600; color: var(--t2); text-decoration: none; font-size: 13px; }
 .ps-post-caption { font-size: 12px; color: var(--t3); margin: 4px 0; }
 .ps-post-meta { font-size: 11px; color: var(--t3); }

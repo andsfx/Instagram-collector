@@ -43,8 +43,19 @@
     if (!raw || !raw.generated_at_wib) issues.push('generated_at_wib tidak ada');
     if (!raw || !Array.isArray(raw.history) || raw.history.length === 0) issues.push('history kosong');
     if (!raw || typeof raw.content_breakdown !== 'object' || raw.content_breakdown === null) issues.push('content_breakdown tidak ada');
+    if (!raw || typeof raw.post_insights !== 'object' || raw.post_insights === null) issues.push('post_insights tidak ada');
     var accounts = raw && Array.isArray(raw.accounts) ? raw.accounts : [];
     REQUIRED_ACCOUNTS.forEach(function(u){ if (accounts.indexOf(u) === -1) issues.push('akun wajib hilang: ' + u); });
+    if (raw && raw.post_insights && typeof raw.post_insights === 'object') {
+      accounts.forEach(function(u){
+        if (!(u in raw.post_insights)) {
+          issues.push('post_insights akun hilang: ' + u);
+          return;
+        }
+        var insight = raw.post_insights[u];
+        if (insight && !Array.isArray(insight.posts)) issues.push('post_insights.posts invalid untuk: ' + u);
+      });
+    }
     if (raw && raw.latest && raw.latest.date && raw.history && raw.history.length) {
       var lastHistoryDate = raw.history[raw.history.length - 1] && raw.history[raw.history.length - 1].date;
       if (lastHistoryDate && raw.latest.date !== lastHistoryDate) issues.push('latest.date tidak sinkron dengan history terakhir');

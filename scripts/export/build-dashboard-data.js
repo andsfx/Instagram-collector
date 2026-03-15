@@ -162,7 +162,7 @@ function formatCaptionSnippet(text) {
   return `${normalized.slice(0, 90).trim()}...`;
 }
 
-function buildPostInsight(raw) {
+function buildPostInsight(raw, followers) {
   if (!raw || !Array.isArray(raw.posts) || !raw.posts.length) return null;
   const posts = raw.posts.slice(0, 12).map((post) => {
     const caption = post.caption || '';
@@ -177,6 +177,10 @@ function buildPostInsight(raw) {
       caption_snippet: formatCaptionSnippet(caption),
       apify_type: post.apify_type || post.type || 'unknown',
     };
+  }).map((post) => {
+    const interactions = Number(post.likes || 0) + Number(post.comments || 0);
+    const post_er = followers && followers > 0 ? Number(((interactions / followers) * 100).toFixed(4)) : null;
+    return { ...post, interactions, post_er, performance_label: 'normal' };
   });
   if (!posts.length) return null;
   const average_likes = Number((posts.reduce((sum, item) => sum + item.likes, 0) / posts.length).toFixed(2));
@@ -199,13 +203,39 @@ function buildPostInsight(raw) {
     .slice(0, 3)
     .map(([tag]) => tag);
   const campaign_terms = POST_CAMPAIGN_TERMS.filter((term) => posts.some((item) => item.caption.toLowerCase().includes(term)));
+
+  const erValues = posts.map((post) => post.post_er).filter((value) => Number.isFinite(value));
+  let q1 = null;
+  let q3 = null;
+  if (erValues.length >= 4) {
+    const sorted = [...erValues].sort((a, b) => a - b);
+    q1 = sorted[Math.floor((sorted.length - 1) * 0.25)];
+    q3 = sorted[Math.floor((sorted.length - 1) * 0.75)];
+  }
+
+  const labeledPosts = posts.map((post) => {
+    if (!Number.isFinite(post.post_er) || q1 == null || q3 == null || q1 === q3) {
+      return { ...post, performance_label: 'normal' };
+    }
+    if (post.post_er >= q3) return { ...post, performance_label: 'viral' };
+    if (post.post_er <= q1) return { ...post, performance_label: 'underperform' };
+    return { ...post, performance_label: 'normal' };
+  });
+
+  const avg_post_er = erValues.length ? Number((erValues.reduce((sum, item) => sum + item, 0) / erValues.length).toFixed(4)) : null;
+  const viral_posts = labeledPosts.filter((post) => post.performance_label === 'viral').length;
+  const underperform_posts = labeledPosts.filter((post) => post.performance_label === 'underperform').length;
+
   return {
-    posts,
+    posts: labeledPosts,
     average_likes,
     average_comments,
+    average_post_er: avg_post_er,
     dominant_type,
     top_hashtags,
     campaign_terms: [...new Set(campaign_terms)],
+    viral_posts,
+    underperform_posts,
   };
 }
 
@@ -306,7 +336,8 @@ function main() {
   const post_insights = {};
 for (const username of accounts) {
   const rawPosts = loadLatestPostData(repoRoot, username);
-  post_insights[username] = buildPostInsight(rawPosts);
+  const followers = latest[username] && Number.isFinite(latest[username].followers) ? latest[username].followers : null;
+  post_insights[username] = buildPostInsight(rawPosts, followers);
 }
 
 const now = new Date();
