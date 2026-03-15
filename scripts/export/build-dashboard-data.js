@@ -128,6 +128,88 @@ function buildContentBreakdownMap(rows) {
   return map;
 }
 
+const HASHTAG_REGEX = /#[\p{L}0-9_]+/gu;
+const POST_CAMPAIGN_TERMS = ['promo', 'diskon', 'event', 'grand opening', 'new tenant', 'launch', 'special', 'giveaway', 'limited', 'opening', 'promo menarik'];
+
+function loadLatestPostData(repoRoot, username) {
+  const candidates = [
+    path.join(repoRoot, 'data', 'raw', 'posts', `${username}-latest12-full.json`),
+    path.join(repoRoot, `${username}-latest12-full.json`),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      try {
+        return readJson(candidate);
+      } catch (err) {
+        console.warn(`failed to read ${candidate}: ${err.message}`);
+        return null;
+      }
+    }
+  }
+  return null;
+}
+
+function extractHashtags(text) {
+  if (!text) return [];
+  const matches = [...(text.matchAll(HASHTAG_REGEX))].map((m) => m[0].toLowerCase());
+  return matches;
+}
+
+function formatCaptionSnippet(text) {
+  if (!text) return '';
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (normalized.length <= 90) return normalized;
+  return `${normalized.slice(0, 90).trim()}...`;
+}
+
+function buildPostInsight(raw) {
+  if (!raw || !Array.isArray(raw.posts) || !raw.posts.length) return null;
+  const posts = raw.posts.slice(0, 12).map((post) => {
+    const caption = post.caption || '';
+    return {
+      shortcode: post.shortcode || null,
+      url: post.url || null,
+      type: post.type || post.apify_type || 'unknown',
+      likes: Number(post.likes || 0),
+      comments: Number(post.comments || 0),
+      published_at: post.published_at || null,
+      caption,
+      caption_snippet: formatCaptionSnippet(caption),
+      apify_type: post.apify_type || post.type || 'unknown',
+    };
+  });
+  if (!posts.length) return null;
+  const average_likes = Number((posts.reduce((sum, item) => sum + item.likes, 0) / posts.length).toFixed(2));
+  const average_comments = Number((posts.reduce((sum, item) => sum + item.comments, 0) / posts.length).toFixed(2));
+  const typeCounts = posts.reduce((acc, item) => {
+    const key = item.type || 'unknown';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const dominant_type = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown';
+  const hashtagCounts = posts.reduce((acc, item) => {
+    const tags = extractHashtags(item.caption);
+    tags.forEach((tag) => {
+      acc[tag] = (acc[tag] || 0) + 1;
+    });
+    return acc;
+  }, {});
+  const top_hashtags = Object.entries(hashtagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([tag]) => tag);
+  const campaign_terms = POST_CAMPAIGN_TERMS.filter((term) => posts.some((item) => item.caption.toLowerCase().includes(term)));
+  return {
+    posts,
+    average_likes,
+    average_comments,
+    dominant_type,
+    top_hashtags,
+    campaign_terms: [...new Set(campaign_terms)],
+  };
+}
+
+
 function computeGrowth(history, username) {
   if (history.length < 2) {
     return { followers_change_1d: 0, followers_change_7d: 0, pct_change_7d: 0, anomaly_detected: false, notes: [] };
@@ -221,7 +303,13 @@ function main() {
     content_breakdown[username] = contentByUser.get(username) || null;
   }
 
-  const now = new Date();
+  const post_insights = {};
+for (const username of accounts) {
+  const rawPosts = loadLatestPostData(repoRoot, username);
+  post_insights[username] = buildPostInsight(rawPosts);
+}
+
+const now = new Date();
   const output = {
     generated_at: now.toISOString(),
     generated_at_wib: formatWib(now.toISOString()),
@@ -233,6 +321,7 @@ function main() {
     growth,
     rankings,
     content_breakdown,
+    post_insights,
     meta: {
       brand_account: accounts[0] || null,
       history_days: history.length,

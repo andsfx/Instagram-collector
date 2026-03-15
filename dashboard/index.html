@@ -440,6 +440,24 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 [data-theme="dark"] .skel-chart,.dark .skel-chart{background:#1e1e1e;border-color:#333}
 [data-theme="dark"] .skel-trow,.dark .skel-trow{background:#1e1e1e;border-color:#333}
 [data-theme="dark"] .skel-card,.dark .skel-card{background:#1e1e1e;border-color:#333}
+
+.ps-sec { margin-top: 28px; margin-bottom: 16px; }
+.ps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
+.ps-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); min-height: 210px; }
+.ps-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ps-card-title { font-weight: 700; font-size: 15px; }
+.ps-card-meta { font-size: 12px; color: var(--t3); margin-top: 4px; }
+.ps-card-badge { font-size: 11px; color: var(--t2); background: rgba(52, 152, 219, 0.12); padding: 2px 8px; border-radius: 999px; }
+.ps-card-hashtags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; color: var(--t3); background: var(--card); }
+.ps-chip.muted { opacity: 0.6; }
+.ps-card-posts { display: flex; flex-direction: column; gap: 8px; }
+.ps-post { border-top: 1px solid rgba(0, 0, 0, 0.08); padding-top: 8px; }
+.ps-post-link { font-weight: 600; color: var(--t2); text-decoration: none; font-size: 13px; }
+.ps-post-caption { font-size: 12px; color: var(--t3); margin: 4px 0; }
+.ps-post-meta { font-size: 11px; color: var(--t3); }
+.ps-campaign { font-size: 11px; color: var(--t3); margin: 4px 0 4px 0; }
+.ps-empty { font-size: 13px; color: var(--t3); grid-column: 1 / -1; text-align: center; }
 </style>
 </head>
 <body>
@@ -563,6 +581,11 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   <div class="stitle"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>Growth Velocity<span class="gv-info-toggle" onclick="document.getElementById('gvInfoBox').classList.toggle('open');this.classList.toggle('active')" title="Penjelasan Growth Velocity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Apa ini?</span></div>
   <div class="gv-info-box" id="gvInfoBox"><div class="gv-info-content"><div class="gv-info-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Memahami Growth Velocity</div><div class="gv-info-desc">Growth Velocity mengukur <strong>kecepatan pertumbuhan followers per hari</strong>. Bukan hanya melihat naik atau turun, tapi seberapa cepat perubahannya. Metrik ini membantu mendeteksi momentum akun &mdash; apakah sedang akselerasi atau melambat.</div><div class="gv-info-cards"><div class="gv-info-card"><div class="gv-info-card-icon" style="background:rgba(46,204,113,.12)">&#x1F4C8;</div><div class="gv-info-card-label">Daily Growth</div><div class="gv-info-card-text">Selisih followers hari ini vs kemarin. Positif = bertambah, negatif = berkurang.</div></div><div class="gv-info-card"><div class="gv-info-card-icon" style="background:rgba(52,152,219,.12)">&#x1F4C5;</div><div class="gv-info-card-label">Weekly Growth</div><div class="gv-info-card-text">Total perubahan followers dalam 7 hari terakhir. Menunjukkan tren jangka pendek.</div></div><div class="gv-info-card"><div class="gv-info-card-icon" style="background:rgba(155,89,182,.12)">&#x1F4CA;</div><div class="gv-info-card-label">Progress Bar</div><div class="gv-info-card-text">Visualisasi persentase pertumbuhan relatif terhadap target atau kompetitor tertinggi.</div></div><div class="gv-info-card"><div class="gv-info-card-icon" style="background:rgba(241,196,15,.12)">&#x26A1;</div><div class="gv-info-card-label">Sparkline</div><div class="gv-info-card-text">Mini chart 7 hari terakhir. Hijau = growth positif, merah = negatif, abu = stabil.</div></div></div></div></div>
   <div class="gv-grid" id="gvCards"></div>
+</section>
+
+<section class="ps-sec reveal rv-up" id="sec-post-snapshot">
+  <div class="stitle"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FCAF45" stroke-width="2.5"><rect x="4" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/><rect x="16" y="5" width="4" height="4"/><rect x="4" y="11" width="4" height="4"/><rect x="10" y="11" width="4" height="4"/><rect x="16" y="11" width="4" height="4"/></svg></div>12-Post Snapshot<span>Analisa 12 postingan terakhir tiap akun</span></div>
+  <div class="ps-grid" id="postSnapshotGrid"></div>
 </section>
 
 <!-- RANKING TABLE -->

@@ -6,6 +6,17 @@ function dashData(){
   return getDashboardData();
 }
 
+function escapeHtml(text){
+  if(!text) return '';
+  return String(text).replace(/[&<>]/g,(char)=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[char]));
+}
+
+function formatPostDate(iso){
+  if(!iso) return '-';
+  const d = new Date(iso);
+  return d.toLocaleDateString('id-ID',{ day:'2-digit', month:'short' });
+}
+
 function renderSummaryStrip(){
   var el = document.getElementById('summaryStrip');
   if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
@@ -112,6 +123,52 @@ function renderGrowthVelocity(){
     </div>`;
   }).join(''));
 }
+
+function renderPostSnapshot(){
+  const container = document.getElementById('postSnapshotGrid');
+  if(!container) return;
+  const insights = (dashData() && dashData().post_insights) || {};
+  const accounts = dashData().accounts || [];
+  if(!accounts.length){
+    container.innerHTML = '<div class="ps-empty">Data akun belum tersedia.</div>';
+    return;
+  }
+  const html = accounts.map((username) => {
+    const insight = insights[username];
+    if(!insight){
+      return `<div class="ps-card"><div class="ps-card-title">@${username}</div><div class="ps-empty">Data postingan belum tersedia.</div></div>`;
+    }
+    const posts = insight.posts || [];
+    const averageLikes = Number.isFinite(insight.average_likes) ? fmtFull(insight.average_likes) : '-';
+    const averageComments = Number.isFinite(insight.average_comments) ? fmtFull(insight.average_comments) : '-';
+    const hashtagHtml = (insight.top_hashtags || []).map((tag) => `<span class="ps-chip">${escapeHtml(tag)}</span>`).join('') || '<span class="ps-chip muted">No hashtags</span>';
+    const postRows = posts.length ? posts.slice(0, 3).map((post) => {
+      const date = formatPostDate(post.published_at);
+      const caption = post.caption_snippet || post.caption || post.shortcode || '';
+      return `<div class="ps-post">
+        <a class="ps-post-link" href="${post.url || '#'}" target="_blank" rel="noreferrer">${escapeHtml(caption || ('@'+(post.shortcode||'post')))}</a>
+        <div class="ps-post-caption">${escapeHtml(caption)}</div>
+        <div class="ps-post-meta">${date} · ${fmtFull(post.likes)} likes · ${fmtFull(post.comments)} comments</div>
+      </div>`;
+    }).join('') : '<div class="ps-post ps-empty">Tidak ada detail posting.</div>';
+    const campaigns = (insight.campaign_terms || []).map((term) => escapeHtml(term)).join(', ');
+    const campaignHtml = campaigns ? `<div class="ps-campaign">Campaign: ${campaigns}</div>` : '';
+    return `<div class="ps-card">
+      <div class="ps-card-header">
+        <div>
+          <div class="ps-card-title">@${username}</div>
+          <div class="ps-card-meta">${averageLikes} likes · ${averageComments} comments · ${escapeHtml(insight.dominant_type || 'unknown')}</div>
+        </div>
+        <div class="ps-card-badge">${posts.length} post</div>
+      </div>
+      <div class="ps-card-hashtags">${hashtagHtml}</div>
+      ${campaignHtml}
+      <div class="ps-card-posts">${postRows}</div>
+    </div>`;
+  }).join('');
+  container.innerHTML = html;
+}
+window.renderPostSnapshot = renderPostSnapshot;
 
 // ===== RANKING TABLE =====
 function renderTable(){

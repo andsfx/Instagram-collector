@@ -95,6 +95,7 @@ assert.equal(typeof sandbox.fmtFull, 'function', 'fmtFull should be loaded from 
 assert.equal(typeof sandbox.getBrand, 'function', 'getBrand should be loaded from ui utils module');
 assert.equal(typeof sandbox.renderCards, 'function', 'renderCards should be loaded from render modules');
 assert.equal(typeof sandbox.renderContentBreakdown, 'function', 'renderContentBreakdown should be loaded from render modules');
+assert.equal(typeof sandbox.renderPostSnapshot, 'function', 'renderPostSnapshot should be loaded from render modules');
 assert.equal(typeof sandbox.initDashboard, 'function', 'initDashboard should be loaded from runtime data loader module');
 assert.equal(typeof sandbox.forceRefreshData, 'function', 'forceRefreshData should be loaded from runtime data loader module');
 assert.equal(typeof sandbox.IG_DASH_STATE, 'object', 'IG_DASH_STATE namespace should exist');
@@ -118,6 +119,7 @@ console.log(JSON.stringify({
     'data URL is stable for HTTP caching',
     'chart bootstrap is deferred via runtime helper',
     'chart loading can be triggered by viewport bootstrap helper',
+    'dashboard includes 12-post snapshot panel',
     'dashboard no longer depends on Google Fonts'
   ]
 }, null, 2));

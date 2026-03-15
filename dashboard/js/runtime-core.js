@@ -180,6 +180,7 @@ function render(){
   renderSummaryStrip();
   renderCards();
   renderGrowthVelocity();
+  renderPostSnapshot();
 
   requestAnimationFrame(function(){
     renderTable();
