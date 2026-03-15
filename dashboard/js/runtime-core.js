@@ -378,6 +378,20 @@ function _getPresentationReport(){
   return data && data.presentation_report ? data.presentation_report : null;
 }
 
+function _formatPresentationDate(value){
+  if(!value) return '-';
+  var d = new Date(value);
+  if (isNaN(d.getTime())) return String(value);
+  return d.toLocaleString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Jakarta'
+  }) + ' WIB';
+}
+
 function _loadBrandLogoDataURL(){
   var logoPath = './assets/metropolitan-mall-logo.png';
   return fetch(logoPath).then(function(res){
@@ -453,7 +467,7 @@ function exportPDF(){
         }
         pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(18);
+        pdf.setFontSize(19);
         pdf.text(title, marginX + 104, 36);
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(11);
@@ -543,9 +557,9 @@ function exportPDF(){
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(14);
       pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-      pdf.text('Deck siap presentasi · Tema brand tosca + pink', marginX, 194);
+      pdf.text('Laporan ringkas performa kompetitor Instagram', marginX, 194);
       pdf.setFontSize(10.5);
-      var dateLabel = 'Generated: ' + new Date().toLocaleString('id-ID');
+      var dateLabel = 'Dibuat: ' + _formatPresentationDate(new Date().toISOString());
       pdf.text(dateLabel, marginX, 218);
       pdf.setFillColor(255, 255, 255);
       pdf.roundedRect(marginX, 254, pageW - marginX * 2, 74, 10, 10, 'F');
@@ -556,8 +570,8 @@ function exportPDF(){
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
       pdf.setFontSize(11);
-      pdf.text('- Monitoring performa akun, campaign, dan konten paling efektif', marginX + 14, 298);
-      pdf.text('- Menentukan prioritas optimasi konten berdasarkan ER dan tren terbaru', marginX + 14, 316);
+      pdf.text('- Memantau posisi kompetitor dari sisi audience, growth, dan engagement', marginX + 14, 298);
+      pdf.text('- Mengidentifikasi campaign, format konten, dan akun yang paling menonjol', marginX + 14, 316);
       drawFooter();
 
       var report = _getPresentationReport();
@@ -567,7 +581,7 @@ function exportPDF(){
         var cols = options.cols || 3;
         var gap = options.gap || 12;
         var cardW = (contentW - gap * (cols - 1)) / cols;
-        var cardH = options.cardH || 78;
+        var cardH = options.cardH || 84;
         cards.forEach(function(card, idx){
           var col = idx % cols;
           var row = Math.floor(idx / cols);
@@ -601,9 +615,9 @@ function exportPDF(){
 
       function drawBullets(items, startY, title){
         pdf.setFillColor(255,255,255);
-        pdf.roundedRect(marginX, startY - 14, contentW, 104, 10, 10, 'F');
+        pdf.roundedRect(marginX, startY - 14, contentW, 118, 10, 10, 'F');
         pdf.setDrawColor(228,232,240);
-        pdf.roundedRect(marginX, startY - 14, contentW, 104, 10, 10, 'S');
+        pdf.roundedRect(marginX, startY - 14, contentW, 118, 10, 10, 'S');
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(12);
         pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
@@ -622,7 +636,7 @@ function exportPDF(){
       }
 
       function drawOverviewTable(rows){
-        startNewPage('Competitive Overview', report?.meta?.generatedAtWib || 'Perbandingan lintas akun');
+        startNewPage('Competitive Overview', 'Perbandingan lintas akun pada update ' + _formatPresentationDate(report?.meta?.generatedAtWib || report?.meta?.generatedAt));
         var headers = ['Akun','Followers','Growth','ER','Avg Post ER','Format','Viral'];
         var widths = [150, 92, 72, 62, 96, 90, 52];
         var totalW = widths.reduce((a,b)=>a+b,0);
@@ -669,13 +683,13 @@ function exportPDF(){
         pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.text('Positioning', rightX, contentTop);
         y = contentTop + 18;
         (gp?.roles || []).slice(0,5).forEach(function(item){
-          pdf.setFillColor(255,255,255); pdf.roundedRect(rightX, y, 260, 42, 6, 6, 'F');
-          pdf.setDrawColor(232,236,242); pdf.roundedRect(rightX, y, 260, 42, 6, 6, 'S');
+          pdf.setFillColor(255,255,255); pdf.roundedRect(rightX, y, 260, 50, 8, 8, 'F');
+          pdf.setDrawColor(232,236,242); pdf.roundedRect(rightX, y, 260, 50, 8, 8, 'S');
           pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
-          pdf.text('@'+item.account+' · '+item.role, rightX+8, y+14);
+          pdf.text('@'+item.account+' · '+item.role, rightX+10, y+16);
           pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
-          pdf.text(pdf.splitTextToSize(item.reason, 242), rightX+8, y+28);
-          y += 48;
+          pdf.text(pdf.splitTextToSize(item.reason, 238), rightX+10, y+32);
+          y += 58;
         });
       }
 
@@ -765,7 +779,7 @@ function exportPDF(){
       }
 
       function drawTakeawaysAndRecommendations(report){
-        startNewPage('Strategic Takeaways & Recommendations', 'Insight utama dan aksi yang disarankan');
+        startNewPage('Strategic Takeaways & Recommendations', 'Insight utama dan langkah yang disarankan');
         drawBullets((report?.strategicTakeaways || []).map(function(item){ return item.title + ': ' + item.detail; }), contentTop, 'Strategic Takeaways');
         var recY = contentTop + 146;
         var blocks = [
@@ -792,7 +806,7 @@ function exportPDF(){
       }
 
       if(report){
-        startNewPage('Executive Summary', report.meta?.generatedAtWib || 'Ringkasan performa terbaru');
+        startNewPage('Executive Summary', _formatPresentationDate(report.meta?.generatedAtWib || report.meta?.generatedAt));
         var y1 = drawKpiCards(report.executiveSummary?.kpis || [], contentTop + 4);
         drawBullets(report.executiveSummary?.bullets || [], y1 + 10, 'Key Takeaways');
         drawOverviewTable(report.competitiveOverview || []);

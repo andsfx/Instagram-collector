@@ -431,21 +431,27 @@ function buildCompetitiveOverview(metrics) {
 }
 
 function buildGrowthPositioning(metrics, overviewRows) {
+  const topFollowersAccount = metrics.winners.topFollowers?.account;
+  const topGrowthAccount = metrics.winners.fastestGrowth?.account;
+  const topEngagementAccount = metrics.winners.topEngagement?.account;
+  const watchlistAccount = metrics.rankings.underperformPosts.find((row) => row.underperformPosts >= 3 && row.account !== topFollowersAccount && row.account !== topGrowthAccount && row.account !== topEngagementAccount)?.account
+    || metrics.rankings.viralPosts.find((row) => row.viralPosts >= 3 && row.account !== topFollowersAccount && row.account !== topGrowthAccount && row.account !== topEngagementAccount)?.account;
+
   const roles = overviewRows.map((row) => {
     let role = 'Stable Player';
-    let reason = 'Performa relatif stabil tanpa lonjakan ekstrem.';
-    if (metrics.winners.topFollowers && row.account === metrics.winners.topFollowers.account) {
+    let reason = 'Performa relatif stabil dan konsisten di periode ini.';
+    if (topFollowersAccount && row.account === topFollowersAccount) {
       role = 'Leader';
-      reason = 'Memimpin dari sisi ukuran audiens.';
-    } else if (metrics.rankings.growth.slice(0, 2).some((item) => item.account === row.account)) {
+      reason = 'Memimpin dari sisi ukuran audiens dan tetap menjadi acuan awareness.';
+    } else if (topGrowthAccount && row.account === topGrowthAccount) {
       role = 'Challenger';
-      reason = 'Pertumbuhan termasuk paling cepat dibanding akun lain.';
-    } else if (metrics.winners.topEngagement && row.account === metrics.winners.topEngagement.account) {
+      reason = 'Mencatat pertumbuhan paling cepat dan berpotensi meningkatkan tekanan kompetitif.';
+    } else if (topEngagementAccount && row.account === topEngagementAccount) {
       role = 'High Engagement';
-      reason = 'Kualitas interaksi paling kuat di antara kompetitor.';
-    } else if ((row.viralPosts >= 3 && row.followers < (metrics.winners.topFollowers?.followers || 0)) || row.underperformPosts >= 3) {
+      reason = 'Memiliki kualitas interaksi paling kuat dibanding akun lain.';
+    } else if (watchlistAccount && row.account === watchlistAccount) {
       role = 'Watchlist';
-      reason = 'Perlu dipantau karena menunjukkan sinyal performa yang bisa mengubah dinamika kompetisi.';
+      reason = 'Layak dipantau lebih dekat karena menunjukkan sinyal performa yang menonjol atau belum stabil.';
     }
     return { account: row.account, role, reason };
   });
@@ -477,7 +483,7 @@ function buildPresentationReport(data) {
     },
     cover: {
       title: 'Instagram Performance Dashboard Report',
-      subtitle: 'Report Performa Kompetitor Instagram',
+      subtitle: 'Laporan ringkas performa kompetitor Instagram',
       periodLabel: `Update: ${formatDateLabel(metrics.generatedAtWib || metrics.generatedAt)}`,
       scopeLabel: `${data.accounts.length} akun dipantau · ${data.meta?.history_days || 0} hari histori`,
       brand: {
