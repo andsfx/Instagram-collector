@@ -367,6 +367,22 @@ function _collectPresentationInsights(){
   };
 }
 
+
+function _loadBrandLogoDataURL(){
+  var logoPath = './assets/metropolitan-mall-logo.png';
+  return fetch(logoPath).then(function(res){
+    if(!res.ok) throw new Error('logo fetch failed');
+    return res.blob();
+  }).then(function(blob){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){ resolve(reader.result); };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }).catch(function(){ return null; });
+}
+
 function exportPDF(){
   var overlay = document.getElementById('exportOverlay');
   var msg = document.getElementById('exportMsg');
@@ -378,6 +394,15 @@ function exportPDF(){
       msg.textContent = 'Menyiapkan template presentasi...';
       await queueChartBootstrap();
       await new Promise(function(resolve){ setTimeout(resolve, 500); });
+      var logoDataURL = await _loadBrandLogoDataURL();
+
+      var BRAND = {
+        pink: [225, 48, 108],
+        tosca: [33, 190, 176],
+        dark: [24, 34, 52],
+        bg: [246, 248, 251],
+        muted: [96, 108, 126]
+      };
 
       var pdf = new jspdf.jsPDF({
         orientation: 'landscape',
@@ -394,28 +419,36 @@ function exportPDF(){
       var pageCount = 1;
 
       function drawFooter(){
-        pdf.setDrawColor(232, 236, 242);
+        pdf.setDrawColor(226, 231, 239);
         pdf.line(marginX, pageH - 24, pageW - marginX, pageH - 24);
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(9);
-        pdf.setTextColor(120, 128, 140);
+        pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
         pdf.text('Instagram Dashboard · Metropolitan Mall Bekasi', marginX, pageH - 11);
+        pdf.setTextColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
         pdf.text('Halaman ' + pageCount, pageW - marginX - 44, pageH - 11);
       }
 
       function header(title, subtitle){
-        pdf.setFillColor(246, 247, 251);
-        pdf.rect(0, 0, pageW, 78, 'F');
-        pdf.setFillColor(225, 48, 108);
-        pdf.rect(0, 0, pageW, 6, 'F');
-        pdf.setTextColor(25, 28, 35);
+        pdf.setFillColor(BRAND.bg[0], BRAND.bg[1], BRAND.bg[2]);
+        pdf.rect(0, 0, pageW, 82, 'F');
+        pdf.setFillColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
+        pdf.rect(0, 0, pageW * 0.42, 8, 'F');
+        pdf.setFillColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
+        pdf.rect(pageW * 0.42, 0, pageW * 0.58, 8, 'F');
+        pdf.setFillColor(255, 255, 255);
+        pdf.roundedRect(marginX, 16, 92, 44, 8, 8, 'F');
+        if(logoDataURL){
+          try { pdf.addImage(logoDataURL, 'PNG', marginX + 6, 21, 80, 34, undefined, 'FAST'); } catch(_) {}
+        }
+        pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(18);
-        pdf.text(title, marginX, 36);
+        pdf.text(title, marginX + 104, 36);
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(11);
-        pdf.setTextColor(92, 101, 115);
-        pdf.text(subtitle || '', marginX, 56);
+        pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
+        pdf.text(subtitle || '', marginX + 104, 56);
       }
 
       function startNewPage(title, subtitle){
@@ -428,7 +461,7 @@ function exportPDF(){
       function drawInsightsTable(title, pairs, startY){
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(12);
-        pdf.setTextColor(35, 40, 48);
+        pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
         pdf.text(title, marginX, startY);
         var y = startY + 14;
         pairs.slice(0, 6).forEach(function(item){
@@ -436,10 +469,10 @@ function exportPDF(){
           pdf.rect(marginX, y, contentW, 24);
           pdf.setFont('helvetica', 'bold');
           pdf.setFontSize(10);
-          pdf.setTextColor(76, 85, 101);
+          pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
           pdf.text(item.key, marginX + 8, y + 15);
           pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(31, 41, 55);
+          pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
           var val = String(item.value || '-');
           if (val.length > 72) val = val.slice(0, 69) + '...';
           pdf.text(val, marginX + 210, y + 15);
@@ -482,21 +515,39 @@ function exportPDF(){
         });
       }
       // Cover page
-      pdf.setFillColor(244, 245, 247);
+      pdf.setFillColor(BRAND.bg[0], BRAND.bg[1], BRAND.bg[2]);
       pdf.rect(0, 0, pageW, pageH, 'F');
-      pdf.setFillColor(225, 48, 108);
-      pdf.rect(0, 0, pageW, 10, 'F');
+      pdf.setFillColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
+      pdf.rect(0, 0, pageW * 0.65, 16, 'F');
+      pdf.setFillColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
+      pdf.rect(pageW * 0.65, 0, pageW * 0.35, 16, 'F');
+      pdf.setFillColor(255, 255, 255);
+      pdf.roundedRect(marginX, 36, 180, 74, 12, 12, 'F');
+      if(logoDataURL){
+        try { pdf.addImage(logoDataURL, 'PNG', marginX + 12, 50, 156, 48, undefined, 'FAST'); } catch(_) {}
+      }
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(25, 28, 35);
-      pdf.setFontSize(26);
-      pdf.text('Instagram Dashboard Report', marginX, 96);
+      pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+      pdf.setFontSize(29);
+      pdf.text('Instagram Dashboard Report', marginX, 170);
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(14);
-      pdf.setTextColor(92, 101, 115);
-      pdf.text('Template siap presentasi (auto-generated)', marginX, 124);
+      pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
+      pdf.text('Deck siap presentasi · Tema brand tosca + pink', marginX, 198);
       pdf.setFontSize(11);
       var dateLabel = 'Generated: ' + new Date().toLocaleString('id-ID');
-      pdf.text(dateLabel, marginX, 154);
+      pdf.text(dateLabel, marginX, 224);
+      pdf.setFillColor(255, 255, 255);
+      pdf.roundedRect(marginX, 254, pageW - marginX * 2, 74, 10, 10, 'F');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
+      pdf.setFontSize(13);
+      pdf.text('Tujuan Laporan', marginX + 14, 278);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+      pdf.setFontSize(11);
+      pdf.text('- Monitoring performa akun, campaign, dan konten paling efektif', marginX + 14, 298);
+      pdf.text('- Menentukan prioritas optimasi konten berdasarkan ER dan tren terbaru', marginX + 14, 316);
       drawFooter();
 
       // Executive summary page
