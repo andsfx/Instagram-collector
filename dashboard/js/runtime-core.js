@@ -666,22 +666,119 @@ function exportPDF(){
         });
       }
 
+      function drawCampaignAnalysis(ca){
+        startNewPage('Campaign & Theme Analysis', 'Tema campaign, hashtag, dan format dominan');
+        var y = contentTop;
+        var cards = [
+          { label: 'Tema Campaign Teratas', value: ca?.topCampaignTerm || 'Belum dominan' },
+          { label: 'Hashtag Paling Sering', value: ca?.topHashtag || '-' },
+          { label: 'Format Dominan', value: titleCase(ca?.topContentFormat || '-') }
+        ];
+        drawKpiCards(cards, y);
+        y += 156;
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+        pdf.text('Ringkasan per akun', marginX, y);
+        y += 16;
+        (ca?.accounts || []).slice(0,5).forEach(function(item){
+          pdf.setFillColor(255,255,255); pdf.roundedRect(marginX, y, contentW, 38, 6, 6, 'F');
+          pdf.setDrawColor(232,236,242); pdf.roundedRect(marginX, y, contentW, 38, 6, 6, 'S');
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
+          pdf.text('@'+item.account, marginX+8, y+14);
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+          var line1 = 'Tema: ' + ((item.campaignTerms || []).join(', ') || '-');
+          var line2 = 'Hashtag: ' + ((item.topHashtags || []).join(', ') || '-') + ' · Format: ' + titleCase(item.dominantType || '-');
+          pdf.text(pdf.splitTextToSize(line1, contentW-16), marginX+8, y+26);
+          pdf.text(pdf.splitTextToSize(line2, contentW-16), marginX+280, y+26);
+          y += 46;
+        });
+        drawBullets(ca?.summary || [], y + 8, 'Insight Campaign');
+      }
+
+      function drawContentSnapshot(cards){
+        startNewPage('12-Post Content Snapshot', 'Ringkasan kualitas konten terbaru per akun');
+        var cols = 2;
+        var gap = 14;
+        var cardW = (contentW - gap) / cols;
+        var cardH = 92;
+        (cards || []).slice(0,5).forEach(function(item, idx){
+          var col = idx % cols;
+          var row = Math.floor(idx / cols);
+          var x = marginX + col * (cardW + gap);
+          var y = contentTop + row * (cardH + 12);
+          pdf.setFillColor(255,255,255); pdf.roundedRect(x, y, cardW, cardH, 8, 8, 'F');
+          pdf.setDrawColor(232,236,242); pdf.roundedRect(x, y, cardW, cardH, 8, 8, 'S');
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
+          pdf.text('@'+item.account, x+10, y+16);
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+          pdf.text('Avg likes: ' + item.averageLikesLabel + ' · Avg komentar: ' + item.averageCommentsLabel, x+10, y+34);
+          pdf.text('Avg ER: ' + item.averagePostErLabel + ' · Format: ' + titleCase(item.dominantType), x+10, y+48);
+          pdf.text('Post viral: ' + item.viralPosts + ' · Perlu optimasi: ' + item.underperformPosts, x+10, y+62);
+          pdf.setTextColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
+          pdf.text('Kualitas: ' + item.qualityTag, x+10, y+78);
+        });
+      }
+
+      function drawViralHighlights(items){
+        startNewPage('Viral Content Highlights', 'Konten dengan performa post terbaik lintas akun');
+        var y = contentTop;
+        (items || []).slice(0,5).forEach(function(item, idx){
+          pdf.setFillColor(255,255,255); pdf.roundedRect(marginX, y, contentW, 54, 8, 8, 'F');
+          pdf.setDrawColor(232,236,242); pdf.roundedRect(marginX, y, contentW, 54, 8, 8, 'S');
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
+          pdf.text('#' + (idx+1) + ' · @' + item.account + ' · ' + titleCase(item.type), marginX+10, y+16);
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+          var snippet = String(item.captionSnippet || '-');
+          if (snippet.length > 90) snippet = snippet.slice(0, 87) + '...';
+          pdf.text(snippet, marginX+10, y+30);
+          pdf.text('ER ' + item.postErLabel + ' · ' + item.likes + ' likes · ' + item.comments + ' komentar · ' + item.publishedAtLabel, marginX+10, y+44);
+          y += 62;
+        });
+      }
+
+      function drawTakeawaysAndRecommendations(report){
+        startNewPage('Strategic Takeaways & Recommendations', 'Insight utama dan aksi yang disarankan');
+        drawBullets((report?.strategicTakeaways || []).map(function(item){ return item.title + ': ' + item.detail; }), contentTop, 'Strategic Takeaways');
+        var recY = contentTop + 150;
+        var blocks = [
+          { title: 'Scale', items: report?.recommendations?.scale || [] },
+          { title: 'Improve', items: report?.recommendations?.improve || [] },
+          { title: 'Watchlist', items: report?.recommendations?.watchlist || [] }
+        ];
+        var blockW = (contentW - 24) / 3;
+        blocks.forEach(function(block, idx){
+          var x = marginX + idx * (blockW + 12);
+          pdf.setFillColor(255,255,255); pdf.roundedRect(x, recY, blockW, 120, 8, 8, 'F');
+          pdf.setDrawColor(232,236,242); pdf.roundedRect(x, recY, blockW, 120, 8, 8, 'S');
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(idx===1 ? BRAND.pink[0] : BRAND.tosca[0], idx===1 ? BRAND.pink[1] : BRAND.tosca[1], idx===1 ? BRAND.pink[2] : BRAND.tosca[2]);
+          pdf.text(block.title, x+10, recY+16);
+          var yy = recY + 30;
+          (block.items || []).slice(0,3).forEach(function(item){
+            pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+            var lines = pdf.splitTextToSize('• ' + item, blockW - 18);
+            pdf.text(lines, x+10, yy);
+            yy += lines.length * 11 + 6;
+          });
+        });
+      }
+
       if(report){
         startNewPage('Executive Summary', report.meta?.generatedAtWib || 'Ringkasan performa terbaru');
         var y1 = drawKpiCards(report.executiveSummary?.kpis || [], contentTop + 4);
         drawBullets(report.executiveSummary?.bullets || [], y1 + 10, 'Key Takeaways');
         drawOverviewTable(report.competitiveOverview || []);
         drawGrowthPositioning(report.growthPositioning || {});
+        drawCampaignAnalysis(report.campaignAnalysis || {});
+        drawContentSnapshot(report.contentSnapshot || []);
+        drawViralHighlights(report.viralHighlights || []);
+        drawTakeawaysAndRecommendations(report);
       } else {
         var insight = _collectPresentationInsights();
         startNewPage('Executive Summary', insight.updatedAt || 'Ringkasan performa terbaru');
         var y1 = drawInsightsTable('Ringkasan Umum', insight.summaryPairs, contentTop + 4);
         drawInsightsTable('Ringkasan Campaign', insight.campaignPairs, y1 + 14);
+        await addSectionCapture('sec-content', 'Performa Konten', 'Breakdown konten dan heatmap posting');
+        await addSectionCapture('sec-history', 'Riwayat & Insight', 'Insight utama dari data historis');
       }
-
-      // Remaining visual pages (temporary fallback until full data-driven export is complete)
-      await addSectionCapture('sec-content', 'Performa Konten', 'Breakdown konten dan heatmap posting');
-      await addSectionCapture('sec-history', 'Riwayat & Insight', 'Insight utama dari data historis');
 
       pdf.save('instagram-dashboard-report-' + new Date().toISOString().slice(0,10) + '.pdf');
       overlay.style.display = 'none';
