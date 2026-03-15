@@ -1,0 +1,196 @@
+function dashState(){
+  return getDashboardState();
+}
+
+function dashData(){
+  return getDashboardData();
+}
+
+function renderSummaryStrip(){
+  var el = document.getElementById('summaryStrip');
+  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
+  var rankedFollowers = [...dashData().accounts].sort((a,b) => b.f - a.f);
+  var rankedER = [...dashData().accounts].sort((a,b) => (b.er||0) - (a.er||0));
+  var rankedGrowth = [...dashData().accounts].sort((a,b) => (b.growthAbs||0) - (a.growthAbs||0));
+  var topFollowers = rankedFollowers[0];
+  var topER = rankedER[0];
+  var topGrowth = rankedGrowth[0];
+  var formatTotals = { reels:0, carousel:0, image:0, video:0 };
+  Object.values(dashData().contentBreakdown || {}).forEach(function(cb){
+    ['reels','carousel','image','video'].forEach(function(t){
+      formatTotals[t] += Number(cb[t] || 0);
+    });
+  });
+  var topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0] || ['reels',0];
+  var cards = [
+    { k:'Top Followers', v:'@' + topFollowers.u, s: fmtFull(topFollowers.f) + ' followers', cls:'highlight' },
+    { k:'Top Engagement', v:'@' + topER.u, s: pct(topER.er || 0) + ' engagement rate' },
+    { k:'Fastest Growth', v:'@' + topGrowth.u, s: (topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(topGrowth.growthAbs || 0) + ' hari ini' },
+    { k:'Top Content Format', v: (topFormat[0] || 'reels').charAt(0).toUpperCase() + (topFormat[0] || 'reels').slice(1), s: fmtFull(topFormat[1] || 0) + ' post pada dataset terbaru' },
+    { k:'Freshness', v: dashData().latest && dashData().latest.date ? dashData().latest.date : '-', s: 'Sync ' + prettyLastUpdate(dashData().lastUpdate || '-') }
+  ];
+  el.innerHTML = cards.map(function(card){
+    return '<div class="summary-card ' + (card.cls || '') + '"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>';
+  }).join('');
+}
+
+// ===== OVERVIEW CARDS =====
+function renderCards(){
+  const el = document.getElementById('cards');
+  const accs = [...dashData().accounts].sort((a,b) => b.f - a.f);
+  const cardClasses = ['cc','cg','ca','cr'];
+  replaceWithFragment(el, accs.map((a, i) => {
+    const cls = a.b ? 'acard brand' : 'acard ' + cardClasses[i % cardClasses.length];
+    const tag = a.b ? '<span class="ctag bt">BRAND</span>' : '<span class="ctag ct">COMPETITOR</span>';
+    const gCls = a.growthPct > 0 ? 'up' : a.growthPct < 0 ? 'down' : 'flat';
+    const gIcon = a.growthPct > 0 ? '&#9650;' : a.growthPct < 0 ? '&#9660;' : '&#8226;';
+    return `<div class="${cls}">
+      <div class="ch"><span class="cun">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}@${a.u}</span>${tag}</div>
+      <div class="cfol"><div class="lb">Followers</div><div class="vl">${fmtFull(a.f)}</div><div class="gr ${gCls}">${gIcon} ${a.growthAbs >= 0 ? '+' : ''}${fmtFull(a.growthAbs)} (${pct(a.growthPct)})</div></div>
+      <div class="csts">
+        <div class="cst"><div class="sv">${fmtFull(a.fo)}</div><div class="sl">Following</div></div>
+        <div class="cst"><div class="sv">${fmtFull(a.p)}</div><div class="sl">Posts</div></div>
+      </div>
+      <div class="csts4">
+        <div class="cst"><div class="sv">${fmtFull(Math.round(a.al))}</div><div class="sl">Avg Likes</div></div>
+        <div class="cst"><div class="sv">${a.ac.toFixed(1)}</div><div class="sl">Avg Comments</div></div>
+        <div class="cst er-highlight"><div class="sv">${a.er.toFixed(3)}%</div><div class="sl">ER</div></div>
+        <div class="cst"><div class="sv">${a.growthPct != null ? a.growthPct.toFixed(3)+'%' : '-'}</div><div class="sl">Growth</div></div>
+      </div>
+    </div>`;
+  }).join(''));
+}
+
+// ===== FEATURE 1: GROWTH VELOCITY =====
+function renderGrowthVelocity(){
+  const el = document.getElementById('gvCards');
+  const accs = dashData().accounts;
+  const trend = dashData().trend || {};
+
+  replaceWithFragment(el, accs.map((a, idx) => {
+    const t = trend[a.u] || [];
+    const len = t.length;
+
+    // Daily growth
+    const daily = len >= 2 ? t[len-1] - t[len-2] : 0;
+    const dailyPct = len >= 2 && t[len-2] > 0 ? ((daily / t[len-2]) * 100) : 0;
+
+    // Weekly growth
+    const weekIdx = Math.max(0, len - 7);
+    const weekly = len >= 2 ? t[len-1] - t[weekIdx] : 0;
+    const weeklyPct = t[weekIdx] > 0 ? ((weekly / t[weekIdx]) * 100) : 0;
+
+    // Sparkline data (last 7 days of daily changes)
+    const sparkDays = Math.min(7, len - 1);
+    let sparkData = [];
+    for(let i = len - sparkDays; i < len; i++){
+      sparkData.push(t[i] - (t[i-1] || t[i]));
+    }
+    const maxSpark = Math.max(...sparkData.map(Math.abs), 1);
+
+    const dailyCls = daily > 0 ? 'up' : daily < 0 ? 'down' : 'flat';
+    const weeklyCls = weekly > 0 ? 'up' : weekly < 0 ? 'down' : 'flat';
+    const maxBar = Math.max(Math.abs(dailyPct), Math.abs(weeklyPct), 0.01);
+
+    return `<div class="gv-card">
+      <div class="gv-name"><span style="color:${COLORS[idx % COLORS.length]}">&#9679;</span> @${a.u}</div>
+      <div class="gv-row">
+        <span class="gv-label">Daily</span>
+        <span class="gv-val ${dailyCls}">${daily >= 0 ? '+' : ''}${fmtFull(daily)} (${dailyPct >= 0 ? '+' : ''}${dailyPct.toFixed(3)}%)</span>
+      </div>
+      <div class="gv-bar"><div class="gv-bar-fill" style="width:${Math.min(Math.abs(dailyPct)/maxBar*100, 100)}%;background:${daily >= 0 ? 'var(--success)' : 'var(--danger)'}"></div></div>
+      <div class="gv-row">
+        <span class="gv-label">Weekly</span>
+        <span class="gv-val ${weeklyCls}">${weekly >= 0 ? '+' : ''}${fmtFull(weekly)} (${weeklyPct >= 0 ? '+' : ''}${weeklyPct.toFixed(3)}%)</span>
+      </div>
+      <div class="gv-bar"><div class="gv-bar-fill" style="width:${Math.min(Math.abs(weeklyPct)/maxBar*100, 100)}%;background:${weekly >= 0 ? 'var(--success)' : 'var(--danger)'}"></div></div>
+      <div class="gv-sparkline">${sparkData.map(v => {
+        const h = Math.max(Math.abs(v)/maxSpark * 28, 2);
+        const c = v >= 0 ? 'var(--success)' : 'var(--danger)';
+        return `<div class="gv-spark-bar" style="height:${h}px;background:${c}"></div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join(''));
+}
+
+// ===== RANKING TABLE =====
+function renderTable(){
+  const brand = getBrand();
+  const sorted = [...dashData().accounts].sort((a,b) => {
+    let va, vb;
+    switch(dashState().sortCol){
+      case 'rank': va = b.f; vb = a.f; break;
+      case 'username': va = a.u.toLowerCase(); vb = b.u.toLowerCase(); return dashState().sortAsc ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1);
+      case 'followers': va = a.f; vb = b.f; break;
+      case 'following': va = a.fo; vb = b.fo; break;
+      case 'posts': va = a.p; vb = b.p; break;
+      case 'avgLikes': va = a.al; vb = b.al; break;
+      case 'avgComments': va = a.ac; vb = b.ac; break;
+      case 'er': va = a.er; vb = b.er; break;
+      case 'verified': va = a.v ? 1 : 0; vb = b.v ? 1 : 0; break;
+      case 'gap': va = Math.abs(a.f - brand.f); vb = Math.abs(b.f - brand.f); break;
+      default: va = a.f; vb = b.f;
+    }
+    return dashState().sortAsc ? va - vb : vb - va;
+  });
+
+  // Update header styling
+  document.querySelectorAll('.rtbl thead th').forEach(th => {
+    th.classList.toggle('sd', th.getAttribute('data-s') === dashState().sortCol);
+  });
+
+  const tbody = document.getElementById('rtb');
+  // Rank by followers
+  const ranked = [...dashData().accounts].sort((a,b) => b.f - a.f);
+  replaceWithFragment(tbody, sorted.map(a => {
+    const rank = ranked.findIndex(x => x.u === a.u) + 1;
+    const rCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : '';
+    const gap = a.f - brand.f;
+    const gapCls = a.b ? 'gz' : gap > 0 ? 'gp' : gap < 0 ? 'gn' : 'gz';
+    const erCls = a.er >= 0.2 ? 'er-high' : a.er >= 0.1 ? 'er-mid' : 'er-low';
+    return `<tr class="${a.b ? 'brow' : ''}">
+      <td><span class="rn ${rCls}">#${rank}</span></td>
+      <td><span class="tu">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}@${a.u}</span></td>
+      <td>${fmtFull(a.f)}</td>
+      <td>${fmtFull(a.fo)}</td>
+      <td>${fmtFull(a.p)}</td>
+      <td>${fmtFull(Math.round(a.al))}</td>
+      <td>${a.ac.toFixed(1)}</td>
+      <td><span class="er-badge ${erCls}">${a.er.toFixed(3)}%</span></td>
+      <td>${a.v ? '&#10003;' : '-'}</td>
+      <td><span class="${gapCls}">${a.b ? '-' : (gap >= 0 ? '+' : '') + fmtFull(gap)}</span></td>
+    </tr>`;
+  }).join(''));
+}
+
+// Table sort handler
+document.querySelectorAll('.rtbl thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.getAttribute('data-s');
+    if(dashState().sortCol === col) setDashboardSort(col, !dashState().sortAsc);
+    else setDashboardSort(col, false);
+    renderTable();
+  });
+});
+
+// ===== ALERTS =====
+function renderAlerts(){
+  const sec = document.getElementById('alertSection');
+  const list = document.getElementById('alertList');
+  if(!dashData().alerts || dashData().alerts.length === 0){
+    sec.style.display = 'none';
+    return;
+  }
+  sec.style.display = 'block';
+  list.innerHTML = '<div class="al-list">' + dashData().alerts.map(a => {
+    const isDanger = a.jenis && a.jenis.toLowerCase().includes('drop');
+    const pctCls = a.persen >= 0 ? 'up' : 'dn';
+    return `<div class="al-item${isDanger ? ' danger' : ''}">
+      <span class="al-date">${a.tanggal || '-'}</span>
+      <span class="al-akun">@${a.akun}</span>
+      <span class="al-info">${a.jenis || ''} ${a.catatan ? '- ' + a.catatan : ''}</span>
+      <span class="al-pct ${pctCls}">${a.persen != null ? (a.persen >= 0 ? '+' : '') + a.persen.toFixed(2) + '%' : ''}</span>
+    </div>`;
+  }).join('') + '</div>';
+}
+
