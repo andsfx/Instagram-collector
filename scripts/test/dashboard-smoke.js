@@ -96,6 +96,8 @@ assert.equal(typeof sandbox.getBrand, 'function', 'getBrand should be loaded fro
 assert.equal(typeof sandbox.renderCards, 'function', 'renderCards should be loaded from render modules');
 assert.equal(typeof sandbox.renderContentBreakdown, 'function', 'renderContentBreakdown should be loaded from render modules');
 assert.equal(typeof sandbox.renderPostSnapshot, 'function', 'renderPostSnapshot should be loaded from render modules');
+assert.equal(html.includes('postCampaignSummary'), true, 'post campaign summary container should exist');
+assert.equal(html.includes('psSort'), true, 'snapshot sort control should exist');
 assert.equal(typeof sandbox.initDashboard, 'function', 'initDashboard should be loaded from runtime data loader module');
 assert.equal(typeof sandbox.forceRefreshData, 'function', 'forceRefreshData should be loaded from runtime data loader module');
 assert.equal(typeof sandbox.IG_DASH_STATE, 'object', 'IG_DASH_STATE namespace should exist');
@@ -120,6 +122,7 @@ console.log(JSON.stringify({
     'chart bootstrap is deferred via runtime helper',
     'chart loading can be triggered by viewport bootstrap helper',
     'dashboard includes 12-post snapshot panel',
+    'snapshot includes campaign summary and filters',
     'dashboard no longer depends on Google Fonts'
   ]
 }, null, 2));

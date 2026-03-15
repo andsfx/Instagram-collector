@@ -126,27 +126,96 @@ function renderGrowthVelocity(){
 
 function renderPostSnapshot(){
   const container = document.getElementById('postSnapshotGrid');
+  const summaryEl = document.getElementById('postCampaignSummary');
+  const accountSelect = document.getElementById('psAccountFilter');
+  const sortSelect = document.getElementById('psSort');
+  const postFilterSelect = document.getElementById('psPostFilter');
   if(!container) return;
+
   const insights = (dashData() && dashData().post_insights) || {};
   const accounts = dashData().accounts || [];
   const usernames = accounts.map((acc) => typeof acc === 'string' ? acc : acc.u).filter(Boolean);
   if(!usernames.length){
+    if(summaryEl) summaryEl.innerHTML = '';
     container.innerHTML = '<div class="ps-empty">Data akun belum tersedia.</div>';
     return;
   }
-  const html = usernames.map((username) => {
-    const insight = insights[username];
+
+  if(accountSelect){
+    const selectedBefore = accountSelect.value || 'all';
+    accountSelect.innerHTML = '<option value="all">Semua akun</option>' + usernames.map((u) => `<option value="${u}">@${u}</option>`).join('');
+    accountSelect.value = usernames.includes(selectedBefore) || selectedBefore === 'all' ? selectedBefore : 'all';
+  }
+
+  const selectedAccount = accountSelect ? (accountSelect.value || 'all') : 'all';
+  const sortBy = sortSelect ? (sortSelect.value || 'viral_posts') : 'viral_posts';
+  const selectedPostFilter = postFilterSelect ? (postFilterSelect.value || 'all') : 'all';
+
+  let cards = usernames.map((username) => ({ username, insight: insights[username] || null }));
+  if(selectedAccount !== 'all') cards = cards.filter((item) => item.username === selectedAccount);
+
+  cards.sort((a, b) => {
+    const ia = a.insight || {};
+    const ib = b.insight || {};
+    switch(sortBy){
+      case 'average_post_er': return (Number(ib.average_post_er || 0) - Number(ia.average_post_er || 0));
+      case 'average_likes': return (Number(ib.average_likes || 0) - Number(ia.average_likes || 0));
+      case 'campaign_terms': return ((ib.campaign_terms || []).length - (ia.campaign_terms || []).length);
+      case 'username': return a.username.localeCompare(b.username);
+      case 'viral_posts':
+      default: return (Number(ib.viral_posts || 0) - Number(ia.viral_posts || 0));
+    }
+  });
+
+  if(summaryEl){
+    const scoped = cards.map((item) => item.insight).filter(Boolean);
+    const totalPosts = scoped.reduce((sum, item) => sum + ((item.posts || []).length || 0), 0);
+    const totalViral = scoped.reduce((sum, item) => sum + Number(item.viral_posts || 0), 0);
+    const totalUnder = scoped.reduce((sum, item) => sum + Number(item.underperform_posts || 0), 0);
+    const campaignCounts = {};
+    scoped.forEach((item) => {
+      (item.campaign_terms || []).forEach((term) => {
+        campaignCounts[term] = (campaignCounts[term] || 0) + 1;
+      });
+    });
+    const topCampaign = Object.entries(campaignCounts).sort((x,y)=>y[1]-x[1])[0]?.[0] || '-';
+    const topViral = cards
+      .filter((item) => item.insight)
+      .sort((x,y)=>Number(y.insight.viral_posts||0)-Number(x.insight.viral_posts||0))[0];
+    const topER = cards
+      .filter((item)=>item.insight)
+      .sort((x,y)=>Number(y.insight.average_post_er||0)-Number(x.insight.average_post_er||0))[0];
+
+    const items = [
+      { k:'Total Post Teralisa', v: fmtFull(totalPosts) },
+      { k:'Viral / Under', v: `${fmtFull(totalViral)} / ${fmtFull(totalUnder)}` },
+      { k:'Tema Campaign Top', v: escapeHtml(topCampaign) },
+      { k:'Akun Viral Top', v: topViral ? `@${topViral.username}` : '-' },
+      { k:'Akun Avg ER Top', v: topER ? `@${topER.username}` : '-' },
+    ];
+    summaryEl.innerHTML = items.map((item)=>`<div class="ps-summary-card"><div class="ps-summary-k">${item.k}</div><div class="ps-summary-v">${item.v}</div></div>`).join('');
+  }
+
+  if(!cards.length){
+    container.innerHTML = '<div class="ps-empty">Tidak ada akun sesuai filter.</div>';
+    return;
+  }
+
+  const html = cards.map(({ username, insight }) => {
     if(!insight){
       return `<div class="ps-card"><div class="ps-card-title">@${username}</div><div class="ps-empty">Data postingan belum tersedia.</div></div>`;
     }
     const posts = insight.posts || [];
+    const visiblePosts = selectedPostFilter === 'all' ? posts : posts.filter((post) => post.performance_label === selectedPostFilter);
+
     const averageLikes = Number.isFinite(insight.average_likes) ? fmtFull(insight.average_likes) : '-';
     const averageComments = Number.isFinite(insight.average_comments) ? fmtFull(insight.average_comments) : '-';
     const averagePostEr = Number.isFinite(insight.average_post_er) ? pct(insight.average_post_er) : '-';
     const hashtagHtml = (insight.top_hashtags || []).slice(0, 3).map((tag) => `<span class="ps-chip">${escapeHtml(tag)}</span>`).join('') || '<span class="ps-chip muted">No hashtags</span>';
     const campaigns = (insight.campaign_terms || []).slice(0, 3).map((term) => escapeHtml(term)).join(', ');
     const campaignHtml = campaigns ? `<div class="ps-campaign">Campaign: ${campaigns}</div>` : '';
-    const postRows = posts.length ? posts.slice(0, 2).map((post) => {
+
+    const postRows = visiblePosts.length ? visiblePosts.slice(0, 2).map((post) => {
       const date = formatPostDate(post.published_at);
       const caption = post.caption_snippet || post.caption || post.shortcode || '';
       const label = post.performance_label || 'normal';
@@ -157,7 +226,8 @@ function renderPostSnapshot(){
         <a class="ps-post-link" href="${post.url || '#'}" target="_blank" rel="noreferrer">${escapeHtml(caption || ('@'+(post.shortcode||'post')))}</a>
         <div class="ps-post-meta">${fmtFull(post.likes)} likes · ${fmtFull(post.comments)} comments · ER ${postEr}</div>
       </div>`;
-    }).join('') : '<div class="ps-post ps-empty">Tidak ada detail posting.</div>';
+    }).join('') : `<div class="ps-post ps-empty">Tidak ada post dengan label ${selectedPostFilter}.</div>`;
+
     return `<div class="ps-card">
       <div class="ps-card-header">
         <div>
@@ -176,6 +246,7 @@ function renderPostSnapshot(){
       <div class="ps-card-posts">${postRows}</div>
     </div>`;
   }).join('');
+
   container.innerHTML = html;
 }
 window.renderPostSnapshot = renderPostSnapshot;

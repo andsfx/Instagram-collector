@@ -442,6 +442,14 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 [data-theme="dark"] .skel-card,.dark .skel-card{background:#1e1e1e;border-color:#333}
 
 .ps-sec { margin-top: 28px; margin-bottom: 16px; }
+.ps-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top: 14px; }
+.ps-filters { display:flex; flex-wrap:wrap; gap:10px; }
+.ps-filters label { font-size: 12px; color: var(--t3); display:flex; flex-direction:column; gap:4px; }
+.ps-filters select { border:1px solid var(--input-border); background:var(--input-bg); color:var(--t1); border-radius:10px; padding:8px 10px; font-size:12px; min-width:150px; }
+.ps-summary { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-top:12px; }
+.ps-summary-card { border:1px solid var(--border); border-radius:12px; padding:10px 12px; background:var(--card); }
+.ps-summary-k { font-size:11px; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; }
+.ps-summary-v { font-size:15px; font-weight:700; color:var(--t1); margin-top:2px; }
 .ps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
 .ps-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); min-height: 210px; }
 .ps-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
@@ -591,6 +599,31 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 
 <section class="ps-sec reveal rv-up" id="sec-post-snapshot">
   <div class="stitle"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FCAF45" stroke-width="2.5"><rect x="4" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/><rect x="16" y="5" width="4" height="4"/><rect x="4" y="11" width="4" height="4"/><rect x="10" y="11" width="4" height="4"/><rect x="16" y="11" width="4" height="4"/></svg></div>12-Post Snapshot<span>Analisa 12 postingan terakhir tiap akun</span></div>
+  <div class="ps-toolbar">
+    <div class="ps-filters">
+      <label>Akun
+        <select id="psAccountFilter" onchange="renderPostSnapshot()"></select>
+      </label>
+      <label>Urutkan
+        <select id="psSort" onchange="renderPostSnapshot()">
+          <option value="viral_posts">Viral terbanyak</option>
+          <option value="average_post_er">Avg ER tertinggi</option>
+          <option value="average_likes">Avg likes tertinggi</option>
+          <option value="campaign_terms">Tema campaign terbanyak</option>
+          <option value="username">Username A-Z</option>
+        </select>
+      </label>
+      <label>Filter Post
+        <select id="psPostFilter" onchange="renderPostSnapshot()">
+          <option value="all">Semua</option>
+          <option value="viral">Viral</option>
+          <option value="normal">Normal</option>
+          <option value="underperform">Underperform</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="ps-summary" id="postCampaignSummary"></div>
   <div class="ps-grid" id="postSnapshotGrid"></div>
 </section>
 
