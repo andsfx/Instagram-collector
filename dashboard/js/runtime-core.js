@@ -424,8 +424,6 @@ function exportPDF(){
       msg.textContent = 'Menyiapkan template presentasi...';
       await queueChartBootstrap();
       await new Promise(function(resolve){ setTimeout(resolve, 500); });
-      var logoAsset = await _loadBrandLogoDataURL();
-
       var BRAND = {
         pink: [225, 55, 125],
         pinkSoft: [246, 213, 226],
@@ -449,19 +447,6 @@ function exportPDF(){
       var contentW = pageW - marginX * 2;
       var contentH = pageH - contentTop - 34;
       var pageCount = 1;
-
-      function drawLogoFit(asset, x, y, maxW, maxH){
-        if(!asset || !asset.dataUrl) return;
-        var w = asset.width || maxW;
-        var h = asset.height || maxH;
-        var ratio = Math.min(maxW / w, maxH / h);
-        var drawW = w * ratio;
-        var drawH = h * ratio;
-        var dx = x + (maxW - drawW) / 2;
-        var dy = y + (maxH - drawH) / 2;
-        try { pdf.addImage(asset.dataUrl, 'PNG', dx, dy, drawW, drawH, undefined, 'FAST'); } catch(_) {}
-      }
-
       function drawFooter(){
         pdf.setDrawColor(226, 231, 239);
         pdf.line(marginX, pageH - 24, pageW - marginX, pageH - 24);
@@ -486,17 +471,14 @@ function exportPDF(){
         pdf.rect(pageW * 0.70, 0, pageW * 0.30, 8, 'F');
         pdf.setFillColor(255, 255, 255);
         pdf.roundedRect(marginX, 16, 92, 44, 8, 8, 'F');
-        if(logoAsset){
-          drawLogoFit(logoAsset, marginX + 6, 21, 80, 34);
-        }
         pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(19);
-        pdf.text(title, marginX + 104, 36);
+        pdf.text(title, marginX, 36);
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(11);
         pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-        pdf.text(subtitle || '', marginX + 104, 56);
+        pdf.text(subtitle || '', marginX, 56);
       }
 
       function startNewPage(title, subtitle){
@@ -573,11 +555,6 @@ function exportPDF(){
       pdf.rect(pageW * 0.6, 0, pageW * 0.18, 16, 'F');
       pdf.setFillColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
       pdf.rect(pageW * 0.78, 0, pageW * 0.22, 16, 'F');
-      pdf.setFillColor(255, 255, 255);
-      pdf.roundedRect(marginX, 36, 180, 74, 12, 12, 'F');
-      if(logoAsset){
-        drawLogoFit(logoAsset, marginX + 12, 50, 156, 48);
-      }
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
       pdf.setFontSize(30);
