@@ -604,18 +604,18 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
       <label>Akun
         <select id="psAccountFilter" onchange="renderPostSnapshot()"></select>
       </label>
-      <label>Urutkan
+      <label>Urutan akun
         <select id="psSort" onchange="renderPostSnapshot()">
           <option value="viral_posts">Viral terbanyak</option>
-          <option value="average_post_er">Avg ER tertinggi</option>
-          <option value="average_likes">Avg likes tertinggi</option>
+          <option value="average_post_er">Rata-rata ER tertinggi</option>
+          <option value="average_likes">Rata-rata likes tertinggi</option>
           <option value="campaign_terms">Tema campaign terbanyak</option>
           <option value="username">Username A-Z</option>
         </select>
       </label>
-      <label>Filter Post
+      <label>Filter performa post
         <select id="psPostFilter" onchange="renderPostSnapshot()">
-          <option value="all">Semua</option>
+          <option value="all">Semua status</option>
           <option value="viral">Viral</option>
           <option value="normal">Normal</option>
           <option value="underperform">Underperform</option>

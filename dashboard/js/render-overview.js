@@ -187,11 +187,11 @@ function renderPostSnapshot(){
       .sort((x,y)=>Number(y.insight.average_post_er||0)-Number(x.insight.average_post_er||0))[0];
 
     const items = [
-      { k:'Total Post Teralisa', v: fmtFull(totalPosts) },
-      { k:'Viral / Under', v: `${fmtFull(totalViral)} / ${fmtFull(totalUnder)}` },
-      { k:'Tema Campaign Top', v: escapeHtml(topCampaign) },
-      { k:'Akun Viral Top', v: topViral ? `@${topViral.username}` : '-' },
-      { k:'Akun Avg ER Top', v: topER ? `@${topER.username}` : '-' },
+      { k:'Total post teranalisis', v: fmtFull(totalPosts) },
+      { k:'Viral / perlu optimasi', v: `${fmtFull(totalViral)} / ${fmtFull(totalUnder)}` },
+      { k:'Tema campaign teratas', v: escapeHtml(topCampaign) },
+      { k:'Akun paling viral', v: topViral ? `@${topViral.username}` : '-' },
+      { k:'Akun dengan ER tertinggi', v: topER ? `@${topER.username}` : '-' },
     ];
     summaryEl.innerHTML = items.map((item)=>`<div class="ps-summary-card"><div class="ps-summary-k">${item.k}</div><div class="ps-summary-v">${item.v}</div></div>`).join('');
   }
@@ -213,32 +213,32 @@ function renderPostSnapshot(){
     const averagePostEr = Number.isFinite(insight.average_post_er) ? pct(insight.average_post_er) : '-';
     const hashtagHtml = (insight.top_hashtags || []).slice(0, 3).map((tag) => `<span class="ps-chip">${escapeHtml(tag)}</span>`).join('') || '<span class="ps-chip muted">No hashtags</span>';
     const campaigns = (insight.campaign_terms || []).slice(0, 3).map((term) => escapeHtml(term)).join(', ');
-    const campaignHtml = campaigns ? `<div class="ps-campaign">Campaign: ${campaigns}</div>` : '';
+    const campaignHtml = campaigns ? `<div class="ps-campaign">Tema campaign: ${campaigns}</div>` : '';
 
     const postRows = visiblePosts.length ? visiblePosts.slice(0, 2).map((post) => {
       const date = formatPostDate(post.published_at);
       const caption = post.caption_snippet || post.caption || post.shortcode || '';
       const label = post.performance_label || 'normal';
-      const labelText = label === 'viral' ? 'Viral' : label === 'underperform' ? 'Underperform' : 'Normal';
+      const labelText = label === 'viral' ? 'Viral' : label === 'underperform' ? 'Perlu Optimasi' : 'Stabil';
       const postEr = Number.isFinite(post.post_er) ? pct(post.post_er) : '-';
       return `<div class="ps-post">
         <div class="ps-post-head"><span class="ps-post-tag ${label}">${labelText}</span><span class="ps-post-meta">${date}</span></div>
         <a class="ps-post-link" href="${post.url || '#'}" target="_blank" rel="noreferrer">${escapeHtml(caption || ('@'+(post.shortcode||'post')))}</a>
-        <div class="ps-post-meta">${fmtFull(post.likes)} likes · ${fmtFull(post.comments)} comments · ER ${postEr}</div>
+        <div class="ps-post-meta">${fmtFull(post.likes)} likes · ${fmtFull(post.comments)} komentar · ER ${postEr}</div>
       </div>`;
-    }).join('') : `<div class="ps-post ps-empty">Tidak ada post dengan label ${selectedPostFilter}.</div>`;
+    }).join('') : `<div class="ps-post ps-empty">Tidak ada post sesuai filter "${selectedPostFilter}".</div>`;
 
     return `<div class="ps-card">
       <div class="ps-card-header">
         <div>
           <div class="ps-card-title">@${username}</div>
-          <div class="ps-card-meta">${averageLikes} likes · ${averageComments} comments · Avg ER ${averagePostEr}</div>
+          <div class="ps-card-meta">${averageLikes} likes · ${averageComments} komentar · Rata-rata ER ${averagePostEr}</div>
         </div>
         <div class="ps-card-badge">${posts.length} post</div>
       </div>
       <div class="ps-card-stats">
-        <span class="ps-chip">Viral ${fmtFull(insight.viral_posts || 0)}</span>
-        <span class="ps-chip">Under ${fmtFull(insight.underperform_posts || 0)}</span>
+        <span class="ps-chip">Post viral ${fmtFull(insight.viral_posts || 0)}</span>
+        <span class="ps-chip">Perlu optimasi ${fmtFull(insight.underperform_posts || 0)}</span>
         <span class="ps-chip">${escapeHtml(insight.dominant_type || 'unknown')}</span>
       </div>
       <div class="ps-card-hashtags">${hashtagHtml}</div>
