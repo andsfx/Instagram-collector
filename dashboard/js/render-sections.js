@@ -1,14 +1,22 @@
+function dashState(){
+  return getDashboardState();
+}
+
+function dashData(){
+  return getDashboardData();
+}
+
 function renderSummaryStrip(){
   var el = document.getElementById('summaryStrip');
-  if(!el || !D || !D.accounts || !D.accounts.length) return;
-  var rankedFollowers = [...D.accounts].sort((a,b) => b.f - a.f);
-  var rankedER = [...D.accounts].sort((a,b) => (b.er||0) - (a.er||0));
-  var rankedGrowth = [...D.accounts].sort((a,b) => (b.growthAbs||0) - (a.growthAbs||0));
+  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
+  var rankedFollowers = [...dashData().accounts].sort((a,b) => b.f - a.f);
+  var rankedER = [...dashData().accounts].sort((a,b) => (b.er||0) - (a.er||0));
+  var rankedGrowth = [...dashData().accounts].sort((a,b) => (b.growthAbs||0) - (a.growthAbs||0));
   var topFollowers = rankedFollowers[0];
   var topER = rankedER[0];
   var topGrowth = rankedGrowth[0];
   var formatTotals = { reels:0, carousel:0, image:0, video:0 };
-  Object.values(D.contentBreakdown || {}).forEach(function(cb){
+  Object.values(dashData().contentBreakdown || {}).forEach(function(cb){
     ['reels','carousel','image','video'].forEach(function(t){
       formatTotals[t] += Number(cb[t] || 0);
     });
@@ -19,7 +27,7 @@ function renderSummaryStrip(){
     { k:'Top Engagement', v:'@' + topER.u, s: pct(topER.er || 0) + ' engagement rate' },
     { k:'Fastest Growth', v:'@' + topGrowth.u, s: (topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(topGrowth.growthAbs || 0) + ' hari ini' },
     { k:'Top Content Format', v: (topFormat[0] || 'reels').charAt(0).toUpperCase() + (topFormat[0] || 'reels').slice(1), s: fmtFull(topFormat[1] || 0) + ' post pada dataset terbaru' },
-    { k:'Freshness', v: D.latest && D.latest.date ? D.latest.date : '-', s: 'Sync ' + prettyLastUpdate(D.lastUpdate || '-') }
+    { k:'Freshness', v: dashData().latest && dashData().latest.date ? dashData().latest.date : '-', s: 'Sync ' + prettyLastUpdate(dashData().lastUpdate || '-') }
   ];
   el.innerHTML = cards.map(function(card){
     return '<div class="summary-card ' + (card.cls || '') + '"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>';
@@ -29,7 +37,7 @@ function renderSummaryStrip(){
 // ===== OVERVIEW CARDS =====
 function renderCards(){
   const el = document.getElementById('cards');
-  const accs = D.accounts.sort((a,b) => b.f - a.f);
+  const accs = dashData().accounts.sort((a,b) => b.f - a.f);
   const cardClasses = ['cc','cg','ca','cr'];
   replaceWithFragment(el, accs.map((a, i) => {
     const cls = a.b ? 'acard brand' : 'acard ' + cardClasses[i % cardClasses.length];
@@ -56,8 +64,8 @@ function renderCards(){
 // ===== FEATURE 1: GROWTH VELOCITY =====
 function renderGrowthVelocity(){
   const el = document.getElementById('gvCards');
-  const accs = D.accounts;
-  const trend = D.trend || {};
+  const accs = dashData().accounts;
+  const trend = dashData().trend || {};
 
   replaceWithFragment(el, accs.map((a, idx) => {
     const t = trend[a.u] || [];
@@ -108,11 +116,11 @@ function renderGrowthVelocity(){
 // ===== RANKING TABLE =====
 function renderTable(){
   const brand = getBrand();
-  const sorted = [...D.accounts].sort((a,b) => {
+  const sorted = [...dashData().accounts].sort((a,b) => {
     let va, vb;
-    switch(sortCol){
+    switch(dashState().sortCol){
       case 'rank': va = b.f; vb = a.f; break;
-      case 'username': va = a.u.toLowerCase(); vb = b.u.toLowerCase(); return sortAsc ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1);
+      case 'username': va = a.u.toLowerCase(); vb = b.u.toLowerCase(); return dashState().sortAsc ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1);
       case 'followers': va = a.f; vb = b.f; break;
       case 'following': va = a.fo; vb = b.fo; break;
       case 'posts': va = a.p; vb = b.p; break;
@@ -123,17 +131,17 @@ function renderTable(){
       case 'gap': va = Math.abs(a.f - brand.f); vb = Math.abs(b.f - brand.f); break;
       default: va = a.f; vb = b.f;
     }
-    return sortAsc ? va - vb : vb - va;
+    return dashState().sortAsc ? va - vb : vb - va;
   });
 
   // Update header styling
   document.querySelectorAll('.rtbl thead th').forEach(th => {
-    th.classList.toggle('sd', th.getAttribute('data-s') === sortCol);
+    th.classList.toggle('sd', th.getAttribute('data-s') === dashState().sortCol);
   });
 
   const tbody = document.getElementById('rtb');
   // Rank by followers
-  const ranked = [...D.accounts].sort((a,b) => b.f - a.f);
+  const ranked = [...dashData().accounts].sort((a,b) => b.f - a.f);
   replaceWithFragment(tbody, sorted.map(a => {
     const rank = ranked.findIndex(x => x.u === a.u) + 1;
     const rCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : '';
@@ -159,7 +167,7 @@ function renderTable(){
 document.querySelectorAll('.rtbl thead th').forEach(th => {
   th.addEventListener('click', () => {
     const col = th.getAttribute('data-s');
-    if(sortCol === col) setDashboardSort(col, !sortAsc);
+    if(dashState().sortCol === col) setDashboardSort(col, !dashState().sortAsc);
     else setDashboardSort(col, false);
     renderTable();
   });
@@ -169,12 +177,12 @@ document.querySelectorAll('.rtbl thead th').forEach(th => {
 function renderAlerts(){
   const sec = document.getElementById('alertSection');
   const list = document.getElementById('alertList');
-  if(!D.alerts || D.alerts.length === 0){
+  if(!dashData().alerts || dashData().alerts.length === 0){
     sec.style.display = 'none';
     return;
   }
   sec.style.display = 'block';
-  list.innerHTML = '<div class="al-list">' + D.alerts.map(a => {
+  list.innerHTML = '<div class="al-list">' + dashData().alerts.map(a => {
     const isDanger = a.jenis && a.jenis.toLowerCase().includes('drop');
     const pctCls = a.persen >= 0 ? 'up' : 'dn';
     return `<div class="al-item${isDanger ? ' danger' : ''}">
@@ -205,8 +213,8 @@ function chartDefaults(){
 function mkFollowersBar(){
   destroyChart('bar');
   const ctx = document.getElementById('chBar').getContext('2d');
-  const accs = [...D.accounts].sort((a,b) => b.f - a.f);
-  chartInstances.bar = new Chart(ctx, {
+  const accs = [...dashData().accounts].sort((a,b) => b.f - a.f);
+  dashState().chartInstances.bar = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: accs.map(a => '@'+a.u),
@@ -227,8 +235,8 @@ function mkFollowersBar(){
 function mkERBar(){
   destroyChart('erbar');
   const ctx = document.getElementById('chER').getContext('2d');
-  const accs = [...D.accounts].sort((a,b) => b.er - a.er);
-  chartInstances.erbar = new Chart(ctx, {
+  const accs = [...dashData().accounts].sort((a,b) => b.er - a.er);
+  dashState().chartInstances.erbar = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: accs.map(a => '@'+a.u),
@@ -249,14 +257,14 @@ function mkERBar(){
 function mkShare(){
   destroyChart('share');
   const ctx = document.getElementById('chShare').getContext('2d');
-  const total = D.accounts.reduce((s,a) => s + a.f, 0);
-  chartInstances.share = new Chart(ctx, {
+  const total = dashData().accounts.reduce((s,a) => s + a.f, 0);
+  dashState().chartInstances.share = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: D.accounts.map(a => '@'+a.u),
+      labels: dashData().accounts.map(a => '@'+a.u),
       datasets: [{
-        data: D.accounts.map(a => a.f),
-        backgroundColor: D.accounts.map((a,i) => COLORS[i%COLORS.length]),
+        data: dashData().accounts.map(a => a.f),
+        backgroundColor: dashData().accounts.map((a,i) => COLORS[i%COLORS.length]),
         borderWidth: 2,
         borderColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1E1E1E' : '#FFFFFF'
       }]
@@ -277,18 +285,18 @@ function mkShare(){
 function mkRadar(){
   destroyChart('radar');
   const ctx = document.getElementById('chRadar').getContext('2d');
-  const maxF = Math.max(...D.accounts.map(a=>a.f));
-  const maxFo = Math.max(...D.accounts.map(a=>a.fo));
-  const maxP = Math.max(...D.accounts.map(a=>a.p));
-  const maxAL = Math.max(...D.accounts.map(a=>a.al));
-  const maxER = Math.max(...D.accounts.map(a=>a.er));
-  const maxAC = Math.max(...D.accounts.map(a=>a.ac));
+  const maxF = Math.max(...dashData().accounts.map(a=>a.f));
+  const maxFo = Math.max(...dashData().accounts.map(a=>a.fo));
+  const maxP = Math.max(...dashData().accounts.map(a=>a.p));
+  const maxAL = Math.max(...dashData().accounts.map(a=>a.al));
+  const maxER = Math.max(...dashData().accounts.map(a=>a.er));
+  const maxAC = Math.max(...dashData().accounts.map(a=>a.ac));
 
-  chartInstances.radar = new Chart(ctx, {
+  dashState().chartInstances.radar = new Chart(ctx, {
     type: 'radar',
     data: {
       labels: ['Followers','Following','Posts','Avg Likes','Avg Comments','ER'],
-      datasets: D.accounts.map((a,i) => ({
+      datasets: dashData().accounts.map((a,i) => ({
         label: '@'+a.u,
         data: [
           maxF ? a.f/maxF*100 : 0,
@@ -316,13 +324,13 @@ function mkRadar(){
 function mkTrend(){
   destroyChart('trend');
   const ctx = document.getElementById('chTrend').getContext('2d');
-  chartInstances.trend = new Chart(ctx, {
+  dashState().chartInstances.trend = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: D.dates,
-      datasets: D.accounts.map((a,i) => ({
+      labels: dashData().dates,
+      datasets: dashData().accounts.map((a,i) => ({
         label: '@'+a.u,
-        data: (D.trend && D.trend[a.u]) || [],
+        data: (dashData().trend && dashData().trend[a.u]) || [],
         borderColor: COLORS[i%COLORS.length],
         backgroundColor: COLORS[i%COLORS.length] + '11',
         borderWidth: a.b ? 3 : 2,
@@ -340,17 +348,17 @@ function mkTrend(){
 function mkERTrend(){
   destroyChart('ertrend');
   const ctx = document.getElementById('chERTrend').getContext('2d');
-  if(!D.engTrend){
+  if(!dashData().engTrend){
     ctx.canvas.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px">Data engagement trend belum tersedia</div>';
     return;
   }
-  chartInstances.ertrend = new Chart(ctx, {
+  dashState().chartInstances.ertrend = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: D.dates,
-      datasets: D.accounts.map((a,i) => ({
+      labels: dashData().dates,
+      datasets: dashData().accounts.map((a,i) => ({
         label: '@'+a.u,
-        data: (D.engTrend && D.engTrend[a.u]) || [],
+        data: (dashData().engTrend && dashData().engTrend[a.u]) || [],
         borderColor: COLORS[i%COLORS.length],
         borderWidth: a.b ? 3 : 2,
         fill: false,
@@ -369,33 +377,33 @@ function mkProjection(){
   destroyChart('projection');
   var ctx = document.getElementById('chProjection').getContext('2d');
   var note = document.getElementById('projNote');
-  if(!D.trend || !D.dates || D.dates.length < 3){
+  if(!dashData().trend || !dashData().dates || dashData().dates.length < 3){
     ctx.canvas.parentElement.querySelector('.chcon').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px">Minimal 3 hari data diperlukan untuk proyeksi</div>';
     if(note) note.textContent = '';
     return;
   }
-  var nDays = D.dates.length;
+  var nDays = dashData().dates.length;
   var projDays = 30;
   var datasets = [];
   var crossings = [];
   var brandData = null;
   var brandU = '';
-  D.accounts.forEach(function(a){
-    if(a.b){ brandU = a.u; brandData = D.trend[a.u]; }
+  dashData().accounts.forEach(function(a){
+    if(a.b){ brandU = a.u; brandData = dashData().trend[a.u]; }
   });
 
   // Generate future date labels
-  var lastDate = D.dates[D.dates.length - 1];
+  var lastDate = dashData().dates[dashData().dates.length - 1];
   var futureDates = [];
   for(var d = 1; d <= projDays; d++){
     var dt = new Date();
     dt.setDate(dt.getDate() + d);
     futureDates.push(dt.getDate() + '/' + (dt.getMonth()+1));
   }
-  var allLabels = D.dates.concat(futureDates);
+  var allLabels = dashData().dates.concat(futureDates);
 
-  D.accounts.forEach(function(a, i){
-    var hist = D.trend[a.u];
+  dashData().accounts.forEach(function(a, i){
+    var hist = dashData().trend[a.u];
     if(!hist) return;
     // Linear regression
     var xs = [], ys = [];
@@ -485,7 +493,7 @@ function mkProjection(){
     note.textContent = crossings.length > 0 ? crossings.join(' | ') : 'Tidak ada prediksi crossing dalam 90 hari ke depan.';
   }
 
-  chartInstances.projection = new Chart(ctx, {
+  dashState().chartInstances.projection = new Chart(ctx, {
     type: 'line',
     data: { labels: allLabels, datasets: datasets },
     options: Object.assign({}, chartDefaults(), {
@@ -493,7 +501,7 @@ function mkProjection(){
         legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 11 }, color: getChartTextColor(),
           filter: function(item){ return item.text.indexOf('proyeksi') === -1; }
         }},
-        annotation: crossings.length > 0 ? { annotations: { line1: { type: 'line', xMin: D.dates.length - 1, xMax: D.dates.length - 1, borderColor: 'rgba(150,150,150,0.5)', borderWidth: 1, borderDash: [4,4], label: { display: true, content: 'Hari Ini', position: 'start', font: { size: 10 } } } } } : {}
+        annotation: crossings.length > 0 ? { annotations: { line1: { type: 'line', xMin: dashData().dates.length - 1, xMax: dashData().dates.length - 1, borderColor: 'rgba(150,150,150,0.5)', borderWidth: 1, borderDash: [4,4], label: { display: true, content: 'Hari Ini', position: 'start', font: { size: 10 } } } } } : {}
       })
     })
   });
@@ -502,8 +510,8 @@ function mkProjection(){
 // ===== HEAD-TO-HEAD (Feature 5) =====
 function getH2HMetricOptions(){
   return {
-    followers: { label: 'Followers', value: function(a){ return a.f || 0; }, series: function(u){ return (D.trend && D.trend[u]) || []; }, formatter: fmtFull, sub: 'Perbandingan followers seiring waktu' },
-    engagement: { label: 'Engagement Rate', value: function(a){ return a.er || 0; }, series: function(u){ return (D.engTrend && D.engTrend[u]) || []; }, formatter: function(v){ return fmtPct(v, 3); }, sub: 'Perbandingan engagement rate seiring waktu' },
+    followers: { label: 'Followers', value: function(a){ return a.f || 0; }, series: function(u){ return (dashData().trend && dashData().trend[u]) || []; }, formatter: fmtFull, sub: 'Perbandingan followers seiring waktu' },
+    engagement: { label: 'Engagement Rate', value: function(a){ return a.er || 0; }, series: function(u){ return (dashData().engTrend && dashData().engTrend[u]) || []; }, formatter: function(v){ return fmtPct(v, 3); }, sub: 'Perbandingan engagement rate seiring waktu' },
     avgLikes: { label: 'Avg Likes', value: function(a){ return a.al || 0; }, series: function(){ return []; }, formatter: fmtFull, sub: 'Metrik perbandingan ringkas untuk rata-rata likes' },
     growth: { label: 'Growth', value: function(a){ return a.growthPct || 0; }, series: function(){ return []; }, formatter: function(v){ return pct(v || 0); }, sub: 'Metrik perbandingan ringkas untuk growth periodik' }
   };
@@ -522,7 +530,7 @@ function setH2HPreset(kind){
     var topER = comps.slice().sort(function(a,b){ return (b.er||0) - (a.er||0); })[0];
     if (topER) { selA.value = brand.u; selB.value = topER.u; }
   } else if (kind === 'top-two') {
-    var ranked = D.accounts.slice().sort(function(a,b){ return (b.f||0) - (a.f||0); });
+    var ranked = dashData().accounts.slice().sort(function(a,b){ return (b.f||0) - (a.f||0); });
     if (ranked[0] && ranked[1]) { selA.value = ranked[0].u; selB.value = ranked[1].u; }
   }
   renderH2H();
@@ -542,7 +550,7 @@ function renderH2HSelectors(){
   var prev = [selA.value, selB.value];
   selA.innerHTML = '';
   selB.innerHTML = '';
-  D.accounts.forEach(function(a){
+  dashData().accounts.forEach(function(a){
     var optA = document.createElement('option');
     optA.value = a.u; optA.textContent = '@' + a.u;
     var optB = optA.cloneNode(true);
@@ -575,7 +583,7 @@ function renderH2HSelectors(){
   if (metricsEl) {
     var metricOptions = getH2HMetricOptions();
     metricsEl.innerHTML = Object.keys(metricOptions).map(function(key){
-      return '<button class="h2h-chip ' + (h2hMetric === key ? 'active' : '') + '" data-metric="' + key + '">' + metricOptions[key].label + '</button>';
+      return '<button class="h2h-chip ' + (dashState().h2hMetric === key ? 'active' : '') + '" data-metric="' + key + '">' + metricOptions[key].label + '</button>';
     }).join('');
     Array.from(metricsEl.querySelectorAll('.h2h-chip')).forEach(function(btn){
       btn.addEventListener('click', function(){ setH2HMetric(btn.getAttribute('data-metric')); });
@@ -591,12 +599,12 @@ function renderH2H(){
   var metricSub = document.getElementById('h2hTrendSub');
   var metricsEl = document.getElementById('h2hMetrics');
   if(!uA || !uB || !grid) return;
-  var aA = D.accounts.find(function(a){ return a.u === uA; });
-  var aB = D.accounts.find(function(a){ return a.u === uB; });
+  var aA = dashData().accounts.find(function(a){ return a.u === uA; });
+  var aB = dashData().accounts.find(function(a){ return a.u === uB; });
   if(!aA || !aB){ grid.innerHTML = ''; if(header) header.innerHTML = ''; return; }
   if (metricsEl) {
     Array.from(metricsEl.querySelectorAll('.h2h-chip')).forEach(function(btn){
-      btn.classList.toggle('active', btn.textContent === getH2HMetricOptions()[h2hMetric].label);
+      btn.classList.toggle('active', btn.textContent === getH2HMetricOptions()[dashState().h2hMetric].label);
     });
   }
 
@@ -605,7 +613,7 @@ function renderH2H(){
   }
 
   var metricOptions = getH2HMetricOptions();
-  var activeMetric = metricOptions[h2hMetric] || metricOptions.followers;
+  var activeMetric = metricOptions[dashState().h2hMetric] || metricOptions.followers;
   var metrics = [
     { label: 'Followers', vA: aA.f, vB: aB.f, fmt: fmtFull },
     { label: 'Following', vA: aA.fo || 0, vB: aB.fo || 0, fmt: fmtFull },
@@ -656,12 +664,12 @@ function renderH2H(){
     ctx.canvas.parentElement.querySelector('.chcon').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px">Trend untuk metrik ini belum tersedia</div>';
     return;
   }
-  var idxA = D.accounts.indexOf(aA);
-  var idxB = D.accounts.indexOf(aB);
-  chartInstances.h2h = new Chart(ctx, {
+  var idxA = dashData().accounts.indexOf(aA);
+  var idxB = dashData().accounts.indexOf(aB);
+  dashState().chartInstances.h2h = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: D.dates,
+      labels: dashData().dates,
       datasets: [
         { label: '@'+uA, data: seriesA, borderColor: COLORS[idxA % COLORS.length], borderWidth: 3, fill: false, tension: 0.3, pointRadius: 3 },
         { label: '@'+uB, data: seriesB, borderColor: COLORS[idxB % COLORS.length], borderWidth: 3, fill: false, tension: 0.3, pointRadius: 3 }
@@ -676,7 +684,7 @@ function renderContentBreakdown(){
   var el = document.getElementById('cbContent');
   var highlights = document.getElementById('contentHighlights');
   if(!el) return;
-  if(!D.contentBreakdown || Object.keys(D.contentBreakdown).length === 0){
+  if(!dashData().contentBreakdown || Object.keys(dashData().contentBreakdown).length === 0){
     if (highlights) highlights.innerHTML = '';
     el.innerHTML = '<div class="neo" style="padding:24px;text-align:center;color:var(--t3);font-size:13px">' +
       '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.5" style="margin-bottom:8px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><br>' +
@@ -688,7 +696,7 @@ function renderContentBreakdown(){
   var typeLabels = {reels:'Reels',carousel:'Carousel',image:'Image',video:'Video'};
   var formatTotals = { reels:0, carousel:0, image:0, video:0 };
   var bestOwner = null;
-  Object.entries(D.contentBreakdown).forEach(function(entry){
+  Object.entries(dashData().contentBreakdown).forEach(function(entry){
     var username = entry[0];
     var cb = entry[1] || {};
     types.forEach(function(t){ formatTotals[t] += Number(cb[t] || 0); });
@@ -699,7 +707,7 @@ function renderContentBreakdown(){
     }
   });
   var topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0] || ['reels',0];
-  var mostEfficient = Object.entries(D.contentBreakdown).sort(function(a,b){ return (b[1].avgER || 0) - (a[1].avgER || 0); })[0];
+  var mostEfficient = Object.entries(dashData().contentBreakdown).sort(function(a,b){ return (b[1].avgER || 0) - (a[1].avgER || 0); })[0];
   if (highlights) {
     highlights.innerHTML = [
       { k:'Format Terbanyak', v:typeLabels[topFormat[0]] || topFormat[0], s:fmtFull(topFormat[1]) + ' post' },
@@ -709,8 +717,8 @@ function renderContentBreakdown(){
   }
   var html = '<div class="cp-grid">';
 
-  D.accounts.forEach(function(a){
-    var cb = D.contentBreakdown[a.u];
+  dashData().accounts.forEach(function(a){
+    var cb = dashData().contentBreakdown[a.u];
     if(!cb) return;
     var tp = cb.typePerf || {};
     var bp = cb.bestPost || {};
@@ -778,7 +786,7 @@ function renderHeatmapSelectors(){
   if(!sel) return;
   var prev = sel.value;
   sel.innerHTML = '';
-  D.accounts.forEach(function(a){
+  dashData().accounts.forEach(function(a){
     var opt = document.createElement('option');
     opt.value = a.u; opt.textContent = '@' + a.u;
     sel.appendChild(opt);
@@ -808,8 +816,8 @@ function renderHeatmap(){
 
   // Get raw 7x24 data or generate placeholder
   var rawData = null;
-  if(D.heatmap && D.heatmap[user]){
-    rawData = D.heatmap[user];
+  if(dashData().heatmap && dashData().heatmap[user]){
+    rawData = dashData().heatmap[user];
   } else {
     rawData = [];
     for(var di = 0; di < 7; di++){

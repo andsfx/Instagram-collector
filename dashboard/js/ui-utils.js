@@ -61,7 +61,7 @@
   }
 
   function destroyChart(key){
-    var charts = (window.IG_DASH_STATE && window.IG_DASH_STATE.chartInstances) || window.chartInstances;
+    var charts = window.getDashboardCharts ? window.getDashboardCharts() : null;
     if(charts && charts[key]){
       charts[key].destroy();
       delete charts[key];
@@ -89,12 +89,12 @@
   }
 
   function getBrand(){
-    var data = (window.IG_DASH_STATE && window.IG_DASH_STATE.data) || window.D;
+    var data = window.getDashboardData();
     return data.accounts.find(a => a.b) || data.accounts[0];
   }
 
   function getCompetitors(){
-    var data = (window.IG_DASH_STATE && window.IG_DASH_STATE.data) || window.D;
+    var data = window.getDashboardData();
     return data.accounts.filter(a => !a.b);
   }
 

@@ -98,7 +98,10 @@ assert.equal(typeof sandbox.renderContentBreakdown, 'function', 'renderContentBr
 assert.equal(typeof sandbox.initDashboard, 'function', 'initDashboard should be loaded from runtime data loader module');
 assert.equal(typeof sandbox.forceRefreshData, 'function', 'forceRefreshData should be loaded from runtime data loader module');
 assert.equal(typeof sandbox.IG_DASH_STATE, 'object', 'IG_DASH_STATE namespace should exist');
+assert.equal(typeof sandbox.getDashboardState, 'function', 'getDashboardState helper should exist');
+assert.equal(typeof sandbox.getDashboardData, 'function', 'getDashboardData helper should exist');
 assert.equal(sandbox.IG_DASH_STATE.sortCol, 'followers', 'IG_DASH_STATE should track default sort');
+assert.equal(sandbox.D, undefined, 'legacy D global should not be required anymore');
 
 console.log(JSON.stringify({
   ok: true,
@@ -107,6 +110,7 @@ console.log(JSON.stringify({
     'normalizeDashboardData maps dates/trend/engTrend/contentBreakdown correctly',
     'render module functions are loaded from external script',
     'runtime loader/init functions are loaded from external scripts',
-    'IG_DASH_STATE namespace is initialized'
+    'IG_DASH_STATE namespace is initialized',
+    'legacy D global is no longer required'
   ]
 }, null, 2));

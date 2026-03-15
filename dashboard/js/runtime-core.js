@@ -11,45 +11,33 @@ const IG_DASH_STATE = window.IG_DASH_STATE || {
 };
 window.IG_DASH_STATE = IG_DASH_STATE;
 
-let D = IG_DASH_STATE.data;
-let curFilter = IG_DASH_STATE.curFilter;
-let sortCol = IG_DASH_STATE.sortCol;
-let sortAsc = IG_DASH_STATE.sortAsc;
-let h2hMetric = IG_DASH_STATE.h2hMetric;
-let chartInstances = IG_DASH_STATE.chartInstances;
-window.D = D;
-window.chartInstances = chartInstances;
+function getDashboardState(){
+  return IG_DASH_STATE;
+}
 
-function syncLegacyGlobalsFromState(){
-  D = IG_DASH_STATE.data;
-  curFilter = IG_DASH_STATE.curFilter;
-  sortCol = IG_DASH_STATE.sortCol;
-  sortAsc = IG_DASH_STATE.sortAsc;
-  h2hMetric = IG_DASH_STATE.h2hMetric;
-  chartInstances = IG_DASH_STATE.chartInstances;
-  window.D = D;
-  window.chartInstances = chartInstances;
+function getDashboardData(){
+  return IG_DASH_STATE.data;
+}
+
+function getDashboardCharts(){
+  return IG_DASH_STATE.chartInstances;
 }
 
 function setDashboardData(data){
   IG_DASH_STATE.data = data;
-  syncLegacyGlobalsFromState();
 }
 
 function setDashboardFilter(filter){
   IG_DASH_STATE.curFilter = filter;
-  syncLegacyGlobalsFromState();
 }
 
 function setDashboardSort(col, asc){
   IG_DASH_STATE.sortCol = col;
   IG_DASH_STATE.sortAsc = asc;
-  syncLegacyGlobalsFromState();
 }
 
 function setDashboardH2HMetric(metric){
   IG_DASH_STATE.h2hMetric = metric;
-  syncLegacyGlobalsFromState();
 }
 
 const COLORS = ['#E1306C','#833AB4','#405DE6','#F77737','#FCAF45','#5B51D8','#FD1D1D','#2ecc71','#00376B','#C13584'];
@@ -58,12 +46,13 @@ const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
 window.COLORS = COLORS;
 window.DEFAULTS = DEFAULTS;
 window.DEBUG_MODE = DEBUG_MODE;
-window.syncLegacyGlobalsFromState = syncLegacyGlobalsFromState;
+window.getDashboardState = getDashboardState;
+window.getDashboardData = getDashboardData;
+window.getDashboardCharts = getDashboardCharts;
 window.setDashboardData = setDashboardData;
 window.setDashboardFilter = setDashboardFilter;
 window.setDashboardSort = setDashboardSort;
 window.setDashboardH2HMetric = setDashboardH2HMetric;
-syncLegacyGlobalsFromState();
 
 // ===== DYNAMIC SCRIPT LOADER =====
 var _scriptCache = {};
@@ -104,7 +93,7 @@ function toggleDark(){
   html.setAttribute('data-theme', next);
   localStorage.setItem('ig-dash-theme', next);
   updateDarkBtn(next);
-  if(IG_DASH_STATE.data) renderAllCharts();
+  if(getDashboardData()) renderAllCharts();
 }
 
 function updateDarkBtn(theme){
@@ -172,7 +161,8 @@ function setF(f){
     fn.classList.remove('show');
   } else {
     fn.classList.add('show');
-    const pts = D.totalDataPoints || D.dates.length;
+    const data = getDashboardData();
+    const pts = data.totalDataPoints || data.dates.length;
     if(f === 'week' && pts < 7){
       fnt.textContent = 'Data mingguan membutuhkan minimal 7 hari. Saat ini baru '+pts+' hari data tersedia.';
     } else if(f === 'month' && pts < 30){
