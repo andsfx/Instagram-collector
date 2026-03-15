@@ -400,7 +400,13 @@ function _loadBrandLogoDataURL(){
   }).then(function(blob){
     return new Promise(function(resolve, reject){
       var reader = new FileReader();
-      reader.onload = function(){ resolve(reader.result); };
+      reader.onload = function(){
+        var dataUrl = reader.result;
+        var img = new Image();
+        img.onload = function(){ resolve({ dataUrl: dataUrl, width: img.width, height: img.height }); };
+        img.onerror = function(){ resolve({ dataUrl: dataUrl, width: 0, height: 0 }); };
+        img.src = dataUrl;
+      };
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
@@ -418,7 +424,7 @@ function exportPDF(){
       msg.textContent = 'Menyiapkan template presentasi...';
       await queueChartBootstrap();
       await new Promise(function(resolve){ setTimeout(resolve, 500); });
-      var logoDataURL = await _loadBrandLogoDataURL();
+      var logoAsset = await _loadBrandLogoDataURL();
 
       var BRAND = {
         pink: [225, 55, 125],
@@ -444,6 +450,18 @@ function exportPDF(){
       var contentH = pageH - contentTop - 34;
       var pageCount = 1;
 
+      function drawLogoFit(asset, x, y, maxW, maxH){
+        if(!asset || !asset.dataUrl) return;
+        var w = asset.width || maxW;
+        var h = asset.height || maxH;
+        var ratio = Math.min(maxW / w, maxH / h);
+        var drawW = w * ratio;
+        var drawH = h * ratio;
+        var dx = x + (maxW - drawW) / 2;
+        var dy = y + (maxH - drawH) / 2;
+        try { pdf.addImage(asset.dataUrl, 'PNG', dx, dy, drawW, drawH, undefined, 'FAST'); } catch(_) {}
+      }
+
       function drawFooter(){
         pdf.setDrawColor(226, 231, 239);
         pdf.line(marginX, pageH - 24, pageW - marginX, pageH - 24);
@@ -468,8 +486,8 @@ function exportPDF(){
         pdf.rect(pageW * 0.70, 0, pageW * 0.30, 8, 'F');
         pdf.setFillColor(255, 255, 255);
         pdf.roundedRect(marginX, 16, 92, 44, 8, 8, 'F');
-        if(logoDataURL){
-          try { pdf.addImage(logoDataURL, 'PNG', marginX + 6, 21, 80, 34, undefined, 'FAST'); } catch(_) {}
+        if(logoAsset){
+          drawLogoFit(logoAsset, marginX + 6, 21, 80, 34);
         }
         pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
         pdf.setFont('helvetica', 'bold');
@@ -557,8 +575,8 @@ function exportPDF(){
       pdf.rect(pageW * 0.78, 0, pageW * 0.22, 16, 'F');
       pdf.setFillColor(255, 255, 255);
       pdf.roundedRect(marginX, 36, 180, 74, 12, 12, 'F');
-      if(logoDataURL){
-        try { pdf.addImage(logoDataURL, 'PNG', marginX + 12, 50, 156, 48, undefined, 'FAST'); } catch(_) {}
+      if(logoAsset){
+        drawLogoFit(logoAsset, marginX + 12, 50, 156, 48);
       }
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
