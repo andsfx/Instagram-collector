@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-14T05:58:55.793Z",
-  "generated_at_wib": "2026-03-14T12:58:55+07:00",
+  "generated_at": "2026-03-15T03:08:21.223Z",
+  "generated_at_wib": "2026-03-15T10:08:21+07:00",
   "version": 2,
   "sources": {
     "stats": "socialblade",
@@ -14,15 +14,15 @@
     "pakuwonmallbekasi"
   ],
   "latest": {
-    "date": "2026-03-14",
+    "date": "2026-03-15",
     "metmalbekasi": {
-      "followers": 93592,
+      "followers": 93630,
       "following": 265,
-      "posts": 16477,
+      "posts": 16478,
       "avg_likes": 61.83,
-      "avg_comments": 2.75,
+      "avg_comments": 1.75,
       "engagement_rate": 0.07,
-      "ff_ratio": 353.18,
+      "ff_ratio": 353.32,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -30,13 +30,13 @@
       }
     },
     "grandmetropolitan": {
-      "followers": 92492,
+      "followers": 92508,
       "following": 268,
-      "posts": 11371,
-      "avg_likes": 43.5,
-      "avg_comments": 2.92,
-      "engagement_rate": 0.05,
-      "ff_ratio": 345.12,
+      "posts": 11382,
+      "avg_likes": 50.42,
+      "avg_comments": 1,
+      "engagement_rate": 0.06,
+      "ff_ratio": 345.18,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -44,13 +44,13 @@
       }
     },
     "metmalcileungsi": {
-      "followers": 83264,
+      "followers": 83307,
       "following": 2181,
-      "posts": 18423,
-      "avg_likes": 193.33,
-      "avg_comments": 9,
-      "engagement_rate": 0.24,
-      "ff_ratio": 38.18,
+      "posts": 18424,
+      "avg_likes": 179,
+      "avg_comments": 5.75,
+      "engagement_rate": 0.22,
+      "ff_ratio": 38.2,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -58,13 +58,13 @@
       }
     },
     "summareconmal.bekasi": {
-      "followers": 333088,
+      "followers": 333211,
       "following": 813,
-      "posts": 15742,
-      "avg_likes": 315.67,
-      "avg_comments": 19.25,
-      "engagement_rate": 0.1,
-      "ff_ratio": 409.7,
+      "posts": 15753,
+      "avg_likes": 206.42,
+      "avg_comments": 7.08,
+      "engagement_rate": 0.06,
+      "ff_ratio": 409.85,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -72,13 +72,13 @@
       }
     },
     "pakuwonmallbekasi": {
-      "followers": 72213,
+      "followers": 72204,
       "following": 232,
-      "posts": 1544,
-      "avg_likes": 134.75,
-      "avg_comments": 18.25,
-      "engagement_rate": 0.21,
-      "ff_ratio": 311.26,
+      "posts": 1547,
+      "avg_likes": 242.5,
+      "avg_comments": 15.25,
+      "engagement_rate": 0.36,
+      "ff_ratio": 311.22,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -854,41 +854,89 @@
         "engagement_rate": 0.21,
         "anomaly": false
       }
+    },
+    {
+      "date": "2026-03-15",
+      "metmalbekasi": {
+        "followers": 93630,
+        "following": 265,
+        "posts": 16478,
+        "avg_likes": 61.83,
+        "avg_comments": 1.75,
+        "engagement_rate": 0.07,
+        "anomaly": false
+      },
+      "grandmetropolitan": {
+        "followers": 92508,
+        "following": 268,
+        "posts": 11382,
+        "avg_likes": 50.42,
+        "avg_comments": 1,
+        "engagement_rate": 0.06,
+        "anomaly": false
+      },
+      "metmalcileungsi": {
+        "followers": 83307,
+        "following": 2181,
+        "posts": 18424,
+        "avg_likes": 179,
+        "avg_comments": 5.75,
+        "engagement_rate": 0.22,
+        "anomaly": false
+      },
+      "summareconmal.bekasi": {
+        "followers": 333211,
+        "following": 813,
+        "posts": 15753,
+        "avg_likes": 206.42,
+        "avg_comments": 7.08,
+        "engagement_rate": 0.06,
+        "anomaly": false
+      },
+      "pakuwonmallbekasi": {
+        "followers": 72204,
+        "following": 232,
+        "posts": 1547,
+        "avg_likes": 242.5,
+        "avg_comments": 15.25,
+        "engagement_rate": 0.36,
+        "anomaly": false
+      }
     }
   ],
   "growth": {
     "metmalbekasi": {
-      "followers_change_1d": 61,
-      "followers_change_7d": 194,
-      "pct_change_7d": 0.21,
+      "followers_change_1d": 38,
+      "followers_change_7d": 201,
+      "pct_change_7d": 0.22,
       "anomaly_detected": false,
       "notes": []
     },
     "grandmetropolitan": {
-      "followers_change_1d": 35,
-      "followers_change_7d": 192,
+      "followers_change_1d": 16,
+      "followers_change_7d": 190,
       "pct_change_7d": 0.21,
       "anomaly_detected": false,
       "notes": []
     },
     "metmalcileungsi": {
-      "followers_change_1d": 6,
-      "followers_change_7d": 35,
-      "pct_change_7d": 0.04,
+      "followers_change_1d": 43,
+      "followers_change_7d": 64,
+      "pct_change_7d": 0.08,
       "anomaly_detected": false,
       "notes": []
     },
     "summareconmal.bekasi": {
-      "followers_change_1d": 69,
-      "followers_change_7d": 463,
-      "pct_change_7d": 0.14,
+      "followers_change_1d": 123,
+      "followers_change_7d": 447,
+      "pct_change_7d": 0.13,
       "anomaly_detected": false,
       "notes": []
     },
     "pakuwonmallbekasi": {
-      "followers_change_1d": -5,
-      "followers_change_7d": -134,
-      "pct_change_7d": -0.19,
+      "followers_change_1d": -9,
+      "followers_change_7d": -131,
+      "pct_change_7d": -0.18,
       "anomaly_detected": false,
       "notes": []
     }
@@ -898,71 +946,71 @@
       {
         "rank": 1,
         "account": "summareconmal.bekasi",
-        "followers": 333088
+        "followers": 333211
       },
       {
         "rank": 2,
         "account": "metmalbekasi",
-        "followers": 93592
+        "followers": 93630
       },
       {
         "rank": 3,
         "account": "grandmetropolitan",
-        "followers": 92492
+        "followers": 92508
       },
       {
         "rank": 4,
         "account": "metmalcileungsi",
-        "followers": 83264
+        "followers": 83307
       },
       {
         "rank": 5,
         "account": "pakuwonmallbekasi",
-        "followers": 72213
+        "followers": 72204
       }
     ],
     "by_engagement_rate": [
       {
         "rank": 1,
-        "account": "metmalcileungsi",
-        "engagement_rate": 0.24
+        "account": "pakuwonmallbekasi",
+        "engagement_rate": 0.36
       },
       {
         "rank": 2,
-        "account": "pakuwonmallbekasi",
-        "engagement_rate": 0.21
+        "account": "metmalcileungsi",
+        "engagement_rate": 0.22
       },
       {
         "rank": 3,
-        "account": "summareconmal.bekasi",
-        "engagement_rate": 0.1
-      },
-      {
-        "rank": 4,
         "account": "metmalbekasi",
         "engagement_rate": 0.07
       },
       {
-        "rank": 5,
+        "rank": 4,
         "account": "grandmetropolitan",
-        "engagement_rate": 0.05
+        "engagement_rate": 0.06
+      },
+      {
+        "rank": 5,
+        "account": "summareconmal.bekasi",
+        "engagement_rate": 0.06
       }
     ],
     "by_avg_likes": [
       {
         "rank": 1,
-        "account": "summareconmal.bekasi",
-        "avg_likes": 315.67
+        "account": "pakuwonmallbekasi",
+        "avg_likes": 242.5
       },
       {
         "rank": 2,
-        "account": "metmalcileungsi",
-        "avg_likes": 193.33
+        "account": "summareconmal.bekasi",
+        "avg_likes": 206.42
       },
       {
         "rank": 3,
-        "account": "pakuwonmallbekasi",
-        "avg_likes": 134.75
+        "account": "metmalcileungsi",
+        "avg_likes": 179
       },
       {
         "rank": 4,
@@ -972,134 +1020,134 @@
       {
         "rank": 5,
         "account": "grandmetropolitan",
-        "avg_likes": 43.5
+        "avg_likes": 50.42
       }
     ]
   },
   "content_breakdown": {
     "metmalbekasi": {
-      "date": "2026-03-14",
+      "date": "2026-03-15",
       "reels": 0,
       "carousel": 7,
       "image": 1,
       "video": 4,
       "total_posts_analyzed": 12,
       "avg_likes": 61.83,
-      "avg_comments": 2.75,
+      "avg_comments": 1.75,
       "engagement_rate": 0.07,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
-      "carousel_avg_likes": 35.14,
+      "carousel_avg_likes": 36.14,
       "carousel_avg_comments": 1,
       "carousel_er": 0.04,
-      "image_avg_likes": 15,
-      "image_avg_comments": 0,
+      "image_avg_likes": 17,
+      "image_avg_comments": 1,
       "image_er": 0.02,
       "best_post_url": "https://www.instagram.com/p/DVqpPvokgPH/",
       "best_post_type": "video",
-      "best_post_likes": 320,
+      "best_post_likes": 409,
       "best_post_comments": 9
     },
     "grandmetropolitan": {
-      "date": "2026-03-14",
+      "date": "2026-03-15",
       "reels": 0,
-      "carousel": 8,
-      "image": 2,
-      "video": 2,
-      "total_posts_analyzed": 12,
-      "avg_likes": 43.5,
-      "avg_comments": 2.92,
-      "engagement_rate": 0.05,
-      "reels_avg_likes": null,
-      "reels_avg_comments": null,
-      "reels_er": null,
-      "carousel_avg_likes": 47.13,
-      "carousel_avg_comments": 1.25,
-      "carousel_er": 0.05,
-      "image_avg_likes": 31.5,
-      "image_avg_comments": 3,
-      "image_er": 0.04,
-      "best_post_url": "https://www.instagram.com/p/DVUpWY7kwq0/",
-      "best_post_type": "carousel",
-      "best_post_likes": 111,
-      "best_post_comments": 2
-    },
-    "metmalcileungsi": {
-      "date": "2026-03-14",
-      "reels": 0,
-      "carousel": 7,
-      "image": 2,
-      "video": 3,
-      "total_posts_analyzed": 12,
-      "avg_likes": 193.33,
-      "avg_comments": 9,
-      "engagement_rate": 0.24,
-      "reels_avg_likes": null,
-      "reels_avg_comments": null,
-      "reels_er": null,
-      "carousel_avg_likes": 66.14,
-      "carousel_avg_comments": 3.14,
-      "carousel_er": 0.08,
-      "image_avg_likes": 746.5,
-      "image_avg_comments": 35.5,
-      "image_er": 0.94,
-      "best_post_url": "https://www.instagram.com/p/DVqYzsMFLfu/",
-      "best_post_type": "image",
-      "best_post_likes": 1358,
-      "best_post_comments": 66
-    },
-    "summareconmal.bekasi": {
-      "date": "2026-03-14",
-      "reels": 0,
-      "carousel": 10,
+      "carousel": 12,
       "image": 0,
-      "video": 2,
+      "video": 0,
       "total_posts_analyzed": 12,
-      "avg_likes": 315.67,
-      "avg_comments": 19.25,
-      "engagement_rate": 0.1,
+      "avg_likes": 50.42,
+      "avg_comments": 1,
+      "engagement_rate": 0.06,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
-      "carousel_avg_likes": 339.7,
-      "carousel_avg_comments": 10.7,
-      "carousel_er": 0.11,
+      "carousel_avg_likes": 50.42,
+      "carousel_avg_comments": 1,
+      "carousel_er": 0.06,
       "image_avg_likes": null,
       "image_avg_comments": null,
       "image_er": null,
-      "best_post_url": "https://www.instagram.com/p/DV0ImgHDy9c/",
+      "best_post_url": "https://www.instagram.com/p/DV3R7bCEg8t/",
       "best_post_type": "carousel",
-      "best_post_likes": 1133,
-      "best_post_comments": 26
+      "best_post_likes": 215,
+      "best_post_comments": 3
+    },
+    "metmalcileungsi": {
+      "date": "2026-03-15",
+      "reels": 0,
+      "carousel": 7,
+      "image": 0,
+      "video": 5,
+      "total_posts_analyzed": 12,
+      "avg_likes": 179,
+      "avg_comments": 5.75,
+      "engagement_rate": 0.22,
+      "reels_avg_likes": null,
+      "reels_avg_comments": null,
+      "reels_er": null,
+      "carousel_avg_likes": 77.29,
+      "carousel_avg_comments": 3.29,
+      "carousel_er": 0.1,
+      "image_avg_likes": null,
+      "image_avg_comments": null,
+      "image_er": null,
+      "best_post_url": "https://www.instagram.com/p/DV4IJI9k4ex/",
+      "best_post_type": "video",
+      "best_post_likes": 1135,
+      "best_post_comments": 27
+    },
+    "summareconmal.bekasi": {
+      "date": "2026-03-15",
+      "reels": 0,
+      "carousel": 7,
+      "image": 0,
+      "video": 5,
+      "total_posts_analyzed": 12,
+      "avg_likes": 206.42,
+      "avg_comments": 7.08,
+      "engagement_rate": 0.06,
+      "reels_avg_likes": null,
+      "reels_avg_comments": null,
+      "reels_er": null,
+      "carousel_avg_likes": 258.43,
+      "carousel_avg_comments": 7.29,
+      "carousel_er": 0.08,
+      "image_avg_likes": null,
+      "image_avg_comments": null,
+      "image_er": null,
+      "best_post_url": "https://www.instagram.com/p/DV2nDrxD95B/",
+      "best_post_type": "carousel",
+      "best_post_likes": 529,
+      "best_post_comments": 9
     },
     "pakuwonmallbekasi": {
-      "date": "2026-03-14",
+      "date": "2026-03-15",
       "reels": 0,
       "carousel": 9,
       "image": 1,
       "video": 2,
       "total_posts_analyzed": 12,
-      "avg_likes": 134.75,
-      "avg_comments": 18.25,
-      "engagement_rate": 0.21,
+      "avg_likes": 242.5,
+      "avg_comments": 15.25,
+      "engagement_rate": 0.36,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
-      "carousel_avg_likes": 164.33,
-      "carousel_avg_comments": 18.22,
-      "carousel_er": 0.25,
-      "image_avg_likes": 38,
+      "carousel_avg_likes": 169.67,
+      "carousel_avg_comments": 18.67,
+      "carousel_er": 0.26,
+      "image_avg_likes": 39,
       "image_avg_comments": 1,
-      "image_er": 0.05,
+      "image_er": 0.06,
       "best_post_url": "https://www.instagram.com/p/DVIGwSakUl2/",
       "best_post_type": "carousel",
-      "best_post_likes": 1251,
-      "best_post_comments": 161
+      "best_post_likes": 1255,
+      "best_post_comments": 162
     }
   },
   "meta": {
     "brand_account": "metmalbekasi",
-    "history_days": 16
+    "history_days": 17
   }
 }
