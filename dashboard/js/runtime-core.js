@@ -468,7 +468,7 @@ function exportPDF(){
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(9);
         pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-        pdf.text('Instagram Dashboard · Metropolitan Mall Bekasi', marginX, pageH - 11);
+        pdf.text('Competitor Performance Report · Metropolitan Mall Bekasi', marginX, pageH - 11);
         pdf.setTextColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
         pdf.text('Halaman ' + pageCount, pageW - marginX - 44, pageH - 11);
       }
@@ -581,11 +581,14 @@ function exportPDF(){
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
       pdf.setFontSize(30);
-      pdf.text('Instagram Dashboard Report', marginX, 166);
+      pdf.text('Instagram Competitor', marginX, 162);
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(14);
       pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-      pdf.text('Laporan ringkas performa kompetitor Instagram', marginX, 194);
+      pdf.text('Performance Report', marginX, 188);
+      pdf.setFontSize(12);
+      pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
+      pdf.text('Laporan ringkas performa kompetitor Instagram', marginX, 206);
       pdf.setFontSize(10.5);
       var dateLabel = 'Dibuat: ' + _formatPresentationDate(new Date().toISOString());
       pdf.text(dateLabel, marginX, 218);
@@ -679,8 +682,10 @@ function exportPDF(){
         y += 32;
         (rows || []).slice(0, 5).forEach(function(row, idx){
           x = marginX;
-          if(idx % 2 === 0){ pdf.setFillColor(252,253,254); pdf.roundedRect(marginX, y-2, totalW, 28, 0, 0, 'F'); }
-          pdf.setDrawColor(232,236,242);
+          var isLeader = row.positioningTag === 'Leader';
+          if(isLeader){ pdf.setFillColor(240,252,248); pdf.roundedRect(marginX, y-2, totalW, 28, 4, 4, 'F'); }
+          else if(idx % 2 === 0){ pdf.setFillColor(252,253,254); pdf.roundedRect(marginX, y-2, totalW, 28, 0, 0, 'F'); }
+          pdf.setDrawColor(isLeader ? 190 : 232, isLeader ? 229 : 236, isLeader ? 220 : 242);
           pdf.rect(marginX, y-2, totalW, 28);
           var vals = ['@'+row.account, row.followersLabel, row.growthLabel, row.engagementRateLabel, row.avgPostErLabel, titleCase(row.dominantType), String(row.viralPosts || 0)];
           vals.forEach(function(v, i){
@@ -689,6 +694,12 @@ function exportPDF(){
             if(i===6 && Number(v) >= 3) pdf.setTextColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
             pdf.text(String(v), x + 8, y + 15); x += widths[i];
           });
+          if(isLeader){
+            pdf.setFillColor(BRAND.toscaSoft[0], BRAND.toscaSoft[1], BRAND.toscaSoft[2]);
+            pdf.roundedRect(marginX + totalW - 58, y + 3, 46, 14, 7, 7, 'F');
+            pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
+            pdf.text('LEADER', marginX + totalW - 48, y + 13);
+          }
           y += 30;
         });
       }
@@ -711,12 +722,14 @@ function exportPDF(){
         pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.text('Positioning', rightX, contentTop);
         y = contentTop + 18;
         (gp?.roles || []).slice(0,5).forEach(function(item){
+          var accent = item.role === 'Leader' ? BRAND.tosca : item.role === 'High Engagement' ? BRAND.pink : item.role === 'Challenger' ? [95,205,191] : [140,150,165];
           pdf.setFillColor(255,255,255); pdf.roundedRect(rightX, y, 260, 50, 8, 8, 'F');
           pdf.setDrawColor(232,236,242); pdf.roundedRect(rightX, y, 260, 50, 8, 8, 'S');
-          pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
-          pdf.text('@'+item.account+' · '+item.role, rightX+10, y+16);
+          pdf.setFillColor(accent[0], accent[1], accent[2]); pdf.roundedRect(rightX, y, 8, 50, 8, 8, 'F');
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(accent[0], accent[1], accent[2]);
+          pdf.text('@'+item.account+' · '+item.role, rightX+14, y+16);
           pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
-          pdf.text(pdf.splitTextToSize(item.reason, 238), rightX+10, y+32);
+          pdf.text(pdf.splitTextToSize(item.reason, 234), rightX+14, y+32);
           y += 58;
         });
       }

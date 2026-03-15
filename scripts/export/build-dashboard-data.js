@@ -482,7 +482,7 @@ function buildPresentationReport(data) {
       version: 'presentation-v1'
     },
     cover: {
-      title: 'Instagram Performance Dashboard Report',
+      title: 'Instagram Competitor Performance Report',
       subtitle: 'Laporan ringkas performa kompetitor Instagram',
       periodLabel: `Update: ${formatDateLabel(metrics.generatedAtWib || metrics.generatedAt)}`,
       scopeLabel: `${data.accounts.length} akun dipantau · ${data.meta?.history_days || 0} hari histori`,
