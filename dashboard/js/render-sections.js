@@ -652,7 +652,7 @@ function renderH2H(){
   replaceWithFragment(grid, html);
 
   if(typeof Chart === 'undefined'){
-    loadChartJS().then(function(){ renderH2H(); }).catch(function(err){ console.error('Chart.js load failed for H2H:', err); });
+    if(typeof queueChartBootstrap === 'function') queueChartBootstrap();
     return;
   }
   destroyChart('h2h');

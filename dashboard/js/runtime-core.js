@@ -184,9 +184,9 @@ function render(){
   requestAnimationFrame(function(){
     renderTable();
     requestAnimationFrame(function(){
-      renderAllCharts();
       renderH2HSelectors();
       renderH2H();
+      queueChartBootstrap();
       requestAnimationFrame(function(){
         renderContentBreakdown();
         renderHeatmapSelectors();
@@ -211,6 +211,22 @@ var lazyChartMap = {
   'chProjection': mkProjection
 };
 var eagerCharts = ['chBar', 'chER'];
+var chartBootstrapScheduled = false;
+
+function queueChartBootstrap(){
+  if(chartBootstrapScheduled) return;
+  chartBootstrapScheduled = true;
+  var run = function(){
+    chartBootstrapScheduled = false;
+    renderAllCharts();
+    if (typeof renderH2H === 'function') renderH2H();
+  };
+  if(typeof requestIdleCallback === 'function'){
+    requestIdleCallback(run, { timeout: 1200 });
+  } else {
+    setTimeout(run, 250);
+  }
+}
 
 function setupLazyCharts(){
   eagerCharts.forEach(function(id){
@@ -261,6 +277,7 @@ function renderAllCharts(){
 }
 window.setupLazyCharts = setupLazyCharts;
 window.renderAllCharts = renderAllCharts;
+window.queueChartBootstrap = queueChartBootstrap;
 
 // ===== EXPORT =====
 function _doCanvasExport(callback){

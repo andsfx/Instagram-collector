@@ -100,6 +100,7 @@ assert.equal(typeof sandbox.forceRefreshData, 'function', 'forceRefreshData shou
 assert.equal(typeof sandbox.IG_DASH_STATE, 'object', 'IG_DASH_STATE namespace should exist');
 assert.equal(typeof sandbox.getDashboardState, 'function', 'getDashboardState helper should exist');
 assert.equal(typeof sandbox.getDashboardData, 'function', 'getDashboardData helper should exist');
+assert.equal(typeof sandbox.queueChartBootstrap, 'function', 'queueChartBootstrap helper should exist');
 assert.equal(sandbox.IG_DASH_STATE.sortCol, 'followers', 'IG_DASH_STATE should track default sort');
 assert.equal(sandbox.D, undefined, 'legacy D global should not be required anymore');
 assert.equal(sandbox.STATIC_JSON_URL, './data.json', 'STATIC_JSON_URL should be stable for HTTP caching');
@@ -113,6 +114,7 @@ console.log(JSON.stringify({
     'runtime loader/init functions are loaded from external scripts',
     'IG_DASH_STATE namespace is initialized',
     'legacy D global is no longer required',
-    'data URL is stable for HTTP caching'
+    'data URL is stable for HTTP caching',
+    'chart bootstrap is deferred via runtime helper'
   ]
 }, null, 2));
