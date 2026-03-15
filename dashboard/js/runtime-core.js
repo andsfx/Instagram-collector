@@ -430,7 +430,8 @@ function exportPDF(){
         tosca: [31, 184, 176],
         toscaSoft: [214, 244, 240],
         dark: [24, 34, 52],
-        bg: [246, 248, 251],
+        bg: [248, 248, 246],
+        line: [222, 225, 231],
         muted: [96, 108, 126]
       };
 
@@ -447,6 +448,41 @@ function exportPDF(){
       var contentW = pageW - marginX * 2;
       var contentH = pageH - contentTop - 34;
       var pageCount = 1;
+      function drawBrandPill(label, x, y, invert){
+        if(invert){
+          pdf.setFillColor(255,255,255);
+          pdf.roundedRect(x, y, 118, 20, 8, 8, 'F');
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(8);
+          pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+          pdf.text(label, x + 10, y + 13);
+        } else {
+          pdf.setFillColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+          pdf.roundedRect(x, y, 118, 20, 8, 8, 'F');
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(8);
+          pdf.setTextColor(255,255,255);
+          pdf.text(label, x + 10, y + 13);
+        }
+      }
+
+      function drawDecorativeCircles(style){
+        style = style || 'light';
+        var topColor = style === 'cover' ? BRAND.tosca : BRAND.line;
+        var accentColor = style === 'cover' ? BRAND.pink : [196, 198, 204];
+        pdf.setDrawColor(topColor[0], topColor[1], topColor[2]);
+        pdf.circle(pageW - 88, 48, 26, 'S');
+        pdf.circle(28, 110, 22, 'S');
+        pdf.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
+        pdf.circle(86, pageH - 46, 26, 'S');
+        pdf.circle(pageW - 120, pageH - 36, 40, 'S');
+        var dots = style === 'cover' ? [BRAND.pink, BRAND.tosca, [196,198,204]] : [[196,198,204],[196,198,204],[196,198,204]];
+        dots.forEach(function(c, idx){
+          pdf.setFillColor(c[0], c[1], c[2]);
+          pdf.circle(pageW - 86 + idx * 36, pageH - 46, 14, 'F');
+        });
+      }
+
       function drawFooter(){
         pdf.setDrawColor(226, 231, 239);
         pdf.line(marginX, pageH - 24, pageW - marginX, pageH - 24);
@@ -461,24 +497,16 @@ function exportPDF(){
       function header(title, subtitle){
         pdf.setFillColor(BRAND.bg[0], BRAND.bg[1], BRAND.bg[2]);
         pdf.rect(0, 0, pageW, 82, 'F');
-        pdf.setFillColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
-        pdf.rect(0, 0, pageW * 0.34, 8, 'F');
-        pdf.setFillColor(95, 205, 191);
-        pdf.rect(pageW * 0.34, 0, pageW * 0.18, 8, 'F');
-        pdf.setFillColor(198, 108, 162);
-        pdf.rect(pageW * 0.52, 0, pageW * 0.18, 8, 'F');
-        pdf.setFillColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
-        pdf.rect(pageW * 0.70, 0, pageW * 0.30, 8, 'F');
-        pdf.setFillColor(255, 255, 255);
-        pdf.roundedRect(marginX, 16, 92, 44, 8, 8, 'F');
-        pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(19);
-        pdf.text(title, marginX, 36);
+        drawDecorativeCircles('light');
+        drawBrandPill('COMPETITOR REPORT', marginX, 18, false);
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(11);
+        pdf.setFontSize(22);
+        pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+        pdf.text(title, marginX, 56);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10.5);
         pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-        pdf.text(subtitle || '', marginX, 56);
+        pdf.text(subtitle || '', pageW - marginX - 220, 30);
       }
 
       function startNewPage(title, subtitle){
@@ -547,39 +575,43 @@ function exportPDF(){
       // Cover page
       pdf.setFillColor(BRAND.bg[0], BRAND.bg[1], BRAND.bg[2]);
       pdf.rect(0, 0, pageW, pageH, 'F');
-      pdf.setFillColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
-      pdf.rect(0, 0, pageW * 0.4, 16, 'F');
-      pdf.setFillColor(95, 205, 191);
-      pdf.rect(pageW * 0.4, 0, pageW * 0.2, 16, 'F');
-      pdf.setFillColor(198, 108, 162);
-      pdf.rect(pageW * 0.6, 0, pageW * 0.18, 16, 'F');
-      pdf.setFillColor(BRAND.pink[0], BRAND.pink[1], BRAND.pink[2]);
-      pdf.rect(pageW * 0.78, 0, pageW * 0.22, 16, 'F');
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
-      pdf.setFontSize(30);
-      pdf.text('Instagram Competitor', marginX, 162);
+      drawDecorativeCircles('cover');
+      drawBrandPill('COMPETITOR REPORT', marginX, 28, false);
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(14);
+      pdf.setFontSize(15);
       pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-      pdf.text('Performance Report', marginX, 188);
-      pdf.setFontSize(12);
-      pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
-      pdf.text('Laporan ringkas performa kompetitor Instagram', marginX, 206);
-      pdf.setFontSize(10.5);
-      var dateLabel = 'Dibuat: ' + _formatPresentationDate(new Date().toISOString());
-      pdf.text(dateLabel, marginX, 218);
-      pdf.setFillColor(255, 255, 255);
-      pdf.roundedRect(marginX, 254, pageW - marginX * 2, 74, 10, 10, 'F');
+      pdf.text('Instagram', marginX, 128);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(34);
+      pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+      pdf.text('competitor', marginX, 176);
       pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(34);
       pdf.setTextColor(BRAND.tosca[0], BRAND.tosca[1], BRAND.tosca[2]);
-      pdf.setFontSize(13);
-      pdf.text('Tujuan Laporan', marginX + 14, 278);
+      pdf.text('performance', marginX + 176, 176);
       pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(16);
       pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
-      pdf.setFontSize(11);
-      pdf.text('- Memantau posisi kompetitor dari sisi audience, growth, dan engagement', marginX + 14, 298);
-      pdf.text('- Mengidentifikasi campaign, format konten, dan akun yang paling menonjol', marginX + 14, 316);
+      pdf.text('report', marginX, 212);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11.5);
+      pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
+      pdf.text('Laporan ringkas performa kompetitor Instagram', marginX, 238);
+      var dateLabel = 'Dibuat: ' + _formatPresentationDate(new Date().toISOString());
+      pdf.text(dateLabel, marginX, 258);
+      pdf.setFillColor(255, 255, 255);
+      pdf.roundedRect(marginX, 294, 286, 84, 14, 14, 'F');
+      pdf.setDrawColor(230,233,238);
+      pdf.roundedRect(marginX, 294, 286, 84, 14, 14, 'S');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(BRAND.dark[0], BRAND.dark[1], BRAND.dark[2]);
+      pdf.setFontSize(12);
+      pdf.text('Tujuan Laporan', marginX + 16, 320);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10.5);
+      pdf.setTextColor(BRAND.muted[0], BRAND.muted[1], BRAND.muted[2]);
+      pdf.text('• Memantau posisi kompetitor dari sisi audience, growth, dan engagement', marginX + 16, 342);
+      pdf.text('• Mengidentifikasi campaign, format konten, dan akun yang paling menonjol', marginX + 16, 360);
       drawFooter();
 
       var report = _getPresentationReport();
