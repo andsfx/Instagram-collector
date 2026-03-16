@@ -451,15 +451,21 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 .ps-summary-k { font-size:11px; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; }
 .ps-summary-v { font-size:15px; font-weight:700; color:var(--t1); margin-top:2px; }
 .ps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
-.ps-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); min-height: 210px; }
-.ps-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ps-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); min-height: 0; }
+.ps-card-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .ps-card-title { font-weight: 700; font-size: 15px; }
 .ps-card-meta { font-size: 12px; color: var(--t3); margin-top: 4px; }
+.ps-card-format { font-size: 11px; color: var(--t2); background: rgba(31,184,176,.12); padding: 4px 10px; border-radius: 999px; }
 .ps-card-badge { font-size: 11px; color: var(--t2); background: rgba(52, 152, 219, 0.12); padding: 2px 8px; border-radius: 999px; }
 .ps-card-hashtags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-card-kpis { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; }
+.ps-kpi { border:1px solid var(--border); border-radius:12px; padding:8px 10px; background: rgba(255,255,255,.6); }
+.ps-kpi-v { font-size:13px; font-weight:700; color:var(--t1); }
+.ps-kpi-k { font-size:10px; color:var(--t3); text-transform:uppercase; letter-spacing:.2px; margin-top:2px; }
 .ps-card-stats { display: flex; flex-wrap: wrap; gap: 6px; }
 .ps-chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; color: var(--t3); background: var(--card); }
 .ps-chip.muted { opacity: 0.6; }
+.ps-card-insight { font-size: 12px; color: var(--t2); line-height: 1.5; }
 .ps-card-posts { display: flex; flex-direction: column; gap: 8px; }
 .ps-post { border-top: 1px solid rgba(0, 0, 0, 0.08); padding-top: 8px; }
 .ps-post-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
@@ -467,10 +473,10 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 .ps-post-tag.viral { background: rgba(46, 204, 113, 0.16); color: #1e8449; }
 .ps-post-tag.normal { background: rgba(52, 152, 219, 0.14); color: #21618c; }
 .ps-post-tag.underperform { background: rgba(231, 76, 60, 0.14); color: #922b21; }
-.ps-post-link { font-weight: 600; color: var(--t2); text-decoration: none; font-size: 13px; }
-.ps-post-caption { font-size: 12px; color: var(--t3); margin: 4px 0; }
+.ps-post-link { font-weight: 600; color: var(--t2); text-decoration: none; font-size: 12px; }
+.ps-post-caption { font-size: 11px; color: var(--t3); margin: 4px 0; line-height:1.45; }
 .ps-post-meta { font-size: 11px; color: var(--t3); }
-.ps-campaign { font-size: 11px; color: var(--t3); margin: 4px 0 4px 0; }
+.ps-campaign { font-size: 11px; color: var(--t3); margin: 0; }
 .ps-empty { font-size: 13px; color: var(--t3); grid-column: 1 / -1; text-align: center; }
 </style>
 </head>
@@ -598,8 +604,8 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 </section>
 
 <section class="ps-sec reveal rv-up" id="sec-post-snapshot">
-  <div class="stitle"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FCAF45" stroke-width="2.5"><rect x="4" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/><rect x="16" y="5" width="4" height="4"/><rect x="4" y="11" width="4" height="4"/><rect x="10" y="11" width="4" height="4"/><rect x="16" y="11" width="4" height="4"/></svg></div>12-Post Snapshot<span>Analisa 12 postingan terakhir tiap akun</span><span class="gv-info-toggle" onclick="document.getElementById('snapshotInfoBox').classList.toggle('open');this.classList.toggle('active')" title="Penjelasan Snapshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Apa ini?</span></div>
-  <div class="gv-info-box" id="snapshotInfoBox"><div class="gv-info-content"><div class="gv-info-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCAF45" stroke-width="2.5"><rect x="4" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/><rect x="16" y="5" width="4" height="4"/></svg>Memahami 12-Post Snapshot</div><div class="gv-info-desc">Bagian ini merangkum performa 12 postingan terakhir per akun: rata-rata likes/komentar, ER post, status viral vs perlu optimasi, hashtag dominan, dan tema campaign. Gunakan filter untuk menemukan pola konten yang paling efektif.</div></div></div>
+  <div class="stitle"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FCAF45" stroke-width="2.5"><rect x="4" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/><rect x="16" y="5" width="4" height="4"/><rect x="4" y="11" width="4" height="4"/><rect x="10" y="11" width="4" height="4"/><rect x="16" y="11" width="4" height="4"/></svg></div>12-Post Snapshot<span>Analisis 12 postingan terakhir tiap akun</span><span class="gv-info-toggle" onclick="document.getElementById('snapshotInfoBox').classList.toggle('open');this.classList.toggle('active')" title="Penjelasan Snapshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Apa ini?</span></div>
+  <div class="gv-info-box" id="snapshotInfoBox"><div class="gv-info-content"><div class="gv-info-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCAF45" stroke-width="2.5"><rect x="4" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/><rect x="16" y="5" width="4" height="4"/></svg>Memahami 12-Post Snapshot</div><div class="gv-info-desc">Bagian ini merangkum performa 12 postingan terakhir per akun: rata-rata likes/komentar, ER post, status performa, tema campaign, dan konten teratas. Gunakan filter untuk menemukan pola konten yang paling efektif.</div></div></div>
   <div class="ps-toolbar">
     <div class="ps-filters">
       <label>Akun

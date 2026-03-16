@@ -179,13 +179,8 @@ function renderPostSnapshot(){
       });
     });
     const topCampaign = Object.entries(campaignCounts).sort((x,y)=>y[1]-x[1])[0]?.[0] || '-';
-    const topViral = cards
-      .filter((item) => item.insight)
-      .sort((x,y)=>Number(y.insight.viral_posts||0)-Number(x.insight.viral_posts||0))[0];
-    const topER = cards
-      .filter((item)=>item.insight)
-      .sort((x,y)=>Number(y.insight.average_post_er||0)-Number(x.insight.average_post_er||0))[0];
-
+    const topViral = cards.filter((item) => item.insight).sort((x,y)=>Number(y.insight.viral_posts||0)-Number(x.insight.viral_posts||0))[0];
+    const topER = cards.filter((item)=>item.insight).sort((x,y)=>Number(y.insight.average_post_er||0)-Number(x.insight.average_post_er||0))[0];
     const items = [
       { k:'Total post teranalisis', v: fmtFull(totalPosts) },
       { k:'Viral / perlu optimasi', v: `${fmtFull(totalViral)} / ${fmtFull(totalUnder)}` },
@@ -207,43 +202,55 @@ function renderPostSnapshot(){
     }
     const posts = insight.posts || [];
     const visiblePosts = selectedPostFilter === 'all' ? posts : posts.filter((post) => post.performance_label === selectedPostFilter);
+    const bestPost = visiblePosts[0] || posts[0] || null;
 
     const averageLikes = Number.isFinite(insight.average_likes) ? fmtFull(insight.average_likes) : '-';
     const averageComments = Number.isFinite(insight.average_comments) ? fmtFull(insight.average_comments) : '-';
-    const averagePostEr = Number.isFinite(insight.average_post_er) ? pct(insight.average_post_er) : '-';
+    const averagePostEr = Number.isFinite(insight.average_post_er) ? pct(Math.abs(insight.average_post_er)) : '-';
     const hashtagHtml = (insight.top_hashtags || []).slice(0, 3).map((tag) => `<span class="ps-chip">${escapeHtml(tag)}</span>`).join('') || '<span class="ps-chip muted">No hashtags</span>';
-    const campaigns = (insight.campaign_terms || []).slice(0, 3).map((term) => escapeHtml(term)).join(', ');
-    const campaignHtml = campaigns ? `<div class="ps-campaign">Tema campaign: ${campaigns}</div>` : '';
+    const campaigns = (insight.campaign_terms || []).slice(0, 2).map((term) => escapeHtml(term)).join(', ');
+    const campaignHtml = campaigns ? `<div class="ps-campaign">Tema campaign: ${campaigns}</div>` : '<div class="ps-campaign">Tema campaign: -</div>';
 
-    const postRows = visiblePosts.length ? visiblePosts.slice(0, 2).map((post) => {
-      const date = formatPostDate(post.published_at);
-      const caption = post.caption_snippet || post.caption || post.shortcode || '';
-      const label = post.performance_label || 'normal';
+    let insightText = `Konten @${username} paling kuat di format ${titleCase(insight.dominant_type || 'unknown')}.`;
+    if ((insight.viral_posts || 0) > (insight.underperform_posts || 0)) insightText = `Konten @${username} cukup konsisten, dengan ${fmtFull(insight.viral_posts || 0)} postingan viral pada 12 postingan terakhir.`;
+    else if ((insight.underperform_posts || 0) >= 3) insightText = `Konten @${username} perlu perhatian, karena postingan yang perlu optimasi masih cukup banyak.`;
+
+    let previewHtml = '<div class="ps-post ps-empty">Tidak ada postingan sesuai filter.</div>';
+    if (bestPost) {
+      const label = bestPost.performance_label || 'normal';
       const labelText = label === 'viral' ? 'Viral' : label === 'underperform' ? 'Perlu Optimasi' : 'Stabil';
-      const postEr = Number.isFinite(post.post_er) ? pct(post.post_er) : '-';
-      return `<div class="ps-post">
+      const date = formatPostDate(bestPost.published_at);
+      const caption = bestPost.caption_snippet || bestPost.caption || bestPost.shortcode || '';
+      const postEr = Number.isFinite(bestPost.post_er) ? pct(Math.abs(bestPost.post_er)) : '-';
+      previewHtml = `<div class="ps-post">
         <div class="ps-post-head"><span class="ps-post-tag ${label}">${labelText}</span><span class="ps-post-meta">${date}</span></div>
-        <a class="ps-post-link" href="${post.url || '#'}" target="_blank" rel="noreferrer">${escapeHtml(caption || ('@'+(post.shortcode||'post')))}</a>
-        <div class="ps-post-meta">${fmtFull(post.likes)} likes · ${fmtFull(post.comments)} komentar · ER ${postEr}</div>
+        <a class="ps-post-link" href="${bestPost.url || '#'}" target="_blank" rel="noreferrer">Postingan teratas</a>
+        <div class="ps-post-caption">${escapeHtml(caption)}</div>
+        <div class="ps-post-meta">${fmtFull(bestPost.likes)} likes · ${fmtFull(bestPost.comments)} komentar · ER ${postEr}</div>
       </div>`;
-    }).join('') : `<div class="ps-post ps-empty">Tidak ada post sesuai filter "${selectedPostFilter}".</div>`;
+    }
 
     return `<div class="ps-card">
       <div class="ps-card-header">
         <div>
           <div class="ps-card-title">@${username}</div>
-          <div class="ps-card-meta">${averageLikes} likes · ${averageComments} komentar · Rata-rata ER ${averagePostEr}</div>
+          <div class="ps-card-meta">Ringkasan 12 postingan terakhir</div>
         </div>
-        <div class="ps-card-badge">${posts.length} post</div>
+        <div class="ps-card-format">${titleCase(insight.dominant_type || 'unknown')}</div>
+      </div>
+      <div class="ps-card-kpis">
+        <div class="ps-kpi"><div class="ps-kpi-v">${averageLikes}</div><div class="ps-kpi-k">Avg likes</div></div>
+        <div class="ps-kpi"><div class="ps-kpi-v">${averageComments}</div><div class="ps-kpi-k">Avg komentar</div></div>
+        <div class="ps-kpi"><div class="ps-kpi-v">${averagePostEr}</div><div class="ps-kpi-k">Rata-rata ER</div></div>
       </div>
       <div class="ps-card-stats">
         <span class="ps-chip">Post viral ${fmtFull(insight.viral_posts || 0)}</span>
         <span class="ps-chip">Perlu optimasi ${fmtFull(insight.underperform_posts || 0)}</span>
-        <span class="ps-chip">${escapeHtml(insight.dominant_type || 'unknown')}</span>
       </div>
-      <div class="ps-card-hashtags">${hashtagHtml}</div>
       ${campaignHtml}
-      <div class="ps-card-posts">${postRows}</div>
+      <div class="ps-card-hashtags">${hashtagHtml}</div>
+      <div class="ps-card-insight">${insightText}</div>
+      <div class="ps-card-posts">${previewHtml}</div>
     </div>`;
   }).join('');
 
