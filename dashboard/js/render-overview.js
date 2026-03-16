@@ -239,18 +239,20 @@ function renderPostSnapshot(){
         </div>
         <div class="ps-card-format">${titleCase(insight.dominant_type || 'unknown')}</div>
       </div>
-      <div class="ps-card-kpis">
-        <div class="ps-kpi"><div class="ps-kpi-v">${averageLikes}</div><div class="ps-kpi-k">Avg likes</div></div>
-        <div class="ps-kpi"><div class="ps-kpi-v">${averageComments}</div><div class="ps-kpi-k">Avg komentar</div></div>
-        <div class="ps-kpi"><div class="ps-kpi-v">${averagePostEr}</div><div class="ps-kpi-k">Rata-rata ER</div></div>
+      <div class="ps-card-main">
+        <div class="ps-card-kpis">
+          <div class="ps-kpi"><div class="ps-kpi-v">${averageLikes}</div><div class="ps-kpi-k">Avg likes</div></div>
+          <div class="ps-kpi"><div class="ps-kpi-v">${averageComments}</div><div class="ps-kpi-k">Avg komentar</div></div>
+          <div class="ps-kpi"><div class="ps-kpi-v">${averagePostEr}</div><div class="ps-kpi-k">Rata-rata ER</div></div>
+        </div>
+        <div class="ps-card-stats">
+          <span class="ps-chip">Post viral ${fmtFull(insight.viral_posts || 0)}</span>
+          <span class="ps-chip">Perlu optimasi ${fmtFull(insight.underperform_posts || 0)}</span>
+        </div>
+        ${campaignHtml}
+        <div class="ps-card-hashtags">${hashtagHtml}</div>
+        <div class="ps-card-insight">${insightText}</div>
       </div>
-      <div class="ps-card-stats">
-        <span class="ps-chip">Post viral ${fmtFull(insight.viral_posts || 0)}</span>
-        <span class="ps-chip">Perlu optimasi ${fmtFull(insight.underperform_posts || 0)}</span>
-      </div>
-      ${campaignHtml}
-      <div class="ps-card-hashtags">${hashtagHtml}</div>
-      <div class="ps-card-insight">${insightText}</div>
       <div class="ps-card-posts">${previewHtml}</div>
     </div>`;
   }).join('');
