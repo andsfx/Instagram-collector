@@ -211,9 +211,9 @@ function renderPostSnapshot(){
     const campaigns = (insight.campaign_terms || []).slice(0, 2).map((term) => escapeHtml(term)).join(', ');
     const campaignHtml = campaigns ? `<div class="ps-campaign">Tema campaign: ${campaigns}</div>` : '<div class="ps-campaign">Tema campaign: -</div>';
 
-    let insightText = `Konten @${username} paling kuat di format ${titleCase(insight.dominant_type || 'unknown')}.`;
-    if ((insight.viral_posts || 0) > (insight.underperform_posts || 0)) insightText = `Konten @${username} cukup konsisten, dengan ${fmtFull(insight.viral_posts || 0)} postingan viral pada 12 postingan terakhir.`;
-    else if ((insight.underperform_posts || 0) >= 3) insightText = `Konten @${username} perlu perhatian, karena postingan yang perlu optimasi masih cukup banyak.`;
+    let insightText = `Format ${titleCase(insight.dominant_type || 'unknown')} masih jadi kekuatan utama @${username}.`;
+    if ((insight.viral_posts || 0) > (insight.underperform_posts || 0)) insightText = `${fmtFull(insight.viral_posts || 0)} postingan terakhir @${username} masuk kategori viral atau stabil kuat.`;
+    else if ((insight.underperform_posts || 0) >= 3) insightText = `Beberapa postingan @${username} masih perlu optimasi agar performanya lebih konsisten.`;
 
     let previewHtml = '<div class="ps-post ps-empty">Tidak ada postingan sesuai filter.</div>';
     if (bestPost) {
@@ -222,9 +222,10 @@ function renderPostSnapshot(){
       const date = formatPostDate(bestPost.published_at);
       const caption = bestPost.caption_snippet || bestPost.caption || bestPost.shortcode || '';
       const postEr = Number.isFinite(bestPost.post_er) ? pct(Math.abs(bestPost.post_er)) : '-';
-      previewHtml = `<div class="ps-post">
+      previewHtml = `<div class="ps-post ps-post-featured">
+        <div class="ps-post-label">Postingan teratas</div>
         <div class="ps-post-head"><span class="ps-post-tag ${label}">${labelText}</span><span class="ps-post-meta">${date}</span></div>
-        <a class="ps-post-link" href="${bestPost.url || '#'}" target="_blank" rel="noreferrer">Postingan teratas</a>
+        <a class="ps-post-link" href="${bestPost.url || '#'}" target="_blank" rel="noreferrer">${escapeHtml(caption.slice(0, 42) || 'Lihat postingan')}</a>
         <div class="ps-post-caption">${escapeHtml(caption)}</div>
         <div class="ps-post-meta">${fmtFull(bestPost.likes)} likes · ${fmtFull(bestPost.comments)} komentar · ER ${postEr}</div>
       </div>`;
