@@ -114,6 +114,14 @@ function mappedExitCode(error) {
   return 1;
 }
 
+function ensureGitIdentity(repoRoot) {
+  const name = process.env.GIT_AUTHOR_NAME || process.env.GIT_COMMITTER_NAME || 'andsfx';
+  const email = process.env.GIT_AUTHOR_EMAIL || process.env.GIT_COMMITTER_EMAIL || '79969685+andsfx@users.noreply.github.com';
+  run('git', ['config', 'user.name', name], { cwd: repoRoot });
+  run('git', ['config', 'user.email', email], { cwd: repoRoot });
+  return { name, email };
+}
+
 function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   loadEnvFile(path.join(repoRoot, '.env.daily-dashboard'));
@@ -142,6 +150,7 @@ function main() {
     hybridMaster: null,
     dashboardBuild: null,
     git: {
+      identity: null,
       changed: false,
       committed: false,
       pushed: false,
@@ -178,6 +187,7 @@ function main() {
 
     if (summary.git.changed && !skipCommit) {
       try {
+        summary.git.identity = ensureGitIdentity(repoRoot);
         run('git', ['add', ...trackedPaths], { cwd: repoRoot });
         const commitMessage = `Update daily dashboard data (${today})`;
         run('git', ['commit', '-m', commitMessage], { cwd: repoRoot });
