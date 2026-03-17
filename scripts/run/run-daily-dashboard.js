@@ -122,6 +122,18 @@ function ensureGitIdentity(repoRoot) {
   return { name, email };
 }
 
+function githubPushEnv() {
+  const token = process.env.GITHUB_PAT || process.env.GITHUB_TOKEN;
+  if (!token) return {};
+  const askpass = '/tmp/git-askpass-dashboard.sh';
+  const fs = require('fs');
+  fs.writeFileSync(askpass, `#!/bin/sh\ncase "$1" in\n  *Username*) echo "x-access-token" ;;\n  *Password*) echo "${token}" ;;\n  *) echo "" ;;\nesac\n`, { mode: 0o700 });
+  return {
+    GIT_ASKPASS: askpass,
+    GIT_TERMINAL_PROMPT: '0'
+  };
+}
+
 function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   loadEnvFile(path.join(repoRoot, '.env.daily-dashboard'));
@@ -206,7 +218,7 @@ function main() {
 
     if ((summary.git.changed || summary.git.committed) && !skipPush) {
       try {
-        run('git', ['push', 'origin', 'HEAD:main'], { cwd: repoRoot });
+        run('git', ['push', 'origin', 'HEAD:main'], { cwd: repoRoot, env: githubPushEnv() });
         summary.git.pushed = true;
       } catch (error) {
         error.stage = 'git';
