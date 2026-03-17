@@ -74,8 +74,10 @@ for (const match of scripts) {
   const src = match[1];
   const inline = match[2];
   let code = '';
-  if (src) code = fs.readFileSync(path.join(repoRoot, 'dashboard', src.replace(/^\.\//, '')), 'utf8');
-  else code = inline;
+  if (src) {
+    const normalizedSrc = src.split('?')[0].replace(/^\.\//, '');
+    code = fs.readFileSync(path.join(repoRoot, 'dashboard', normalizedSrc), 'utf8');
+  } else code = inline;
   if (!code.trim()) continue;
   vm.runInContext(code, sandbox);
 }
