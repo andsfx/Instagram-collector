@@ -38,7 +38,7 @@ function renderSummaryStrip(){
     { k:'Top Engagement', v:'@' + topER.u, s: pct(topER.er || 0) + ' engagement rate' },
     { k:'Fastest Growth', v:'@' + topGrowth.u, s: (topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(topGrowth.growthAbs || 0) + ' hari ini' },
     { k:'Top Content Format', v: (topFormat[0] || 'reels').charAt(0).toUpperCase() + (topFormat[0] || 'reels').slice(1), s: fmtFull(topFormat[1] || 0) + ' post pada dataset terbaru' },
-    { k:'Freshness', v: dashData().latest && dashData().latest.date ? dashData().latest.date : '-', s: 'Sync ' + prettyLastUpdate(dashData().lastUpdate || '-') }
+    { k:'Tanggal Data', v: dashData().latest && dashData().latest.date ? dashData().latest.date : '-', s: 'Terakhir disinkronkan ' + prettyLastUpdate(dashData().lastUpdate || '-') }
   ];
   el.innerHTML = cards.map(function(card){
     return '<div class="summary-card ' + (card.cls || '') + '"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>';

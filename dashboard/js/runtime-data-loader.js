@@ -23,7 +23,7 @@ function setDataSource(state, detail){
     message = detail ? ('Menampilkan cache lokal • ' + detail) : 'Menampilkan cache lokal';
   } else if(state === 'static'){
     cls = 'live src-live';
-    message = detail ? ('Data live dari data.json • ' + detail) : 'Data live dari data.json';
+    message = detail ? ('Data live dari data.json • Tanggal data ' + detail) : 'Data live dari data.json';
   } else if(state === 'error'){
     cls = 'live src-error';
     message = detail ? ('Gagal memuat data • ' + detail) : 'Gagal memuat data';
