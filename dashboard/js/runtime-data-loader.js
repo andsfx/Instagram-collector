@@ -23,7 +23,7 @@ function setDataSource(state, detail){
     message = detail ? ('Menampilkan cache lokal • ' + detail) : 'Menampilkan cache lokal';
   } else if(state === 'static'){
     cls = 'live src-live';
-    message = detail ? ('Data live dari data.json • Tanggal data ' + detail) : 'Data live dari data.json';
+    message = 'Data live dari data.json';
   } else if(state === 'error'){
     cls = 'live src-error';
     message = detail ? ('Gagal memuat data • ' + detail) : 'Gagal memuat data';
@@ -85,7 +85,7 @@ function onData(raw, source){
   var data = getDashboardData();
   document.getElementById('lastUpdate').textContent = 'Update terakhir: ' + prettyLastUpdate(data.lastUpdate || '-');
   if (source === 'cached') setFreshnessBadge('cached', formatAge(Date.now() - parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10)));
-  else setFreshnessBadge('fresh', parsed.latest && parsed.latest.date ? parsed.latest.date : todayWibDate());
+  else setFreshnessBadge('fresh', prettyLastUpdate(data.lastUpdate || '-'));
   renderDebugPanel(source, parsed, validation.ok ? 'schema ok' : validation.issues.join('; '));
   render();
 }
@@ -172,4 +172,6 @@ window.onError = onError;
 window.fetchWithTimeout = fetchWithTimeout;
 window.silentRefresh = silentRefresh;
 window.initDashboard = initDashboard;
+window.forceRefreshData = forceRefreshData;
+Dashboard = initDashboard;
 window.forceRefreshData = forceRefreshData;
