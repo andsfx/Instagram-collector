@@ -158,7 +158,11 @@
       };
     });
     // Fallback: build contentBreakdown from post_insights when content_breakdown is absent
-    if (Object.keys(contentBreakdown).length === 0 && raw.post_insights) {
+    // OR when existing content_breakdown has null per-type stats (avgER=0, avgLikes=0 for all entries)
+    const cbHasRealData = Object.values(contentBreakdown).some((cb) =>
+      cb.avgER > 0 || Object.values(cb.typePerf).some((tp) => tp.avgLikes > 0 || tp.er > 0)
+    );
+    if (!cbHasRealData && raw.post_insights) {
       Object.entries(raw.post_insights).forEach(([u, insight]) => {
         const posts = (insight && Array.isArray(insight.posts)) ? insight.posts : [];
         if (posts.length === 0) return;
