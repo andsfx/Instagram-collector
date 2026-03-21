@@ -57,10 +57,23 @@ function initRevealAnimations(){
 (function initNav(){
   const nav = document.getElementById('navBar');
   if(!nav) return;
+  const navInner = nav.querySelector('.nav-inner');
   const items = nav.querySelectorAll('.nav-item');
   const sectionIds = ['sec-overview','sec-engagement','sec-content','sec-history'];
   let lastScroll = 0;
   let ticking = false;
+
+  function updateNavScroll(){
+    if(navInner){
+      const isScrolled = navInner.scrollLeft > 10;
+      navInner.classList.toggle('scrolled-right', isScrolled);
+    }
+  }
+
+  if(navInner){
+    navInner.addEventListener('scroll', updateNavScroll, {passive:true});
+    updateNavScroll();
+  }
 
   items.forEach(item => {
     item.addEventListener('click', function(e){

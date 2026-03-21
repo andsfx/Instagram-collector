@@ -64,9 +64,9 @@ function renderCards(){
       </div>
       <div class="csts4">
         <div class="cst"><div class="sv">${fmtFull(Math.round(a.al))}</div><div class="sl">Avg Likes</div></div>
-        <div class="cst"><div class="sv">${a.ac.toFixed(1)}</div><div class="sl">Avg Comments</div></div>
-        <div class="cst er-highlight"><div class="sv">${a.er.toFixed(3)}%</div><div class="sl">ER</div></div>
-        <div class="cst"><div class="sv">${a.growthPct != null ? a.growthPct.toFixed(3)+'%' : '-'}</div><div class="sl">Growth</div></div>
+        <div class="cst"><div class="sv">${a.ac != null ? a.ac.toFixed(1) : '-'}</div><div class="sl">Avg Comments</div></div>
+        <div class="cst er-highlight"><div class="sv">${a.er != null ? (a.er * 100).toFixed(2)+'%' : '-'}</div><div class="sl">ER</div></div>
+        <div class="cst"><div class="sv">${a.growthPct != null ? (a.growthPct > 0 ? '+' : '') + a.growthPct.toFixed(2)+'%' : '-'}</div><div class="sl">Growth</div></div>
       </div>
     </div>`;
   }).join(''));
@@ -303,8 +303,8 @@ function renderTable(){
       <td>${fmtFull(a.fo)}</td>
       <td>${fmtFull(a.p)}</td>
       <td>${fmtFull(Math.round(a.al))}</td>
-      <td>${a.ac.toFixed(1)}</td>
-      <td><span class="er-badge ${erCls}">${a.er.toFixed(3)}%</span></td>
+      <td>${a.ac != null ? a.ac.toFixed(1) : '-'}</td>
+      <td><span class="er-badge ${erCls}">${a.er != null ? (a.er * 100).toFixed(2)+'%' : '-'}</span></td>
       <td>${a.v ? '&#10003;' : '-'}</td>
       <td><span class="${gapCls}">${a.b ? '-' : (gap >= 0 ? '+' : '') + fmtFull(gap)}</span></td>
     </tr>`;

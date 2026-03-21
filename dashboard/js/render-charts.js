@@ -46,7 +46,7 @@ function mkERBar(){
       labels: accs.map(a => '@'+a.u),
       datasets: [{
         label: 'Engagement Rate (%)',
-        data: accs.map(a => a.er),
+        data: accs.map(a => a.er != null ? a.er * 100 : 0),
         backgroundColor: accs.map((a,i) => a.b ? '#833AB4' : COLORS[(i+2)%COLORS.length] + '88'),
         borderColor: accs.map((a,i) => a.b ? '#833AB4' : COLORS[(i+2)%COLORS.length]),
         borderWidth: 2,
@@ -54,7 +54,33 @@ function mkERBar(){
         borderSkipped: false
       }]
     },
-    options: { ...chartDefaults(), plugins: { ...chartDefaults().plugins, legend: { display: false } } }
+    options: { 
+      ...chartDefaults(), 
+      plugins: { 
+        ...chartDefaults().plugins, 
+        legend: { display: false },
+        tooltip: { 
+          backgroundColor: 'rgba(0,0,0,0.8)', 
+          titleFont: { family: 'Inter', weight: '700' }, 
+          bodyFont: { family: 'Inter' }, 
+          cornerRadius: 8, 
+          padding: 12,
+          callbacks: { 
+            label: function(ctx){ return 'ER: ' + (ctx.raw != null ? ctx.raw.toFixed(2) + '%' : 'N/A'); } 
+          }
+        }
+      },
+      scales: {
+        ...chartDefaults().scales,
+        y: { 
+          ...chartDefaults().scales.y, 
+          ticks: { 
+            ...chartDefaults().scales.y.ticks, 
+            callback: function(v){ return v.toFixed(1) + '%'; } 
+          } 
+        }
+      }
+    }
   });
 }
 
@@ -162,7 +188,7 @@ function mkERTrend(){
       labels: dashData().dates,
       datasets: dashData().accounts.map((a,i) => ({
         label: '@'+a.u,
-        data: (dashData().engTrend && dashData().engTrend[a.u]) || [],
+        data: (dashData().engTrend && dashData().engTrend[a.u] && dashData().engTrend[a.u].map(v => v != null ? v * 100 : null)) || [],
         borderColor: COLORS[i%COLORS.length],
         borderWidth: a.b ? 3 : 2,
         fill: false,
@@ -172,7 +198,28 @@ function mkERTrend(){
         pointBackgroundColor: COLORS[i%COLORS.length]
       }))
     },
-    options: chartDefaults()
+    options: {
+      ...chartDefaults(),
+      scales: {
+        ...chartDefaults().scales,
+        y: {
+          ...chartDefaults().scales.y,
+          ticks: {
+            ...chartDefaults().scales.y.ticks,
+            callback: function(v){ return v.toFixed(1) + '%'; }
+          }
+        }
+      },
+      plugins: {
+        ...chartDefaults().plugins,
+        tooltip: {
+          ...chartDefaults().plugins.tooltip,
+          callbacks: {
+            label: function(ctx){ return ctx.dataset.label + ': ' + (ctx.raw != null ? ctx.raw.toFixed(2) + '%' : 'N/A'); }
+          }
+        }
+      }
+    }
   });
 }
 
