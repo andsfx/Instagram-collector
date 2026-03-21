@@ -102,6 +102,12 @@ function initRevealAnimations(){
       nav.classList.remove('scrolled');
       nav.classList.remove('hidden');
     }
+    const btt = document.getElementById('btnBackToTop');
+    if(btt) {
+      if(scrollY > 500) btt.classList.add('show');
+      else btt.classList.remove('show');
+    }
+
     lastScroll = scrollY;
 
     let activeId = sectionIds[0];
