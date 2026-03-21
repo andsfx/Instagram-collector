@@ -157,6 +157,49 @@
         }
       };
     });
+    // Fallback: build contentBreakdown from post_insights when content_breakdown is absent
+    if (Object.keys(contentBreakdown).length === 0 && raw.post_insights) {
+      Object.entries(raw.post_insights).forEach(([u, insight]) => {
+        const posts = (insight && Array.isArray(insight.posts)) ? insight.posts : [];
+        if (posts.length === 0) return;
+        const typeMap = {};
+        let bestPost = null;
+        posts.forEach((p) => {
+          const t = p.type || 'image';
+          if (!typeMap[t]) typeMap[t] = { count: 0, likes: 0, comments: 0, er: 0 };
+          typeMap[t].count++;
+          typeMap[t].likes += Number(p.likes || 0);
+          typeMap[t].comments += Number(p.comments || 0);
+          typeMap[t].er += Number(p.post_er || 0);
+          if (!bestPost || (p.likes || 0) > (bestPost.likes || 0)) {
+            bestPost = { url: p.url || '', type: t, likes: p.likes || 0, comments: p.comments || 0 };
+          }
+        });
+        const typePerf = {};
+        ['reels', 'carousel', 'image', 'video'].forEach((t) => {
+          const m = typeMap[t];
+          if (m && m.count > 0) {
+            typePerf[t] = {
+              avgLikes: Math.round(m.likes / m.count),
+              avgComments: +(m.comments / m.count).toFixed(1),
+              er: +(m.er / m.count).toFixed(4)
+            };
+          } else {
+            typePerf[t] = { avgLikes: 0, avgComments: 0, er: 0 };
+          }
+        });
+        const totalER = posts.reduce((s, p) => s + Number(p.post_er || 0), 0);
+        contentBreakdown[u] = {
+          reels: (typeMap.reels || {}).count || 0,
+          carousel: (typeMap.carousel || {}).count || 0,
+          image: (typeMap.image || {}).count || 0,
+          video: (typeMap.video || {}).count || 0,
+          avgER: +(totalER / posts.length).toFixed(4),
+          typePerf,
+          bestPost: bestPost || { url: '', type: '', likes: 0, comments: 0 }
+        };
+      });
+    }
     return {
       ...raw,
       lastUpdate: raw.generated_at_wib || raw.generated_at || '-',
