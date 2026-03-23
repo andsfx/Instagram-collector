@@ -1,8 +1,61 @@
+function renderDailyMetricsDisclosureSummary(data) {
+  const titleEl = document.getElementById('dailyMetricsSummaryTitle');
+  const hintEl = document.getElementById('dailyMetricsSummaryHint');
+  const pillEl = document.getElementById('dailyMetricsSummaryPill');
+  if (!titleEl || !hintEl || !pillEl) return;
+
+  if (!data || !data.accounts || !data.history || !data.history.length) {
+    titleEl.textContent = 'Buka untuk melihat riwayat followers, following, dan jumlah post per akun';
+    hintEl.textContent = 'Gunakan saat perlu cek perubahan harian yang lebih rinci.';
+    pillEl.textContent = 'Ringkas dulu';
+    return;
+  }
+
+  const accounts = data.accounts || [];
+  const history = [...data.history].sort((a,b) => new Date(a.date) - new Date(b.date));
+  const latest = data.latest && data.latest.date ? data.latest : null;
+  if (latest && latest.date && history.length && latest.date !== history[history.length - 1].date) {
+    const latestEntry = { date: latest.date };
+    accounts.forEach((acc) => {
+      const key = typeof acc === 'string' ? acc : acc.u;
+      latestEntry[key] = latest[key];
+    });
+    history.push(latestEntry);
+  }
+
+  const deltas = accounts.map((account) => {
+    const username = typeof account === 'string' ? account : account.u;
+    const series = history.filter((row) => row && row[username] && row[username].followers != null);
+    const len = series.length;
+    const current = len ? series[len - 1][username] : null;
+    const prev = len > 1 ? series[len - 2][username] : null;
+    const change = current && prev ? (current.followers || 0) - (prev.followers || 0) : 0;
+    return { username, change };
+  }).sort((a,b) => Math.abs(b.change) - Math.abs(a.change));
+
+  const top = deltas[0];
+  if (!top) {
+    titleEl.textContent = 'Buka untuk melihat riwayat followers, following, dan jumlah post per akun';
+    hintEl.textContent = 'Gunakan saat perlu cek perubahan harian yang lebih rinci.';
+    pillEl.textContent = 'Ringkas dulu';
+    return;
+  }
+
+  titleEl.textContent = top.change > 0
+    ? `Akun paling naik hari ini: @${top.username} (+${top.change.toLocaleString('id-ID')})`
+    : top.change < 0
+      ? `Perubahan terbesar hari ini: @${top.username} (${top.change.toLocaleString('id-ID')})`
+      : `Belum ada perubahan followers menonjol hari ini`;
+  hintEl.textContent = 'Buka untuk mengecek detail followers, following, dan jumlah post tiap akun per hari.';
+  pillEl.textContent = top.change > 0 ? 'Ada pergerakan' : 'Lihat detail';
+}
+
 function renderDailyMetrics() {
   const container = document.getElementById('dailyMetricsContainer');
   if (!container) return;
 
   const data = getDashboardData();
+  renderDailyMetricsDisclosureSummary(data);
   if (!data || !data.accounts || !data.history || data.history.length === 0) {
     container.innerHTML = '<div class="al-empty">Data performa histori tidak cukup untuk menampilkan Daily Metrics.</div>';
     return;
@@ -11,13 +64,18 @@ function renderDailyMetrics() {
   const { history, latest } = data;
   const accounts = (data.accounts || []).map(a => typeof a === 'string' ? a : (a.u || a));
 
-  // Add Account Selector Dropdown
   let html = `
-    <div class="hm-select" style="margin-bottom: 20px; background: var(--card); padding: 16px 20px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow);">
-      <label style="font-size:13px;font-weight:600;color:var(--t2)">Pilih akun:</label>
-      <select id="dmAccountSelector" class="fbtn on" style="font-size: 13px; font-weight: 600; padding: 6px 16px;" onchange="switchDailyMetricsAccount(this.value)">
-        ${accounts.map(acc => `<option value="${acc}" style="background: var(--card); color: var(--t1);">@${acc}</option>`).join('')}
-      </select>
+    <div class="dm-toolbar">
+      <div class="dm-toolbar-copy">
+        <div class="dm-toolbar-k">Metrik Harian Akun</div>
+        <div class="dm-toolbar-s">Riwayat followers, following, dan jumlah post per akun. Dibuka saat perlu analisis detail.</div>
+      </div>
+      <div class="hm-select dm-toolbar-select">
+        <label style="font-size:13px;font-weight:600;color:var(--t2)">Pilih akun:</label>
+        <select id="dmAccountSelector" class="fbtn on" style="font-size: 13px; font-weight: 600; padding: 6px 16px;" onchange="switchDailyMetricsAccount(this.value)">
+          ${accounts.map(acc => `<option value="${acc}" style="background: var(--card); color: var(--t1);">@${acc}</option>`).join('')}
+        </select>
+      </div>
     </div>
   `;
 
@@ -26,46 +84,43 @@ function renderDailyMetrics() {
     html += `
     <div class="dm-card neo" id="dm-card-${account}" style="display: ${displayStyle}">
       <div class="dm-card-hdr">
-        <div class="dm-acc">@${account} <span class="dm-acc-badge">${account === data.meta?.brand_account || accounts[0] === account ? 'Brand' : 'Kompetitor'}</span></div>
+        <div class="dm-acc">@${account} <span class="dm-acc-badge">${account === data.meta?.brand_account || accounts[0] === account ? 'Brand' : 'Pembanding'}</span></div>
         <select class="fbtn on" style="padding: 4px 12px; font-size: 11px;" onchange="filterMetricsTable(this, '${account}')">
-          <option value="7" selected style="background: var(--card); color: var(--t1);">Last 7 Days</option>
-          <option value="14" style="background: var(--card); color: var(--t1);">Last 14 Days</option>
-          <option value="30" style="background: var(--card); color: var(--t1);">Last 30 Days</option>
+          <option value="7" selected style="background: var(--card); color: var(--t1);">7 hari terakhir</option>
+          <option value="14" style="background: var(--card); color: var(--t1);">14 hari terakhir</option>
+          <option value="30" style="background: var(--card); color: var(--t1);">30 hari terakhir</option>
         </select>
       </div>
       <div class="dm-wrap">
         <table class="dm-tbl" id="dm-tbl-${account}">
           <thead>
             <tr>
-              <th style="width: 15%">Date</th>
+              <th style="width: 15%">Tanggal</th>
               <th colspan="2" style="text-align: center">Followers</th>
               <th colspan="2" style="text-align: center">Following</th>
-              <th colspan="2" style="text-align: center">Posts (Media)</th>
+              <th colspan="2" style="text-align: center">Postingan</th>
             </tr>
           </thead>
           <tbody>
     `;
 
     const rowsData = [];
-    
     let chronologicalHistory = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
-    
+
     if (latest && latest.date && chronologicalHistory.length > 0 && latest.date !== chronologicalHistory[chronologicalHistory.length - 1].date) {
         let latestEntry = { date: latest.date };
         accounts.forEach(acc => { latestEntry[acc] = latest[acc]; });
         chronologicalHistory.push(latestEntry);
     }
-    
+
     const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
     for (let i = 0; i < chronologicalHistory.length; i++) {
         const curr = chronologicalHistory[i];
         const prev = i > 0 ? chronologicalHistory[i - 1] : null;
-
         const currData = curr[account];
         const prevData = prev ? prev[account] : null;
-
         if (!currData) continue;
 
         const dateObj = new Date(curr.date);
@@ -84,16 +139,11 @@ function renderDailyMetrics() {
             dPos = posts - (prevData.posts || 0);
         }
 
-        rowsData.unshift({
-            dateHtml,
-            followers, following, posts,
-            dFol, dFing, dPos,
-            isFirst: i === 0
-        });
+        rowsData.unshift({ dateHtml, followers, following, posts, dFol, dFing, dPos, isFirst: i === 0 });
     }
 
     let displayRows = rowsData.slice(0, 7);
-    
+
     const renderDelta = (val, isFirst) => {
         if (isFirst) return '<span class="dm-d-z">--</span>';
         if (val > 0) return `<span class="dm-d-p">+${val.toLocaleString()}</span>`;
@@ -102,7 +152,7 @@ function renderDailyMetrics() {
     };
 
     displayRows.forEach(r => {
-        html += `
+      html += `
         <tr class="dm-data-row" data-account="${account}">
           <td>${r.dateHtml}</td>
           <td class="dm-num-cell" style="text-align:right">${renderDelta(r.dFol, r.isFirst)}</td>
@@ -112,7 +162,7 @@ function renderDailyMetrics() {
           <td class="dm-num-cell" style="text-align:right">${renderDelta(r.dPos, r.isFirst)}</td>
           <td class="dm-num-cell" style="font-weight:700">${r.posts.toLocaleString()}</td>
         </tr>
-        `;
+      `;
     });
 
     const calcAvg = (days) => {
@@ -142,25 +192,25 @@ function renderDailyMetrics() {
 
     html += `
           <tr class="avg-row avg-top">
-            <td style="font-weight:600; color:var(--t2);">Daily Average</td>
+            <td style="font-weight:600; color:var(--t2);">Rata-rata harian</td>
             <td style="text-align:right" colspan="2">${renderDelta(avgAll.fol, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(avgAll.fing, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(avgAll.pos, false)}</td>
           </tr>
           <tr class="avg-row">
-            <td style="font-weight:600; color:var(--t2);">Weekly Average</td>
+            <td style="font-weight:600; color:var(--t2);">Rata-rata 7 hari</td>
             <td style="text-align:right" colspan="2">${renderDelta(avg7.fol, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(avg7.fing, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(avg7.pos, false)}</td>
           </tr>
           <tr class="avg-row">
-            <td style="font-weight:600; color:var(--t2);">Last 30 Days</td>
+            <td style="font-weight:600; color:var(--t2);">Total 30 hari</td>
             <td style="text-align:right" colspan="2">${renderDelta(total30.fol, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(total30.fing, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(total30.pos, false)}</td>
           </tr>
           <tr class="avg-row">
-            <td style="font-weight:600; color:var(--t2);">Last 14 Days</td>
+            <td style="font-weight:600; color:var(--t2);">Total 14 hari</td>
             <td style="text-align:right" colspan="2">${renderDelta(total14.fol, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(total14.fing, false)}</td>
             <td style="text-align:right" colspan="2">${renderDelta(total14.pos, false)}</td>
@@ -173,7 +223,7 @@ function renderDailyMetrics() {
   });
 
   container.innerHTML = html;
-  
+
   window.__DM_ROWS_DATA = window.__DM_ROWS_DATA || {};
   accounts.forEach(acc => {
       const accRows = [];
@@ -183,7 +233,7 @@ function renderDailyMetrics() {
           accounts.forEach(a => { latestEntry[a] = latest[a]; });
           chron.push(latestEntry);
       }
-      
+
       const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -194,7 +244,7 @@ function renderDailyMetrics() {
         const dFol = prev && prev[acc] ? curr[acc].followers - (prev[acc].followers || 0) : 0;
         const dFing = prev && prev[acc] ? curr[acc].following - (prev[acc].following || 0) : 0;
         const dPos = prev && prev[acc] ? curr[acc].posts - (prev[acc].posts || 0) : 0;
-        
+
         const dateObj = new Date(curr.date);
         const dayStr = dayNames[dateObj.getDay()];
         const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')} ${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
@@ -217,7 +267,7 @@ window.switchDailyMetricsAccount = function(selectedAccount) {
     const data = getDashboardData();
     if (!data || !data.accounts) return;
     const accounts = (data.accounts || []).map(a => typeof a === 'string' ? a : (a.u || a));
-    
+
     accounts.forEach(acc => {
         const card = document.getElementById(`dm-card-${acc}`);
         if (card) {
@@ -229,19 +279,19 @@ window.switchDailyMetricsAccount = function(selectedAccount) {
 window.filterMetricsTable = function(selectEl, account) {
     const val = selectEl.value;
     const limit = val === 'all' ? 9999 : parseInt(val, 10);
-    
+
     const rows = window.__DM_ROWS_DATA[account];
     if (!rows) return;
-    
+
     const displayRows = rows.slice(0, limit);
-    
+
     const renderDelta = (val, isFirst) => {
         if (isFirst) return '<span class="dm-d-z">--</span>';
         if (val > 0) return `<span class="dm-d-p">+${val.toLocaleString()}</span>`;
         if (val < 0) return `<span class="dm-d-n">${val.toLocaleString()}</span>`;
         return '<span class="dm-d-z">--</span>';
     };
-    
+
     let rowsHtml = '';
     displayRows.forEach(r => {
         rowsHtml += `
@@ -256,7 +306,7 @@ window.filterMetricsTable = function(selectEl, account) {
         </tr>
         `;
     });
-    
+
     const tbody = document.querySelector(`#dm-tbl-${account} tbody`);
     if(tbody) {
         const avgRows = Array.from(tbody.querySelectorAll('.avg-row'));

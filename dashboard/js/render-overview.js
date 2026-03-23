@@ -17,28 +17,126 @@ function formatPostDate(iso){
   return d.toLocaleDateString('id-ID',{ day:'2-digit', month:'short' });
 }
 
-function renderSummaryStrip(){
-  var el = document.getElementById('summaryStrip');
-  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
-  var rankedFollowers = [...dashData().accounts].sort((a,b) => b.f - a.f);
-  var rankedER = [...dashData().accounts].sort((a,b) => (b.er||0) - (a.er||0));
-  var rankedGrowth = [...dashData().accounts].sort((a,b) => (b.growthAbs||0) - (a.growthAbs||0));
-  var topFollowers = rankedFollowers[0];
-  var topER = rankedER[0];
-  var topGrowth = rankedGrowth[0];
-  var formatTotals = { reels:0, carousel:0, image:0, video:0 };
-  Object.values(dashData().contentBreakdown || {}).forEach(function(cb){
+function computeOverviewLeaders(){
+  const data = dashData();
+  const accounts = (data && data.accounts) || [];
+  if(!accounts.length) return null;
+  const rankedFollowers = [...accounts].sort((a,b) => (b.f||0) - (a.f||0));
+  const rankedER = [...accounts].sort((a,b) => (b.er||0) - (a.er||0));
+  const rankedGrowth = [...accounts].sort((a,b) => (b.growthAbs||0) - (a.growthAbs||0));
+  const rankedGrowthPct = [...accounts].sort((a,b) => (b.growthPct||0) - (a.growthPct||0));
+  const formatTotals = { reels:0, carousel:0, image:0, video:0 };
+  Object.values(data.contentBreakdown || {}).forEach(function(cb){
     ['reels','carousel','image','video'].forEach(function(t){
       formatTotals[t] += Number(cb[t] || 0);
     });
   });
-  var topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0] || ['reels',0];
+  const topFormat = Object.entries(formatTotals).sort((a,b) => b[1]-a[1])[0] || ['reels',0];
+  return {
+    topFollowers: rankedFollowers[0],
+    topER: rankedER[0],
+    topGrowth: rankedGrowth[0],
+    topGrowthPct: rankedGrowthPct[0],
+    topFormat,
+    formatTotals
+  };
+}
+
+function renderExecutiveSummary(){
+  const el = document.getElementById('executiveSummary');
+  if(!el) return;
+  const data = dashData();
+  const leaders = computeOverviewLeaders();
+  const brand = getBrand();
+  const competitors = getCompetitors();
+  if(!data || !leaders || !brand){
+    el.innerHTML = '';
+    return;
+  }
+
+  const rankedFollowers = [...(data.accounts || [])].sort((a,b) => (b.f||0) - (a.f||0));
+  const brandRank = rankedFollowers.findIndex((account) => account.u === brand.u) + 1;
+  const erPct = function(value){ return value == null ? '-' : ((value || 0) * 100).toFixed(2) + '%'; };
+  const closestFollower = competitors.slice().sort((a,b) => Math.abs((a.f||0) - (brand.f||0)) - Math.abs((b.f||0) - (brand.f||0)))[0] || null;
+  const strongestER = leaders.topER;
+  const brandGap = closestFollower ? (brand.f || 0) - (closestFollower.f || 0) : 0;
+  const brandGrowth = brand.growthAbs || 0;
+  const topDailyGrowth = leaders.topGrowth;
+  const erDelta = strongestER ? ((brand.er || 0) - (strongestER.er || 0)) : 0;
+  const cards = [
+    {
+      k:'Posisi Brand',
+      v: brandRank ? `#${brandRank}` : '-',
+      s: closestFollower ? `Followers ${brandGap >= 0 ? 'unggul' : 'tertinggal'} ${fmtFull(Math.abs(brandGap))} vs @${closestFollower.u}` : 'Belum ada akun pembanding terdekat.'
+    },
+    {
+      k:'Gap Rival Terdekat',
+      v: !closestFollower ? '-' : `${brandGap >= 0 ? '+' : '-'}${fmtFull(Math.abs(brandGap))}`,
+      s: closestFollower ? `Dibanding @${closestFollower.u} pada total followers.` : 'Menunggu data pembanding.'
+    },
+    {
+      k:'Growth Hari Ini',
+      v: `${brandGrowth >= 0 ? '+' : ''}${fmtFull(brandGrowth)}`,
+      s: topDailyGrowth ? `Akun paling naik hari ini @${topDailyGrowth.u} (${topDailyGrowth.growthAbs >= 0 ? '+' : ''}${fmtFull(topDailyGrowth.growthAbs || 0)})` : 'Belum ada perubahan harian yang tercatat.'
+    },
+    {
+      k:'ER Brand',
+      v: erPct(brand.er),
+      s: !strongestER ? 'Belum ada data engagement.' : strongestER.u === brand.u ? 'Brand memimpin ER di kelompok akun ini.' : `Selisih ${erDelta >= 0 ? '+' : '-'}${erPct(Math.abs(erDelta))} vs @${strongestER.u}`
+    }
+  ];
+
+  el.innerHTML = cards.map(function(card){
+    return `<article class="summary-card highlight"><div class="k">${card.k}</div><div class="v">${card.v}</div><div class="s">${card.s}</div></article>`;
+  }).join('');
+}
+
+function renderTodaySummary(){
+  const el = document.getElementById('todaySummary');
+  if(!el) return;
+  const data = dashData();
+  const leaders = computeOverviewLeaders();
+  const brand = getBrand();
+  if(!data || !leaders || !brand){
+    el.innerHTML = '';
+    return;
+  }
+  const topGrowth = leaders.topGrowth;
+  const topER = leaders.topER;
+  const topFollowers = leaders.topFollowers;
+  const brandGrowth = brand.growthAbs || 0;
+  const tone = brandGrowth > 0 ? 'positif' : brandGrowth < 0 ? 'melemah' : 'stabil';
+  const items = [
+    `Hari ini performa brand @${brand.u} cenderung <strong>${tone}</strong> dengan perubahan followers <strong>${brandGrowth >= 0 ? '+' : ''}${fmtFull(brandGrowth)}</strong>.`,
+    topGrowth ? `Pergerakan followers tercepat saat ini datang dari <strong>@${topGrowth.u}</strong> (${topGrowth.growthAbs >= 0 ? '+' : ''}${fmtFull(topGrowth.growthAbs)} hari ini).` : '',
+    topER ? `Akun dengan engagement rate tertinggi adalah <strong>@${topER.u}</strong> di level <strong>${pct(topER.er || 0)}</strong>.` : '',
+    topFollowers ? `Pemimpin total followers tetap <strong>@${topFollowers.u}</strong> dengan <strong>${fmtFull(topFollowers.f || 0)}</strong> followers.` : ''
+  ].filter(Boolean);
+
+  el.innerHTML = `
+    <div class="today-summary-card neo">
+      <div class="today-summary-head">
+        <div>
+          <div class="today-summary-k">Ringkasan Hari Ini</div>
+          <div class="today-summary-v">Template otomatis dari data terbaru</div>
+        </div>
+        <div class="today-summary-chip">${prettyLastUpdate(data.lastUpdate || '-')}</div>
+      </div>
+      <ol class="today-summary-list">${items.map((item)=>`<li>${item}</li>`).join('')}</ol>
+    </div>
+  `;
+}
+
+function renderSummaryStrip(){
+  var el = document.getElementById('summaryStrip');
+  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
+  var leaders = computeOverviewLeaders();
   var cards = [
-    { k:'Top Followers', v:'@' + topFollowers.u, s: fmtFull(topFollowers.f) + ' followers', cls:'highlight' },
-    { k:'Top Engagement', v:'@' + topER.u, s: pct(topER.er || 0) + ' engagement rate' },
-    { k:'Fastest Growth', v:'@' + topGrowth.u, s: (topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(topGrowth.growthAbs || 0) + ' hari ini' },
-    { k:'Top Content Format', v: (topFormat[0] || 'reels').charAt(0).toUpperCase() + (topFormat[0] || 'reels').slice(1), s: fmtFull(topFormat[1] || 0) + ' post pada dataset terbaru' },
-    { k:'Terakhir Update', v: prettyLastUpdate(dashData().lastUpdate || '-'), s: 'Dashboard tersinkron ke build terbaru' }
+    { k:'Pemimpin Followers', v:'@' + leaders.topFollowers.u, s: fmtFull(leaders.topFollowers.f) + ' followers', cls:'highlight' },
+    { k:'ER Tertinggi', v:'@' + leaders.topER.u, s: ((leaders.topER.er || 0) * 100).toFixed(2) + '% tingkat interaksi' },
+    { k:'Pertumbuhan Tercepat', v:'@' + leaders.topGrowth.u, s: (leaders.topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(leaders.topGrowth.growthAbs || 0) + ' hari ini' },
+    { k:'Format Dominan', v: (leaders.topFormat[0] || 'reels').charAt(0).toUpperCase() + (leaders.topFormat[0] || 'reels').slice(1), s: fmtFull(leaders.topFormat[1] || 0) + ' post pada dataset terbaru' },
+    { k:'Pembaruan Terakhir', v: prettyLastUpdate(dashData().lastUpdate || '-'), s: 'Data followers harian dan engagement terbaru' }
   ];
   el.innerHTML = cards.map(function(card){
     return '<div class="summary-card ' + (card.cls || '') + '"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>';
@@ -82,16 +180,12 @@ function renderGrowthVelocity(){
     const t = trend[a.u] || [];
     const len = t.length;
 
-    // Daily growth
     const daily = len >= 2 ? t[len-1] - t[len-2] : 0;
     const dailyPct = len >= 2 && t[len-2] > 0 ? ((daily / t[len-2]) * 100) : 0;
-
-    // Weekly growth
     const weekIdx = Math.max(0, len - 7);
     const weekly = len >= 2 ? t[len-1] - t[weekIdx] : 0;
     const weeklyPct = t[weekIdx] > 0 ? ((weekly / t[weekIdx]) * 100) : 0;
 
-    // Sparkline data (last 7 days of daily changes)
     const sparkDays = Math.min(7, len - 1);
     let sparkData = [];
     for(let i = len - sparkDays; i < len; i++){
@@ -282,13 +376,11 @@ function renderTable(){
     return dashState().sortAsc ? va - vb : vb - va;
   });
 
-  // Update header styling
   document.querySelectorAll('.rtbl thead th').forEach(th => {
     th.classList.toggle('sd', th.getAttribute('data-s') === dashState().sortCol);
   });
 
   const tbody = document.getElementById('rtb');
-  // Rank by followers
   const ranked = [...dashData().accounts].sort((a,b) => b.f - a.f);
   replaceWithFragment(tbody, sorted.map(a => {
     const rank = ranked.findIndex(x => x.u === a.u) + 1;
@@ -311,7 +403,6 @@ function renderTable(){
   }).join(''));
 }
 
-// Table sort handler
 document.querySelectorAll('.rtbl thead th').forEach(th => {
   th.addEventListener('click', () => {
     const col = th.getAttribute('data-s');
@@ -321,7 +412,6 @@ document.querySelectorAll('.rtbl thead th').forEach(th => {
   });
 });
 
-// ===== ALERTS =====
 function renderAlerts(){
   const sec = document.getElementById('alertSection');
   const list = document.getElementById('alertList');
@@ -342,3 +432,5 @@ function renderAlerts(){
   }).join('') + '</div>';
 }
 
+window.renderExecutiveSummary = renderExecutiveSummary;
+window.renderTodaySummary = renderTodaySummary;

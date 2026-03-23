@@ -12,6 +12,13 @@ function setFreshnessBadge(type, extra){
   else el.textContent = extra ? ('Perlu perhatian • ' + extra) : 'Perlu refresh';
 }
 
+function setBuildInfo(message, syncMessage){
+  var el = document.getElementById('buildInfoText');
+  var syncEl = document.getElementById('syncInfoText');
+  if(el) el.textContent = message || 'Menunggu info build…';
+  if(syncEl) syncEl.textContent = syncMessage || 'Menunggu info sinkron…';
+}
+
 function setDataSource(state, detail){
   var el = document.getElementById('dataSource');
   var textEl = document.getElementById('dataSourceText');
@@ -23,7 +30,7 @@ function setDataSource(state, detail){
     message = detail ? ('Menampilkan cache lokal • ' + detail) : 'Menampilkan cache lokal';
   } else if(state === 'static'){
     cls = 'live src-live';
-    message = 'Data live dari data.json';
+    message = detail ? ('Data terbaru dashboard • ' + detail) : 'Data terbaru dashboard';
   } else if(state === 'error'){
     cls = 'live src-error';
     message = detail ? ('Gagal memuat data • ' + detail) : 'Gagal memuat data';
@@ -84,8 +91,15 @@ function onData(raw, source){
   updateDarkBtn(document.documentElement.getAttribute('data-theme') || 'light');
   var data = getDashboardData();
   document.getElementById('lastUpdate').textContent = 'Update terakhir: ' + prettyLastUpdate(data.lastUpdate || '-');
-  if (source === 'cached') setFreshnessBadge('cached', formatAge(Date.now() - parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10)));
-  else setFreshnessBadge('fresh', prettyLastUpdate(data.lastUpdate || '-'));
+  if (source === 'cached') {
+    var cacheAge = formatAge(Date.now() - parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10));
+    setFreshnessBadge('cached', cacheAge);
+    setBuildInfo('Cache lokal aktif', 'Disimpan ' + cacheAge);
+  } else {
+    var updated = prettyLastUpdate(data.lastUpdate || '-');
+    setFreshnessBadge('fresh', updated);
+    setBuildInfo('Build dashboard aktif', 'Sinkron terakhir ' + updated);
+  }
   renderDebugPanel(source, parsed, validation.ok ? 'schema ok' : validation.issues.join('; '));
   render();
 }
@@ -97,6 +111,7 @@ function onError(e, raw){
     '<br><br><button onclick="forceRefreshData()" style="padding:8px 20px;border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:var(--radius-pill);cursor:pointer;font-weight:600;font-family:inherit">Force refresh</button></div>';
   setFreshnessBadge('error', 'perlu refresh');
   setDataSource('loading');
+  setBuildInfo('Info build belum tersedia', 'Silakan refresh untuk mencoba lagi.');
   renderDebugPanel('error', raw || null, e && e.message ? e.message : 'unknown error');
 }
 

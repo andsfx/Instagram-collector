@@ -43,10 +43,10 @@
   }
 
   function prettyLastUpdate(v){
-    if (!v) return 'Unknown';
+    if (!v) return 'Tidak diketahui';
     try {
       var d = new Date(v);
-      return d.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Jakarta' }) + ' WIB';
+      return d.toLocaleString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Jakarta' }) + ' WIB';
     } catch(_) {
       return String(v);
     }
