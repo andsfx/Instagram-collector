@@ -186,6 +186,10 @@ function render(){
   renderCards();
   renderGrowthVelocity();
   renderPostSnapshot();
+  
+  if (typeof renderDailyMetrics === 'function') {
+    renderDailyMetrics();
+  }
 
   requestAnimationFrame(function(){
     renderTable();
