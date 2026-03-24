@@ -22,8 +22,57 @@ function runCmd(bin, args, options = {}) {
   });
 }
 
+function sleep(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
 function loadAccounts(repoRoot) {
   return readJson(path.join(repoRoot, 'config', 'accounts.json')).filter((a) => a.enabled);
+}
+
+function getRun(runId) {
+  const out = runCmd('curl', [
+    '-sS',
+    `https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_TOKEN}`
+  ]);
+
+  const parsed = JSON.parse(out);
+  return parsed.data || {};
+}
+
+function waitForRunCompletion(runId, username, options = {}) {
+  const maxAttempts = options.maxAttempts || 12;
+  const delayMs = options.delayMs || 10000;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const run = getRun(runId);
+    const status = run.status;
+
+    if (status === 'SUCCEEDED') {
+      return run;
+    }
+
+    if (['FAILED', 'ABORTED', 'TIMED-OUT'].includes(status)) {
+      throw new Error(
+        `Apify run failed for ${username}: status=${status} runId=${runId} message=${run.statusMessage || 'no status message'}`
+      );
+    }
+
+    if (!['READY', 'RUNNING'].includes(status)) {
+      throw new Error(
+        `Apify run unexpected status for ${username}: status=${status || 'unknown'} runId=${runId}`
+      );
+    }
+
+    if (attempt < maxAttempts) {
+      sleep(delayMs);
+    }
+  }
+
+  const finalRun = getRun(runId);
+  throw new Error(
+    `Apify run did not finish in time for ${username}: status=${finalRun.status || 'unknown'} runId=${runId} message=${finalRun.statusMessage || 'no status message'}`
+  );
 }
 
 function callApifyRun(username, resultsLimit = 12) {
@@ -46,11 +95,33 @@ function callApifyRun(username, resultsLimit = 12) {
   ]);
 
   const parsed = JSON.parse(out);
-  const data = parsed.data || {};
-  if (!data.defaultDatasetId || data.status !== 'SUCCEEDED') {
-    throw new Error(`Apify run failed for ${username}: ${data.status || parsed.error?.message || 'unknown error'}`);
+  let data = parsed.data || {};
+  const status = data.status;
+
+  if (status === 'SUCCEEDED' && data.defaultDatasetId) {
+    return data;
   }
-  return data;
+
+  if (['READY', 'RUNNING'].includes(status) && data.id) {
+    data = waitForRunCompletion(data.id, username, {
+      maxAttempts: 12,
+      delayMs: 10000
+    });
+
+    if (data.status === 'SUCCEEDED' && data.defaultDatasetId) {
+      return data;
+    }
+  }
+
+  if (['FAILED', 'ABORTED', 'TIMED-OUT'].includes(data.status)) {
+    throw new Error(
+      `Apify run failed for ${username}: status=${data.status} runId=${data.id || 'unknown'} message=${data.statusMessage || parsed.error?.message || 'unknown error'}`
+    );
+  }
+
+  throw new Error(
+    `Apify run failed for ${username}: status=${data.status || 'unknown'} runId=${data.id || 'unknown'} message=${data.statusMessage || parsed.error?.message || 'unknown error'}`
+  );
 }
 
 function fetchDatasetItems(datasetId) {
