@@ -92,13 +92,26 @@ function onData(raw, source){
   var data = getDashboardData();
   document.getElementById('lastUpdate').textContent = 'Update terakhir: ' + prettyLastUpdate(data.lastUpdate || '-');
   if (source === 'cached') {
-    var cacheAge = formatAge(Date.now() - parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10));
-    setFreshnessBadge('cached', cacheAge);
+    var cacheTs = parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10);
+    var cacheAge = formatAge(Date.now() - cacheTs);
+    setFreshnessBadge('cached', 'Cache ' + cacheAge);
     setBuildInfo('Cache lokal aktif', 'Disimpan ' + cacheAge);
+    var refreshBtn = document.querySelector('.hdr-btn[onclick="forceRefreshData()"]');
+    if(refreshBtn){
+      refreshBtn.style.borderColor = 'var(--ig-pink)';
+      refreshBtn.style.color = 'var(--ig-pink)';
+      refreshBtn.title = 'Data dari cache (' + cacheAge + '). Klik untuk muat data terbaru.';
+    }
   } else {
     var updated = prettyLastUpdate(data.lastUpdate || '-');
     setFreshnessBadge('fresh', updated);
     setBuildInfo('Build dashboard aktif', 'Sinkron terakhir ' + updated);
+    var refreshBtn2 = document.querySelector('.hdr-btn[onclick="forceRefreshData()"]');
+    if(refreshBtn2){
+      refreshBtn2.style.borderColor = '';
+      refreshBtn2.style.color = '';
+      refreshBtn2.title = 'Muat ulang data terbaru dari server';
+    }
   }
   renderDebugPanel(source, parsed, validation.ok ? 'schema ok' : validation.issues.join('; '));
   render();
@@ -170,6 +183,8 @@ async function initDashboard(){
 function forceRefreshData(){
   clearDashboardCache();
   setDataSource('refreshing');
+  // Reset chart bootstrap flag so charts re-render on fresh data
+  chartVisibilityBootstrapStarted = false;
   var loading = document.getElementById('loadingState');
   var dashboard = document.getElementById('dashboard');
   if(loading) loading.style.display = 'block';

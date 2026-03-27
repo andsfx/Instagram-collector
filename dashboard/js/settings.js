@@ -92,29 +92,15 @@
 
   function applyPanelVisibility(panels){
     for(var key in PANELS){
-      var section = document.getElementById(PANELS[key].sectionId);
-      if(section){
-        if(panels[key]){
-          section.style.display = '';
-        } else {
-          section.style.display = 'none';
-        }
+      var sectionId = PANELS[key].sectionId;
+      var section = document.getElementById(sectionId);
+      // Fallback: try querySelector with class if getElementById fails
+      if(!section && sectionId){
+        section = document.querySelector('.' + sectionId) || document.querySelector('[id="' + sectionId + '"]');
       }
-    }
-
-    var gvSection = document.querySelector('.gv-sec');
-    if(gvSection){
-      gvSection.style.display = panels.growth ? '' : 'none';
-    }
-
-    var tsec = document.querySelector('.tsec');
-    if(tsec){
-      tsec.style.display = panels.ranking ? '' : 'none';
-    }
-
-    var cardsSection = document.querySelector('.cards-s');
-    if(cardsSection){
-      cardsSection.style.display = panels.overview ? '' : 'none';
+      if(section){
+        section.style.display = panels[key] ? '' : 'none';
+      }
     }
   }
 

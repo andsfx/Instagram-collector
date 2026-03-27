@@ -23,7 +23,7 @@ function runCmd(bin, args, options = {}) {
 }
 
 function sleep(ms) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+  return new Promise(function(resolve){ setTimeout(resolve, ms); });
 }
 
 function loadAccounts(repoRoot) {
@@ -40,7 +40,8 @@ function getRun(runId) {
   return parsed.data || {};
 }
 
-function waitForRunCompletion(runId, username, options = {}) {
+async function waitForRunCompletion(runId, username, options) {
+  options = options || {};
   const maxAttempts = options.maxAttempts || 12;
   const delayMs = options.delayMs || 10000;
 
@@ -65,7 +66,7 @@ function waitForRunCompletion(runId, username, options = {}) {
     }
 
     if (attempt < maxAttempts) {
-      sleep(delayMs);
+      await sleep(delayMs);
     }
   }
 
@@ -75,7 +76,8 @@ function waitForRunCompletion(runId, username, options = {}) {
   );
 }
 
-function callApifyRun(username, resultsLimit = 12) {
+async function callApifyRun(username, resultsLimit) {
+  resultsLimit = resultsLimit || 12;
   if (!APIFY_TOKEN) {
     throw new Error('APIFY_TOKEN is required');
   }
@@ -89,7 +91,8 @@ function callApifyRun(username, resultsLimit = 12) {
   const out = runCmd('curl', [
     '-sS',
     '-X', 'POST',
-    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${APIFY_TOKEN}&waitForFinish=180`,
+    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?waitForFinish=180`,
+    '-H', `Authorization: Bearer ${APIFY_TOKEN}`,
     '-H', 'Content-Type: application/json',
     '--data', JSON.stringify(payload)
   ]);
@@ -103,7 +106,7 @@ function callApifyRun(username, resultsLimit = 12) {
   }
 
   if (['READY', 'RUNNING'].includes(status) && data.id) {
-    data = waitForRunCompletion(data.id, username, {
+    data = await waitForRunCompletion(data.id, username, {
       maxAttempts: 12,
       delayMs: 10000
     });
@@ -139,7 +142,7 @@ function writeJson(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
-function main() {
+async function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   const accounts = loadAccounts(repoRoot);
   const outDir = path.join(repoRoot, 'incoming', 'apify');
@@ -151,7 +154,7 @@ function main() {
   for (const account of accounts) {
     const username = account.username;
     try {
-      const run = callApifyRun(username, 12);
+      const run = await callApifyRun(username, 12);
       const items = fetchDatasetItems(run.defaultDatasetId);
       const datasetPath = path.join(datasetsDir, `${username}.json`);
       writeJson(datasetPath, items);
@@ -191,4 +194,7 @@ function main() {
   process.exit(summary.errors > 0 ? 2 : 0);
 }
 
-main();
+main().catch(function(err){
+  console.error('Fatal error:', err.message);
+  process.exit(1);
+});

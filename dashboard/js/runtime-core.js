@@ -134,7 +134,7 @@ function applySettingsToUI(){
   document.getElementById('setFollowChange').value = s.followChange;
 }
 
-function saveSettings(){
+function saveAnalyticsSettings(){
   const s = {
     gapFollow: Number(document.getElementById('setGap').value) || DEFAULTS.gapFollow,
     erDrop: Number(document.getElementById('setErDrop').value) || DEFAULTS.erDrop,
@@ -153,7 +153,8 @@ function toggleSettings(){
 }
 window.loadSettings = loadSettings;
 window.applySettingsToUI = applySettingsToUI;
-window.saveSettings = saveSettings;
+window.saveSettings = saveAnalyticsSettings;
+window.saveAnalyticsSettings = saveAnalyticsSettings;
 window.toggleSettings = toggleSettings;
 
 // ===== FILTER =====
