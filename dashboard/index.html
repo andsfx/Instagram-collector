@@ -528,6 +528,120 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   .ps-card-posts { min-width: 0; }
 }
 
+/* ===== AUTH & SETTINGS MODALS ===== */
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease;padding:16px}
+.auth-overlay.show{opacity:1;visibility:visible}
+.auth-modal{background:var(--card);border-radius:var(--radius);padding:32px;width:100%;max-width:380px;box-shadow:var(--shadow-lg);transform:scale(0.95);transition:transform .3s ease;position:relative}
+.auth-overlay.show .auth-modal{transform:scale(1)}
+.auth-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;color:var(--t3);cursor:pointer;transition:color .2s}
+.auth-modal-close:hover{color:var(--t1)}
+.auth-modal h3{font-size:20px;font-weight:800;margin-bottom:24px;text-align:center;color:var(--t1);padding-right:24px}
+.auth-field{margin-bottom:16px}
+.auth-field label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.auth-field input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--t1);transition:border-color .2s}
+.auth-field input:focus{outline:none;border-color:var(--ig-pink)}
+.auth-field-password{position:relative}
+.auth-field-password input{padding-right:44px}
+.password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:var(--t3);transition:color .2s}
+.password-toggle:hover{color:var(--t1)}
+.auth-error{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:16px;display:none;align-items:center;gap:8px}
+.auth-error.show{display:flex}
+.auth-error svg{width:16px;height:16px;flex-shrink:0}
+.auth-btn{width:100%;padding:14px;background:var(--ig-gradient);border:none;border-radius:var(--radius-sm);color:#FFF;font-size:14px;font-weight:700;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(225,48,108,0.3)}
+
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9998;opacity:0;visibility:hidden;transition:all .3s ease;padding:16px}
+.settings-overlay.show{opacity:1;visibility:visible}
+.settings-modal{background:var(--card);border-radius:var(--radius);width:100%;max-width:560px;max-height:80vh;overflow:hidden;box-shadow:var(--shadow-lg);transform:scale(0.95);transition:transform .3s ease;display:flex;flex-direction:column}
+.settings-overlay.show .settings-modal{transform:scale(1)}
+.settings-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.settings-header h3{font-size:18px;font-weight:800;color:var(--t1);margin:0}
+.settings-close{background:none;border:none;font-size:24px;color:var(--t3);cursor:pointer;padding:4px;line-height:1}
+.settings-close:hover{color:var(--t1)}
+.settings-tabs{display:flex;border-bottom:1px solid var(--border)}
+.settings-tab{flex:1;padding:14px 16px;background:none;border:none;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.settings-tab:hover{color:var(--t1)}
+.settings-tab.active{color:var(--ig-pink);border-bottom-color:var(--ig-pink)}
+.settings-content{padding:24px;overflow-y:auto;flex:1}
+.settings-panel{display:none}
+.settings-panel.active{display:block}
+.settings-section{margin-bottom:24px}
+.settings-section:last-child{margin-bottom:0}
+.settings-section-title{font-size:13px;font-weight:700;color:var(--t2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:14px;color:var(--t1)}
+.settings-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--t1);font-size:13px;min-width:160px}
+.settings-input{padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--t1);font-size:14px;width:100%}
+.settings-input:focus{outline:none;border-color:var(--ig-pink)}
+.settings-btn-group{display:flex;gap:10px;margin-top:20px}
+.settings-btn{padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.settings-btn-primary{background:var(--ig-gradient);border:none;color:#FFF}
+.settings-btn-primary:hover{box-shadow:0 4px 12px rgba(225,48,108,0.3)}
+.settings-btn-secondary{background:var(--bg);border:1px solid var(--border);color:var(--t2)}
+.settings-btn-secondary:hover{background:var(--border)}
+.settings-toggle{position:relative;width:44px;height:24px}
+.settings-toggle input{opacity:0;width:0;height:0}
+.settings-toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:12px;transition:.3s}
+.settings-toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
+.settings-toggle input:checked+.settings-toggle-slider{background:var(--ig-pink)}
+.settings-toggle input:checked+.settings-toggle-slider:before{transform:translateX(20px)}
+.user-table{width:100%;border-collapse:collapse}
+.user-table th,.user-table td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+.user-table th{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.user-table td{font-size:14px;color:var(--t1)}
+.user-table tr:last-child td{border-bottom:none}
+.user-badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.user-badge.admin{background:rgba(225,48,108,0.12);color:var(--ig-pink)}
+.user-badge.viewer{background:rgba(52,152,219,0.12);color:#2980b9}
+.user-actions{display:flex;gap:6px}
+.user-action-btn{padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:none;transition:all .2s}
+.user-action-btn.edit{background:rgba(52,152,219,0.1);color:#2980b9}
+.user-action-btn.delete{background:rgba(231,76,60,0.1);color:var(--danger)}
+.user-action-btn:hover{opacity:.8}
+.add-user-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;background:var(--ig-gradient);border:none;border-radius:var(--radius-sm);color:#FFF;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px}
+.add-user-btn:hover{box-shadow:0 4px 12px rgba(225,48,108,0.3)}
+.protected-btn{position:relative;transition:all .2s}
+.protected-btn.locked{opacity:.5;cursor:not-allowed}
+.protected-btn.locked:hover{transform:none;box-shadow:none}
+.protected-btn.locked:after{content:"\1F512";position:absolute;font-size:10px;top:-6px;right:-6px;background:var(--t3);color:#fff;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+.protected-btn .lock-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--bg);padding:6px 12px;border-radius:6px;font-size:11px;white-space:nowrap;opacity:0;visibility:hidden;transition:all .2s;margin-bottom:8px;pointer-events:none}
+.protected-btn:hover .lock-tooltip{opacity:1;visibility:visible}
+.user-menu{position:relative}
+.user-menu-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-pill);font-size:12px;font-weight:600;color:var(--t1);cursor:pointer;transition:all .2s}
+.user-menu-btn:hover{box-shadow:var(--shadow)}
+.user-dropdown{position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);min-width:160px;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(-10px);transition:all .2s;z-index:100}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0)}
+.user-dropdown-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:13px;color:var(--t1);cursor:pointer;transition:background .2s}
+.user-dropdown-item:hover{background:var(--bg)}
+.user-dropdown-divider{height:1px;background:var(--border);margin:4px 0}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);font-size:13px;font-weight:600;color:var(--t1);transform:translateX(120%);transition:transform .3s ease;pointer-events:auto;max-width:360px}
+.toast.show{transform:translateX(0)}
+.toast.success{border-left:4px solid var(--success)}
+.toast.error{border-left:4px solid var(--danger)}
+.toast.info{border-left:4px solid var(--ig-blue)}
+.toast svg{width:18px;height:18px;flex-shrink:0}
+.toast.success svg{color:var(--success)}
+.toast.error svg{color:var(--danger)}
+.toast.info svg{color:var(--ig-blue)}
+.toast-close{margin-left:auto;background:none;border:none;color:var(--t3);cursor:pointer;padding:4px;font-size:18px}
+.toast-close:hover{color:var(--t1)}
+@media(max-width:768px){
+  .auth-overlay{align-items:center}
+  .auth-modal,.settings-modal{max-width:95%;max-height:90vh}
+  .settings-header h3{font-size:16px}
+  .settings-tabs{overflow-x:auto}
+  .settings-tab{flex-shrink:0}
+  .hdr-actions{gap:6px}
+  .hdr-btn svg{width:14px;height:14px}
+}
+@media(max-width:480px){
+  .hdr-btn span{display:none}
+  .hdr-btn svg{width:18px;height:18px}
+  .hdr-btn{padding:8px}
+}
+
 </style>
 </head>
 <body>
@@ -582,25 +696,46 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
     <div class="meta-chip" id="syncInfo"><span class="meta-label">Sinkron</span><span id="syncInfoText">Menunggu info sinkron…</span></div>
   </div>
   <div class="hdr-actions">
-    <button class="hdr-btn primary" onclick="forceRefreshData()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"/></svg>
-      Refresh data
-    </button>
-    <button class="hdr-btn utility" id="darkToggle" onclick="toggleDark()">
+    <button class="hdr-btn" id="darkToggle" onclick="toggleDark()">
       <svg id="darkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <span id="darkLabel">Mode gelap</span>
     </button>
-    <button class="hdr-btn secondary" onclick="exportPNG()">
+    <button class="hdr-btn" id="settingsBtn" style="display:none" onclick="openSettingsModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </button>
+    <button class="hdr-btn" onclick="forceRefreshData()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"/></svg>
+      Refresh data
+    </button>
+    <button class="hdr-btn secondary protected-btn" onclick="handleProtectedAction(exportPNG)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Ekspor PNG
+      <span class="lock-tooltip">Login required</span>
     </button>
-    <button class="hdr-btn secondary" onclick="exportPDF()">
+    <button class="hdr-btn secondary protected-btn" onclick="handleProtectedAction(exportPDF)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Ekspor PDF
+      <span class="lock-tooltip">Login required</span>
     </button>
-    <button class="hdr-btn debug-only" id="debugToggleBtn" onclick="toggleDebugPanel()">
+    <button class="hdr-btn debug-only" id="debugToggleBtn" onclick="handleProtectedAction(toggleDebugPanel)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 4 12.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26A7 7 0 0 1 12 2z"/></svg>
       Debug Info
+    </button>
+    <div class="user-menu" id="userMenu" style="display:none">
+      <button class="user-menu-btn" onclick="toggleUserDropdown()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="userMenuName">User</span>
+      </button>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-item" onclick="openSettingsModal()">Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item" onclick="handleLogout()">Logout</div>
+      </div>
+    </div>
+    <button class="hdr-btn" id="loginBtn" onclick="showLoginModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Login
     </button>
   </div>
   <div class="debug-panel" id="debugPanel"></div>
@@ -859,6 +994,123 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
 
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="auth-overlay">
+  <div class="auth-modal">
+    <button class="auth-modal-close" onclick="hideLoginModal()">&times;</button>
+    <h3>Login Admin</h3>
+    <div id="loginError" class="auth-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="loginErrorText"></span></div>
+    <div class="auth-field">
+      <label for="loginUsername">Username</label>
+      <input type="text" id="loginUsername" placeholder="Masukkan username" autocomplete="username">
+    </div>
+    <div class="auth-field auth-field-password">
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" placeholder="Masukkan password" autocomplete="current-password">
+      <button type="button" class="password-toggle" onclick="togglePasswordVisibility('loginPassword', this)" aria-label="Toggle password">
+        <svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+      </button>
+    </div>
+    <button class="auth-btn" onclick="handleLogin()">Login</button>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="settings-overlay">
+  <div class="settings-modal">
+    <div class="settings-header">
+      <h3>Settings</h3>
+      <button class="settings-close" onclick="closeSettingsModal()">&times;</button>
+    </div>
+    <div class="settings-tabs">
+      <button class="settings-tab active" data-tab="dashboard" onclick="switchSettingsTab('dashboard')">Dashboard</button>
+      <button class="settings-tab" data-tab="users" onclick="switchSettingsTab('users')" id="usersTab">Users</button>
+      <button class="settings-tab" data-tab="account" onclick="switchSettingsTab('account')">Account</button>
+    </div>
+    <div class="settings-content">
+      <div class="settings-panel active" id="panel-dashboard">
+        <div class="settings-section">
+          <div class="settings-section-title">Panel Visibility</div>
+          <div class="settings-row">
+            <div><div class="settings-label">Preset</div></div>
+            <select class="settings-select" id="presetSelect" onchange="applySettingsPreset(this.value)">
+              <option value="full">Full Dashboard</option>
+              <option value="compact">Compact View</option>
+              <option value="presentation">Presentation Mode</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Panel Individual</div>
+          <div id="panelToggles"></div>
+        </div>
+        <div class="settings-btn-group">
+          <button class="settings-btn settings-btn-secondary" onclick="resetSettingsToDefault()">Reset</button>
+          <button class="settings-btn settings-btn-primary" onclick="applySettings()">Apply</button>
+        </div>
+      </div>
+      <div class="settings-panel" id="panel-users">
+        <div class="settings-section">
+          <div class="settings-section-title">User Management <span id="userCount"></span></div>
+          <button class="add-user-btn" onclick="showAddUserModal()">+ Add User</button>
+          <table class="user-table">
+            <thead><tr><th>Username</th><th>Role</th><th>Actions</th></tr></thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="settings-panel" id="panel-account">
+        <div class="settings-section">
+          <div class="settings-section-title">Change Password</div>
+          <div class="auth-field auth-field-password">
+            <label>Current Password</label>
+            <input type="password" id="currentPassword" class="settings-input" placeholder="Current password">
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('currentPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+          </div>
+          <div class="auth-field auth-field-password">
+            <label>New Password</label>
+            <input type="password" id="newPassword" class="settings-input" placeholder="New password">
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('newPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+          </div>
+          <div class="auth-field auth-field-password">
+            <label>Confirm New Password</label>
+            <input type="password" id="confirmPassword" class="settings-input" placeholder="Confirm new password">
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+          </div>
+          <button class="settings-btn settings-btn-primary" onclick="changePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div id="userModal" class="auth-overlay">
+  <div class="auth-modal">
+    <h3 id="userModalTitle">Add User</h3>
+    <div id="userModalError" class="auth-error"><span></span></div>
+    <input type="hidden" id="editUserId">
+    <div class="auth-field"><label>Username</label><input type="text" id="userUsername" placeholder="Username"></div>
+    <div class="auth-field auth-field-password">
+      <label>Password</label>
+      <input type="password" id="userPassword" placeholder="Password">
+      <button type="button" class="password-toggle" onclick="togglePasswordVisibility('userPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+    </div>
+    <div class="auth-field"><label>Role</label><select id="userRole" class="settings-select" style="width:100%"><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>
+    <div class="settings-btn-group">
+      <button class="settings-btn settings-btn-secondary" onclick="closeUserModal()">Cancel</button>
+      <button class="settings-btn settings-btn-primary" onclick="saveUser()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="./js/auth.js"></script>
+<script src="./js/settings.js"></script>
 <script src="./js/data-core.js?v=20260321_153020"></script>
 <script src="./js/ui-utils.js?v=20260321_153020"></script>
 <script src="./js/render-overview.js?v=20260321_153020"></script>
