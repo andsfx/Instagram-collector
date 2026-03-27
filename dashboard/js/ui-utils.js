@@ -46,6 +46,17 @@
     if (!v) return 'Tidak diketahui';
     try {
       var d = new Date(v);
+      var now = new Date();
+      var diffMs = now - d;
+      var diffMin = Math.floor(diffMs / 60000);
+      
+      if(diffMin < 1) return 'Baru saja';
+      if(diffMin < 60) return diffMin + ' menit lalu';
+      if(diffMin < 1440){
+        var hrs = Math.floor(diffMin / 60);
+        return hrs + ' jam lalu';
+      }
+      
       return d.toLocaleString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Jakarta' }) + ' WIB';
     } catch(_) {
       return String(v);

@@ -177,9 +177,19 @@ function setF(f){
       fn.classList.remove('show');
     }
   }
+  // Show loading state on filter bar
+  var fbar = document.querySelector('.fbar');
+  if(fbar) fbar.classList.add('is-loading');
   render();
+  // Remove loading state after render completes
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      if(fbar) fbar.classList.remove('is-loading');
+    });
+  });
 }
 window.setF = setF;
+
 
 // ===== MAIN RENDER =====
 function render(){
@@ -200,6 +210,7 @@ function render(){
       renderH2HSelectors();
       renderH2H();
       initChartVisibilityBootstrap();
+      updateNavBadges(); // Update navigation badges with counts
       requestAnimationFrame(function(){
         renderContentBreakdown();
         renderHeatmapSelectors();
@@ -211,6 +222,21 @@ function render(){
   });
 }
 window.render = render;
+
+// ===== UI ENHANCEMENTS: NAV BADGES =====
+function updateNavBadges(){
+  const data = getDashboardData();
+  if(!data || !data.accounts) return;
+  const count = data.accounts.length;
+  
+  const badgeOverview = document.getElementById('nav-count-overview');
+  const badgeEngagement = document.getElementById('nav-count-engagement');
+  const badgeContent = document.getElementById('nav-count-content');
+  
+  if(badgeOverview) badgeOverview.textContent = count;
+  if(badgeEngagement) badgeEngagement.textContent = count;
+  if(badgeContent) badgeContent.textContent = count;
+}
 
 // ===== LAZY CHART RENDERING =====
 var lazyChartObserver = null;

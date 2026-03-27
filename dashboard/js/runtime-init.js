@@ -18,7 +18,17 @@ window.addEventListener('DOMContentLoaded', function(){
   if(typeof SettingsModule !== 'undefined'){
     SettingsModule.initSettings();
   }
+  // Live relative time updater — refresh #lastUpdate text tiap 60 detik
+  setInterval(function(){
+    var data = typeof getDashboardData === 'function' ? getDashboardData() : null;
+    if(!data || !data.lastUpdate) return;
+    var el = document.getElementById('lastUpdate');
+    if(el && typeof prettyLastUpdate === 'function'){
+      el.textContent = 'Update terakhir: ' + prettyLastUpdate(data.lastUpdate);
+    }
+  }, 60000);
 });
+
 
 function initRevealAnimations(){
   document.body.classList.add('reveal-ready');
