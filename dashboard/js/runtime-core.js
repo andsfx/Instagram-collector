@@ -118,6 +118,42 @@ function updateDarkBtn(theme){
 window.toggleDark = toggleDark;
 window.updateDarkBtn = updateDarkBtn;
 
+// ===== VIEW DENSITY / DAILY DIGEST =====
+var DASHBOARD_DENSITY_KEY = 'ig-dash-density';
+function applyDashboardDensity(mode){
+  var body = document.body;
+  if(!body) return;
+  var safeMode = ['full','compact','digest'].indexOf(mode) >= 0 ? mode : 'full';
+  if(typeof body.setAttribute === 'function') body.setAttribute('data-dashboard-density', safeMode);
+  if(body.classList && typeof body.classList.toggle === 'function'){
+    body.classList.toggle('compact-mode', safeMode === 'compact');
+    body.classList.toggle('digest-mode', safeMode === 'digest');
+  }
+  try { localStorage.setItem(DASHBOARD_DENSITY_KEY, safeMode); } catch(e){}
+  var label = document.getElementById('viewModeLabel');
+  if(label){
+    label.textContent = safeMode === 'full' ? 'Mode ringkas' : safeMode === 'compact' ? 'Mode digest' : 'Mode penuh';
+  }
+}
+function getDashboardDensity(){
+  try {
+    return localStorage.getItem(DASHBOARD_DENSITY_KEY) || 'full';
+  } catch(e){
+    return 'full';
+  }
+}
+function cycleDashboardDensity(){
+  var current = getDashboardDensity();
+  var next = current === 'full' ? 'compact' : current === 'compact' ? 'digest' : 'full';
+  applyDashboardDensity(next);
+  if(typeof showToast === 'function'){
+    showToast(next === 'full' ? 'Mode penuh aktif' : next === 'compact' ? 'Mode ringkas aktif' : 'Mode digest aktif', 'info');
+  }
+}
+window.applyDashboardDensity = applyDashboardDensity;
+window.getDashboardDensity = getDashboardDensity;
+window.cycleDashboardDensity = cycleDashboardDensity;
+
 // ===== FEATURE 6: SETTINGS =====
 function loadSettings(){
   try {

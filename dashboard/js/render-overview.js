@@ -67,27 +67,31 @@ function renderExecutiveSummary(){
     {
       k:'Posisi Brand',
       v: brandRank ? `#${brandRank}` : '-',
-      s: closestFollower ? `Followers ${brandGap >= 0 ? 'unggul' : 'tertinggal'} ${fmtFull(Math.abs(brandGap))} vs @${closestFollower.u}` : 'Belum ada akun pembanding terdekat.'
+      s: closestFollower ? `Followers ${brandGap >= 0 ? 'unggul' : 'tertinggal'} ${fmtFull(Math.abs(brandGap))} vs @${closestFollower.u}` : 'Belum ada akun pembanding terdekat.',
+      tone:'brand'
     },
     {
       k:'Gap Rival Terdekat',
       v: !closestFollower ? '-' : `${brandGap >= 0 ? '+' : '-'}${fmtFull(Math.abs(brandGap))}`,
-      s: closestFollower ? `Dibanding @${closestFollower.u} pada total followers.` : 'Menunggu data pembanding.'
+      s: closestFollower ? `Dibanding @${closestFollower.u} pada total followers.` : 'Menunggu data pembanding.',
+      tone: brandGap >= 0 ? 'positive' : 'warning'
     },
     {
       k:'Growth Hari Ini',
       v: `${brandGrowth >= 0 ? '+' : ''}${fmtFull(brandGrowth)}`,
-      s: topDailyGrowth ? `Akun paling naik hari ini @${topDailyGrowth.u} (${topDailyGrowth.growthAbs >= 0 ? '+' : ''}${fmtFull(topDailyGrowth.growthAbs || 0)})` : 'Belum ada perubahan harian yang tercatat.'
+      s: topDailyGrowth ? `Akun paling naik hari ini @${topDailyGrowth.u} (${topDailyGrowth.growthAbs >= 0 ? '+' : ''}${fmtFull(topDailyGrowth.growthAbs || 0)})` : 'Belum ada perubahan harian yang tercatat.',
+      tone: brandGrowth >= 0 ? 'positive' : 'warning'
     },
     {
       k:'ER Brand',
       v: erPct(brand.er),
-      s: !strongestER ? 'Belum ada data engagement.' : strongestER.u === brand.u ? 'Brand memimpin ER di kelompok akun ini.' : `Selisih ${erDelta >= 0 ? '+' : '-'}${erPct(Math.abs(erDelta))} vs @${strongestER.u}`
+      s: !strongestER ? 'Belum ada data engagement.' : strongestER.u === brand.u ? 'Brand memimpin ER di kelompok akun ini.' : `Selisih ${erDelta >= 0 ? '+' : '-'}${erPct(Math.abs(erDelta))} vs @${strongestER.u}`,
+      tone: strongestER && strongestER.u === brand.u ? 'positive' : 'brand'
     }
   ];
 
   el.innerHTML = cards.map(function(card){
-    return `<article class="summary-card highlight"><div class="k">${card.k}</div><div class="v">${card.v}</div><div class="s">${card.s}</div></article>`;
+    return `<article class="summary-card highlight" data-tone="${card.tone || 'brand'}" title="${escapeHtml(card.s)}"><div class="k">${card.k}</div><div class="v">${card.v}</div><div class="s">${card.s}</div></article>`;
   }).join('');
 }
 
@@ -118,7 +122,7 @@ function renderTodaySummary(){
       <div class="today-summary-head">
         <div>
           <div class="today-summary-k">Ringkasan Hari Ini</div>
-          <div class="today-summary-v">Template otomatis dari data terbaru</div>
+          <div class="today-summary-v">Sorotan paling penting dari update terbaru</div>
         </div>
         <div class="today-summary-chip">${prettyLastUpdate(data.lastUpdate || '-')}</div>
       </div>
@@ -139,7 +143,7 @@ function renderSummaryStrip(){
     { k:'Pembaruan Terakhir', v: prettyLastUpdate(dashData().lastUpdate || '-'), s: 'Data followers harian dan engagement terbaru' }
   ];
   el.innerHTML = cards.map(function(card){
-    return '<div class="summary-card ' + (card.cls || '') + '"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>';
+    return '<div class="summary-card ' + (card.cls || '') + '" title="' + escapeHtml(card.s) + '"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>';
   }).join('');
 }
 
@@ -153,8 +157,8 @@ function renderCards(){
     const tag = a.b ? '<span class="ctag bt">BRAND</span>' : '<span class="ctag ct">COMPETITOR</span>';
     const gCls = a.growthPct > 0 ? 'up' : a.growthPct < 0 ? 'down' : 'flat';
     const gIcon = a.growthPct > 0 ? '&#9650;' : a.growthPct < 0 ? '&#9660;' : '&#8226;';
-    return `<div class="${cls}">
-      <div class="ch"><span class="cun">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}@${a.u}</span>${tag}</div>
+    return `<article class="${cls}" aria-label="Ringkasan akun @${a.u}" title="Akun @${a.u}">
+      <div class="ch"><span class="cun"><span class="account-label">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}<span class="account-handle" title="@${a.u}">@${a.u}</span></span></span>${tag}</div>
       <div class="cfol"><div class="lb">Followers</div><div class="vl">${fmtFull(a.f)}</div><div class="gr ${gCls}">${gIcon} ${a.growthAbs >= 0 ? '+' : ''}${fmtFull(a.growthAbs)} (${pct(a.growthPct)})</div></div>
       <div class="csts">
         <div class="cst"><div class="sv">${fmtFull(a.fo)}</div><div class="sl">Following</div></div>
@@ -166,7 +170,7 @@ function renderCards(){
         <div class="cst er-highlight"><div class="sv">${a.er != null ? (a.er * 100).toFixed(2)+'%' : '-'}</div><div class="sl">ER</div></div>
         <div class="cst"><div class="sv">${a.growthPct != null ? (a.growthPct > 0 ? '+' : '') + a.growthPct.toFixed(2)+'%' : '-'}</div><div class="sl">Growth</div></div>
       </div>
-    </div>`;
+    </article>`;
   }).join(''));
 }
 
@@ -390,7 +394,7 @@ function renderTable(){
     const erCls = a.er >= 0.2 ? 'er-high' : a.er >= 0.1 ? 'er-mid' : 'er-low';
     return `<tr class="${a.b ? 'brow' : ''}">
       <td><span class="rn ${rCls}">#${rank}</span></td>
-      <td><span class="tu">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}@${a.u}</span></td>
+      <td title="@${a.u}"><span class="tu">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}<span class="account-handle">@${a.u}</span></span></td>
       <td>${fmtFull(a.f)}</td>
       <td>${fmtFull(a.fo)}</td>
       <td>${fmtFull(a.p)}</td>

@@ -9,6 +9,11 @@ window.addEventListener('DOMContentLoaded', function(){
   if(saved === 'dark'){
     document.documentElement.setAttribute('data-theme', 'dark');
     updateDarkBtn('dark');
+  } else {
+    updateDarkBtn('light');
+  }
+  if(typeof applyDashboardDensity === 'function'){
+    applyDashboardDensity(typeof getDashboardDensity === 'function' ? getDashboardDensity() : 'full');
   }
   if (DEBUG_MODE) {
     var debugBtn = document.getElementById('debugToggleBtn');

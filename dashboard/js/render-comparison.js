@@ -100,7 +100,7 @@ function renderH2H(){
   }
 
   if(header){
-    header.innerHTML = '<div class="h2h-name">@' + uA + '</div><div class="h2h-badge">VS</div><div class="h2h-name">@' + uB + '</div>';
+    header.innerHTML = '<div class="h2h-name" title="@' + uA + '">@' + uA + '</div><div class="h2h-badge">VS</div><div class="h2h-name" title="@' + uB + '">@' + uB + '</div>';
   }
 
   var metricOptions = getH2HMetricOptions();
