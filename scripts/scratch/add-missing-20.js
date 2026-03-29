@@ -1,6 +1,9 @@
 const { execFileSync } = require('child_process');
 function runGog(args) {
-  const env = { ...process.env, GOG_ACCOUNT: 'andysafii9@gmail.com' };
+  if (!process.env.GOG_ACCOUNT) {
+    throw new Error('GOG_ACCOUNT environment variable is not set');
+  }
+  const env = { ...process.env };
   return execFileSync('/root/.local/bin/gog', args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
 const row20 = ['2026-03-20', '93628', '266', '16492', '92695', '268', '11397', '83309', '2181', '18444', '333503', '813', '15791', '72141', '232', '1555'];

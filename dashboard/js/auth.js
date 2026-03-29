@@ -1,4 +1,7 @@
-/* Auth Module - Admin Panel Authentication */
+/* Auth Module - Demo/Internal UI Gating Only
+ * Bukan security boundary yang kuat.
+ * Untuk dashboard demo/internal, jangan anggap auth client-side ini aman untuk proteksi data sensitif.
+ */
 (function(global){
   'use strict';
 
@@ -66,10 +69,14 @@
     return null;
   }
 
+  function idsEqual(a, b){
+    return String(a) === String(b);
+  }
+
   function findUserById(id){
     var users = getUsers();
     for(var i = 0; i < users.length; i++){
-      if(users[i].id === id){
+      if(idsEqual(users[i].id, id)){
         return users[i];
       }
     }
@@ -234,7 +241,7 @@
         if(updates.password){
           users[i].passwordHash = hashPasswordSync(updates.password);
         }
-        if(updates.role && userId !== 1){
+        if(updates.role && !idsEqual(userId, 1)){
           users[i].role = updates.role;
         }
         found = true;
@@ -251,7 +258,7 @@
   }
 
   function deleteUser(userId){
-    if(userId === 1){
+    if(idsEqual(userId, 1)){
       return { success: false, message: 'Admin utama tidak dapat dihapus' };
     }
 
@@ -259,7 +266,7 @@
     var newUsers = [];
 
     for(var i = 0; i < users.length; i++){
-      if(users[i].id !== userId){
+      if(!idsEqual(users[i].id, userId)){
         newUsers.push(users[i]);
       }
     }
@@ -279,7 +286,16 @@
   function requireAuth(callback){
     return function(){
       if(!isLoggedIn()){
-        showLoginModal();
+        var loginFn = (typeof window !== 'undefined' && typeof window.showLoginModal === 'function')
+          ? window.showLoginModal
+          : (typeof globalThis !== 'undefined' && typeof globalThis.showLoginModal === 'function')
+            ? globalThis.showLoginModal
+            : null;
+        if(loginFn){
+          loginFn();
+        } else if(typeof console !== 'undefined' && typeof console.warn === 'function'){
+          console.warn('showLoginModal is not available in this environment.');
+        }
         return;
       }
       if(typeof callback === 'function'){
@@ -292,6 +308,9 @@
     var users = getUsers();
     if(!users || users.length === 0){
       saveUsers(getDefaultUsers());
+      if(typeof console !== 'undefined' && typeof console.warn === 'function'){
+        console.warn('AuthModule seeded with demo admin credentials (admin/admin). Demo/internal only; not a real security boundary.');
+      }
     }
   }
 
