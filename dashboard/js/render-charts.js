@@ -1,15 +1,17 @@
 // ===== CHARTS =====
+var DASHBOARD_CHART_FONT = 'Plus Jakarta Sans';
+
 function chartDefaults(){
   return {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { labels: { color: getChartTextColor(), font: { family: 'Inter', size: 11, weight: '600' }, padding: 16, usePointStyle: true, pointStyle: 'circle' } },
-      tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { family: 'Inter', weight: '700' }, bodyFont: { family: 'Inter' }, cornerRadius: 8, padding: 12 }
+      legend: { labels: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11, weight: '600' }, padding: 16, usePointStyle: true, pointStyle: 'circle' } },
+      tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { family: DASHBOARD_CHART_FONT, weight: '700' }, bodyFont: { family: DASHBOARD_CHART_FONT }, cornerRadius: 8, padding: 12 }
     },
     scales: {
-      x: { ticks: { color: getChartTextColor(), font: { family: 'Inter', size: 11 } }, grid: { color: getChartGridColor() } },
-      y: { ticks: { color: getChartTextColor(), font: { family: 'Inter', size: 11 } }, grid: { color: getChartGridColor() } }
+      x: { ticks: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11 } }, grid: { color: getChartGridColor() } },
+      y: { ticks: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11 } }, grid: { color: getChartGridColor() } }
     }
   };
 }
@@ -61,8 +63,8 @@ function mkERBar(){
         legend: { display: false },
         tooltip: { 
           backgroundColor: 'rgba(0,0,0,0.8)', 
-          titleFont: { family: 'Inter', weight: '700' }, 
-          bodyFont: { family: 'Inter' }, 
+          titleFont: { family: DASHBOARD_CHART_FONT, weight: '700' }, 
+          bodyFont: { family: DASHBOARD_CHART_FONT }, 
           cornerRadius: 8, 
           padding: 12,
           callbacks: { 
@@ -102,7 +104,7 @@ function mkShare(){
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'bottom', labels: { color: getChartTextColor(), font: { family: 'Inter', size: 11, weight: '600' }, padding: 12, usePointStyle: true, pointStyle: 'circle' } },
+        legend: { position: 'bottom', labels: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11, weight: '600' }, padding: 12, usePointStyle: true, pointStyle: 'circle' } },
         tooltip: {
           backgroundColor: 'rgba(0,0,0,0.8)', cornerRadius: 8, padding: 12,
           callbacks: { label: function(ctx){ return ctx.label + ': ' + fmtFull(ctx.raw) + ' (' + (ctx.raw/total*100).toFixed(1) + '%)'; } }
@@ -145,8 +147,8 @@ function mkRadar(){
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      scales: { r: { beginAtZero: true, max: 100, ticks: { display: false }, grid: { color: getChartGridColor() }, pointLabels: { color: getChartTextColor(), font: { family: 'Inter', size: 11, weight: '600' } } } },
-      plugins: { legend: { position: 'bottom', labels: { color: getChartTextColor(), font: { family: 'Inter', size: 11, weight: '600' }, padding: 12, usePointStyle: true, pointStyle: 'circle' } } }
+      scales: { r: { beginAtZero: true, max: 100, ticks: { display: false }, grid: { color: getChartGridColor() }, pointLabels: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11, weight: '600' } } } },
+      plugins: { legend: { position: 'bottom', labels: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11, weight: '600' }, padding: 12, usePointStyle: true, pointStyle: 'circle' } } }
     }
   });
 }

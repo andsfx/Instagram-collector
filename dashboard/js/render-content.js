@@ -52,9 +52,11 @@ function renderContentBreakdown(){
     html += '<div class="cp-card">';
     var topType = types.slice().sort(function(x,y){ return (cb[y] || 0) - (cb[x] || 0); })[0];
     // Header
+    var erTone = (cb.avgER || 0) >= 0.03 ? 'strong' : (cb.avgER || 0) >= 0.01 ? 'watch' : 'weak';
+    var erText = erTone === 'strong' ? 'ER kuat' : erTone === 'watch' ? 'ER moderat' : 'ER perlu perhatian';
     html += '<div class="cp-hdr">' +
       '<span class="cp-user">@' + a.u + '</span>' +
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cp-topformat">Top Format: ' + (typeLabels[topType] || topType) + '</span><span class="cp-er-badge">ER ' + pct(cb.avgER || 0) + '</span></div>' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cp-topformat">Top Format: ' + (typeLabels[topType] || topType) + '</span><span class="cp-er-badge ' + erTone + '"><span aria-hidden="true">' + (erTone === 'strong' ? '&#9733;' : erTone === 'watch' ? '&#9673;' : '&#33;') + '</span> ER ' + pct(cb.avgER || 0) + ' · ' + erText + '</span></div>' +
       '</div>';
     // Body: per-type table
     html += '<div class="cp-body">';
@@ -79,7 +81,7 @@ function renderContentBreakdown(){
     });
     html += '</tbody></table>';
 
-    html += '<div class="cp-insight">Format paling aktif: <strong>' + (typeLabels[topType] || topType) + '</strong> · total ' + fmtFull(cb[topType] || 0) + ' post</div>';
+    html += '<div class="cp-insight">Format paling aktif: <strong>' + (typeLabels[topType] || topType) + '</strong> · total ' + fmtFull(cb[topType] || 0) + ' post · rerata ER akun ' + pct(cb.avgER || 0) + '</div>';
 
     // Best post
     if(bp.url && bp.likes > 0){
@@ -199,7 +201,8 @@ function renderHeatmap(){
     html += '<tr><td class="hm-day">' + day + '</td>';
     slotData[di].forEach(function(val, si){
       var c = slotColor(val);
-      html += '<td style="background:'+c.bg+';color:'+c.col+'" title="'+day+' '+slots[si].label+': '+val+' posts">' + (val > 0 ? val : '-') + '</td>';
+      var intensity = val === 0 ? 'belum ada aktivitas' : val >= Math.ceil(maxVal * 0.75) ? 'slot terpadat' : val >= Math.ceil(maxVal * 0.4) ? 'aktivitas menengah' : 'aktivitas ringan';
+      html += '<td style="background:'+c.bg+';color:'+c.col+'" title="'+day+' · '+slots[si].label+' ('+slots[si].sub+') · '+val+' post · '+intensity+'">' + (val > 0 ? val : '-') + '</td>';
     });
     html += '</tr>';
   });
@@ -235,9 +238,9 @@ function renderInsights(){
   if(brand){
     // Brand growth insight
     if(brand.growthPct > 0){
-      insights.push({ type: 'positive', icon: '&#9650;', text: '@' + brand.u + ' tumbuh ' + pct(brand.growthPct) + ' periode ini. Keep it up!' });
+      insights.push({ type: 'positive', icon: '↗', text: '@' + brand.u + ' tumbuh ' + pct(brand.growthPct) + ' periode ini. Keep it up!' });
     } else if(brand.growthPct < 0){
-      insights.push({ type: 'warning', icon: '&#9660;', text: '@' + brand.u + ' turun ' + pct(Math.abs(brand.growthPct)) + '. Perlu evaluasi strategi konten.' });
+      insights.push({ type: 'warning', icon: '↘', text: '@' + brand.u + ' turun ' + pct(Math.abs(brand.growthPct)) + '. Perlu evaluasi strategi konten.' });
     }
 
     // Closest competitor
@@ -246,18 +249,18 @@ function renderInsights(){
       var closest = sorted[0];
       var gap = brand.f - closest.f;
       if(gap > 0){
-        insights.push({ type: 'info', icon: '&#8776;', text: 'Kompetitor terdekat: @' + closest.u + ' (gap ' + fmtFull(gap) + ' followers). ' + (gap < (settings.gapAlert || 500) ? 'Gap sangat tipis!' : 'Posisi aman.') });
+        insights.push({ type: 'info', icon: '◎', text: 'Kompetitor terdekat: @' + closest.u + ' (gap ' + fmtFull(gap) + ' followers). ' + (gap < (settings.gapAlert || 500) ? 'Gap sangat tipis!' : 'Posisi aman.') });
       } else {
-        insights.push({ type: 'danger', icon: '!', text: '@' + closest.u + ' sudah unggul ' + fmtFull(Math.abs(gap)) + ' followers dari brand. Perlu strategi catch-up.' });
+        insights.push({ type: 'danger', icon: '⚠', text: '@' + closest.u + ' sudah unggul ' + fmtFull(Math.abs(gap)) + ' followers dari brand. Perlu strategi catch-up.' });
       }
     }
 
     // Engagement insight
     if(brand.er){
-      if(brand.er > 3){
-        insights.push({ type: 'positive', icon: '&#9733;', text: 'Engagement rate brand (' + pct(brand.er) + ') sangat baik (>3%). Konten beresonansi dengan audience.' });
-      } else if(brand.er < 1){
-        insights.push({ type: 'warning', icon: '!', text: 'Engagement rate brand (' + pct(brand.er) + ') di bawah 1%. Coba variasikan format konten.' });
+      if(brand.er > 0.03){
+        insights.push({ type: 'positive', icon: '★', text: 'Engagement rate brand (' + pct(brand.er) + ') sangat baik (>3%). Konten beresonansi dengan audience.' });
+      } else if(brand.er < 0.01){
+        insights.push({ type: 'warning', icon: '⚠', text: 'Engagement rate brand (' + pct(brand.er) + ') di bawah 1%. Coba variasikan format konten.' });
       }
     }
   }
@@ -266,7 +269,7 @@ function renderInsights(){
   if(comps.length > 0){
     var fastest = comps.slice().sort(function(a,b){ return (b.growthPct||0) - (a.growthPct||0); })[0];
     if(fastest.growthPct > 0){
-      insights.push({ type: 'info', icon: '&#9650;', text: 'Kompetitor paling cepat tumbuh: @' + fastest.u + ' (+' + pct(fastest.growthPct) + '). Pantau strategi mereka.' });
+      insights.push({ type: 'info', icon: '↗', text: 'Kompetitor paling cepat tumbuh: @' + fastest.u + ' (+' + pct(fastest.growthPct) + '). Pantau strategi mereka.' });
     }
   }
 
@@ -274,12 +277,12 @@ function renderInsights(){
   if(comps.length > 0){
     var bestER = comps.slice().sort(function(a,b){ return (b.er||0) - (a.er||0); })[0];
     if(bestER.er > (brand ? brand.er : 0)){
-      insights.push({ type: 'info', icon: '&#9733;', text: '@' + bestER.u + ' punya ER tertinggi (' + pct(bestER.er) + '). Analisis konten mereka untuk inspirasi.' });
+      insights.push({ type: 'info', icon: '★', text: '@' + bestER.u + ' punya ER tertinggi (' + pct(bestER.er) + '). Analisis konten mereka untuk inspirasi.' });
     }
   }
 
   if(insights.length === 0){
-    insights.push({ type: 'info', icon: 'i', text: 'Belum cukup data untuk menghasilkan insights. Tambahkan lebih banyak data historis.' });
+    insights.push({ type: 'info', icon: 'ℹ', text: 'Belum cukup data untuk menghasilkan insights. Tambahkan lebih banyak data historis.' });
   }
 
   el.innerHTML = insights.map(function(ins){

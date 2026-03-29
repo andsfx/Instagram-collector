@@ -156,10 +156,14 @@ function renderCards(){
     const cls = a.b ? 'acard brand' : 'acard ' + cardClasses[i % cardClasses.length];
     const tag = a.b ? '<span class="ctag bt">BRAND</span>' : '<span class="ctag ct">COMPETITOR</span>';
     const gCls = a.growthPct > 0 ? 'up' : a.growthPct < 0 ? 'down' : 'flat';
-    const gIcon = a.growthPct > 0 ? '&#9650;' : a.growthPct < 0 ? '&#9660;' : '&#8226;';
+    const gIcon = a.growthPct > 0 ? '&#9650;' : a.growthPct < 0 ? '&#9660;' : '&#8213;';
+    const deltaText = a.growthAbs > 0 ? 'naik' : a.growthAbs < 0 ? 'turun' : 'stabil';
+    const erValue = a.er != null ? (a.er * 100).toFixed(2)+'%' : '-';
+    const erBadgeClass = a.er >= 0.03 ? 'er-strong' : a.er >= 0.01 ? 'er-watch' : 'er-weak';
+    const erBadgeLabel = a.er >= 0.03 ? 'Kuat' : a.er >= 0.01 ? 'Perlu dipantau' : 'Perlu perhatian';
     return `<article class="${cls}" aria-label="Ringkasan akun @${a.u}" title="Akun @${a.u}">
       <div class="ch"><span class="cun"><span class="account-label">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}<span class="account-handle" title="@${a.u}">@${a.u}</span></span></span>${tag}</div>
-      <div class="cfol"><div class="lb">Followers</div><div class="vl">${fmtFull(a.f)}</div><div class="gr ${gCls}">${gIcon} ${a.growthAbs >= 0 ? '+' : ''}${fmtFull(a.growthAbs)} (${pct(a.growthPct)})</div></div>
+      <div class="cfol"><div class="lb">Followers</div><div class="vl">${fmtFull(a.f)}</div><div class="gr ${gCls}" aria-label="Perubahan harian ${deltaText}">${gIcon} <span class="delta-label">${deltaText}</span> ${a.growthAbs >= 0 ? '+' : ''}${fmtFull(a.growthAbs)} (${pct(a.growthPct)})</div></div>
       <div class="csts">
         <div class="cst"><div class="sv">${fmtFull(a.fo)}</div><div class="sl">Following</div></div>
         <div class="cst"><div class="sv">${fmtFull(a.p)}</div><div class="sl">Posts</div></div>
@@ -167,7 +171,7 @@ function renderCards(){
       <div class="csts4">
         <div class="cst"><div class="sv">${fmtFull(Math.round(a.al))}</div><div class="sl">Avg Likes</div></div>
         <div class="cst"><div class="sv">${a.ac != null ? a.ac.toFixed(1) : '-'}</div><div class="sl">Avg Comments</div></div>
-        <div class="cst er-highlight"><div class="sv">${a.er != null ? (a.er * 100).toFixed(2)+'%' : '-'}</div><div class="sl">ER</div></div>
+        <div class="cst er-highlight ${erBadgeClass}" title="Engagement rate ${erBadgeLabel.toLowerCase()}"><div class="sv">${erValue}</div><div class="sl">ER</div><div class="er-context"><span class="er-context-icon" aria-hidden="true">${a.er >= 0.03 ? '&#9733;' : a.er >= 0.01 ? '&#9673;' : '&#33;'}</span><span>${erBadgeLabel}</span></div></div>
         <div class="cst"><div class="sv">${a.growthPct != null ? (a.growthPct > 0 ? '+' : '') + a.growthPct.toFixed(2)+'%' : '-'}</div><div class="sl">Growth</div></div>
       </div>
     </article>`;
@@ -320,12 +324,13 @@ function renderPostSnapshot(){
       const date = formatPostDate(bestPost.published_at);
       const caption = bestPost.caption_snippet || bestPost.caption || bestPost.shortcode || '';
       const postEr = Number.isFinite(bestPost.post_er) ? pct(Math.abs(bestPost.post_er)) : '-';
+      const contentType = titleCase(bestPost.media_type || bestPost.type || insight.dominant_type || 'unknown');
       previewHtml = `<div class="ps-post ps-post-featured">
         <div class="ps-post-label">Postingan teratas</div>
-        <div class="ps-post-head"><span class="ps-post-tag ${label}">${labelText}</span><span class="ps-post-meta">${date}</span></div>
+        <div class="ps-post-head"><span class="ps-post-tag ${label}">${labelText}</span><span class="ps-post-meta">${date} · ${contentType}</span></div>
         <a class="ps-post-link" href="${bestPost.url || '#'}" target="_blank" rel="noreferrer">${escapeHtml(caption.slice(0, 42) || 'Lihat postingan')}</a>
         <div class="ps-post-caption">${escapeHtml(caption)}</div>
-        <div class="ps-post-meta">${fmtFull(bestPost.likes)} likes · ${fmtFull(bestPost.comments)} komentar · ER ${postEr}</div>
+        <div class="ps-post-meta">${fmtFull(bestPost.likes)} likes · ${fmtFull(bestPost.comments)} komentar · ER ${postEr} · dibanding rata-rata akun ${averagePostEr}</div>
       </div>`;
     }
 

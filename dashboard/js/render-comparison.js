@@ -120,22 +120,27 @@ function renderH2H(){
   var loser = winsA === winsB ? null : (winsA > winsB ? aB : aA);
   var activeA = activeMetric.value(aA);
   var activeB = activeMetric.value(aB);
+  var totalWins = Math.max(winsA + winsB, 1);
   var verdictHtml = '<div class="h2h-verdict"><div class="ttl">Quick Verdict</div><div class="txt">';
   if (winner) {
     verdictHtml += '@' + winner.u + ' unggul keseluruhan atas @' + loser.u + ' (' + (winsA > winsB ? winsA : winsB) + ' dari ' + metrics.length + ' metrik).';
   } else {
     verdictHtml += '@' + aA.u + ' dan @' + aB.u + ' masih berimbang pada metrik utama.';
   }
-  verdictHtml += '</div><div class="sub">Pada metrik aktif <strong>' + activeMetric.label + '</strong>, ' + (activeA === activeB ? 'keduanya masih imbang.' : ('@' + (activeA > activeB ? aA.u : aB.u) + ' lebih unggul dengan nilai ' + activeMetric.formatter((activeA > activeB ? activeA : activeB)))) + '</div></div>';
+  verdictHtml += '</div><div class="sub">Pada metrik aktif <strong>' + activeMetric.label + '</strong>, ' + (activeA === activeB ? 'keduanya masih imbang.' : ('@' + (activeA > activeB ? aA.u : aB.u) + ' lebih unggul dengan nilai ' + activeMetric.formatter((activeA > activeB ? activeA : activeB)))) + '</div>' +
+    '<div class="h2h-scorebar" aria-label="Distribusi kemenangan per metrik"><div class="h2h-scorebar-side a" style="width:' + Math.max((winsA / totalWins) * 100, winsA ? 18 : 0) + '%">@' + aA.u + ': ' + winsA + '</div><div class="h2h-scorebar-side b" style="width:' + Math.max((winsB / totalWins) * 100, winsB ? 18 : 0) + '%">' + winsB + ' :@' + aB.u + '</div></div></div>';
   var html = verdictHtml + '<table class="h2h-table"><tbody>';
   metrics.forEach(function(m){
     var winA = m.vA > m.vB;
     var winB = m.vB > m.vA;
     var draw = m.vA === m.vB;
+    var total = Math.max(Math.abs(m.vA) + Math.abs(m.vB), 1);
+    var barA = draw ? 50 : Math.max((Math.abs(m.vA) / total) * 100, winA ? 12 : 6);
+    var barB = draw ? 50 : Math.max((Math.abs(m.vB) / total) * 100, winB ? 12 : 6);
     html += '<tr class="h2h-item">' +
-      '<td class="' + (winA ? 'h2h-win' : '') + '">' + m.fmt(m.vA) + '</td>' +
+      '<td class="' + (winA ? 'h2h-win' : '') + '"><div class="h2h-metric-value">' + m.fmt(m.vA) + '</div><div class="h2h-mini-bar"><span class="fill a" style="width:' + Math.min(barA, 100) + '%"></span></div></td>' +
       '<td>' + m.label + (draw ? ' (seri)' : '') + '</td>' +
-      '<td class="' + (winB ? 'h2h-win' : '') + '">' + m.fmt(m.vB) + '</td>' +
+      '<td class="' + (winB ? 'h2h-win' : '') + '"><div class="h2h-metric-value">' + m.fmt(m.vB) + '</div><div class="h2h-mini-bar is-right"><span class="fill b" style="width:' + Math.min(barB, 100) + '%"></span></div></td>' +
     '</tr>';
   });
   html += '<tr class="h2h-gap"><td colspan="3">Selisih Followers: ' + fmtFull(gap) + '</td></tr>';

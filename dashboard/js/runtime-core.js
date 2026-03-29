@@ -124,6 +124,7 @@ function applyDashboardDensity(mode){
   var body = document.body;
   if(!body) return;
   var safeMode = ['full','compact','digest'].indexOf(mode) >= 0 ? mode : 'full';
+  if(typeof document !== 'undefined' && document.documentElement && typeof document.documentElement.setAttribute === 'function') document.documentElement.setAttribute('data-dashboard-density', safeMode);
   if(typeof body.setAttribute === 'function') body.setAttribute('data-dashboard-density', safeMode);
   if(body.classList && typeof body.classList.toggle === 'function'){
     body.classList.toggle('compact-mode', safeMode === 'compact');
@@ -132,7 +133,14 @@ function applyDashboardDensity(mode){
   try { localStorage.setItem(DASHBOARD_DENSITY_KEY, safeMode); } catch(e){}
   var label = document.getElementById('viewModeLabel');
   if(label){
-    label.textContent = safeMode === 'full' ? 'Mode ringkas' : safeMode === 'compact' ? 'Mode digest' : 'Mode penuh';
+    label.textContent = safeMode === 'full' ? 'Tampilan penuh' : safeMode === 'compact' ? 'Tampilan ringkas' : 'Daily digest';
+  }
+  var btn = document.getElementById('viewModeToggle');
+  if(btn){
+    var nextMode = safeMode === 'full' ? 'compact' : safeMode === 'compact' ? 'digest' : 'full';
+    var nextLabel = nextMode === 'full' ? 'Tampilan penuh' : nextMode === 'compact' ? 'Tampilan ringkas' : 'Daily digest';
+    btn.setAttribute('aria-label', 'Ganti mode tampilan dashboard. Mode aktif: ' + (label ? label.textContent : safeMode) + '. Klik untuk pindah ke ' + nextLabel + '.');
+    btn.setAttribute('title', 'Mode aktif: ' + (label ? label.textContent : safeMode) + ' · berikutnya: ' + nextLabel);
   }
 }
 function getDashboardDensity(){
