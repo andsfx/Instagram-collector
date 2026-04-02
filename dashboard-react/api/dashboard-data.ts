@@ -5,7 +5,9 @@ const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/andsfx/Instagram-colle
 
 export default async function handler(_request: any, response: any) {
   response.setHeader('Content-Type', 'application/json; charset=utf-8')
-  response.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
+  response.setHeader('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300')
+  response.setHeader('CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
+  response.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
 
   try {
     const remoteResponse = await fetch(RAW_GITHUB_URL, {
