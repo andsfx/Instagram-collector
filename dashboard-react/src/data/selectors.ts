@@ -137,7 +137,7 @@ export interface QuickVisualData {
   engagementTrend: Array<Record<string, number | string | null>>
 }
 
-const SERIES_COLORS = ['#2152d9', '#e1306c', '#0f9f6e', '#c47c00', '#7c3aed']
+const SERIES_COLORS = ['#e8683a', '#3a8763', '#8e3320', '#f28b56', '#6d6d6d']
 
 const H2H_METRICS = {
   followers: { label: 'Followers' },

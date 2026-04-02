@@ -51,7 +51,7 @@ export function RankingGrowth({ data }: { data: DashboardRecord }) {
       description="Section ini sekarang menggabungkan ringkasan ranking cepat dengan tabel kompetitor penuh yang bisa diurutkan seperti versi legacy."
     >
       <div className="ranking-grid">
-        <article className="ranking-card">
+        <article className="ranking-card editorial-ranking-card">
           <div className="section-heading">
             <h3 className="section-title">Peringkat followers</h3>
             <p className="section-description">Urutan berdasarkan ukuran audiens saat ini.</p>
@@ -65,7 +65,7 @@ export function RankingGrowth({ data }: { data: DashboardRecord }) {
             ))}
           </ol>
         </article>
-        <article className="ranking-card">
+        <article className="ranking-card editorial-ranking-card">
           <div className="section-heading">
             <h3 className="section-title">Peringkat engagement</h3>
             <p className="section-description">Akun paling efisien mengubah audiens jadi interaksi.</p>
@@ -81,7 +81,7 @@ export function RankingGrowth({ data }: { data: DashboardRecord }) {
         </article>
       </div>
 
-      <article className="ranking-card">
+      <article className="ranking-card editorial-ranking-card">
         <div className="section-heading">
           <h3 className="section-title">Pertumbuhan 7 hari</h3>
           <p className="section-description">Fokus pada akun yang paling cepat bertambah selama seminggu terakhir.</p>
@@ -96,7 +96,7 @@ export function RankingGrowth({ data }: { data: DashboardRecord }) {
         </ul>
       </article>
 
-      <article className="ranking-card">
+      <article className="ranking-card editorial-table-card">
         <div className="section-heading">
           <h3 className="section-title">Tabel kompetitor penuh</h3>
           <p className="section-description">Urutkan kolom untuk membaca gap brand, status verified, dan metrik akun dengan detail penuh.</p>

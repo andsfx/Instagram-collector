@@ -36,7 +36,7 @@ export function Heatmap({ data }: { data: DashboardRecord }) {
         <span className="table-muted">Tinggi</span>
       </div>
 
-      <div className="heatmap-scroll-shell">
+      <div className="heatmap-scroll-shell editorial-heatmap-shell">
         <div className="heatmap-grid" role="table" aria-label={`Heatmap waktu posting untuk @${account}`}>
           <div className="heatmap-header heatmap-corner" />
           {heatmap.matrix[0]?.map((cell) => (
@@ -53,8 +53,8 @@ export function Heatmap({ data }: { data: DashboardRecord }) {
                   key={`${cell.day}-${cell.slot}`}
                   className="heatmap-cell"
                   style={{
-                    background: `linear-gradient(180deg, rgba(33, 82, 217, ${Math.max(cell.intensity * 0.16, 0.04)}), rgba(225, 48, 108, ${Math.max(cell.intensity * 0.78, 0.06)}))`,
-                    color: cell.intensity >= 0.45 ? '#ffffff' : '#0f172a',
+                    background: `linear-gradient(180deg, rgba(232, 104, 58, ${Math.max(cell.intensity * 0.14, 0.05)}), rgba(142, 51, 32, ${Math.max(cell.intensity * 0.72, 0.08)}))`,
+                    color: cell.intensity >= 0.45 ? '#ffffff' : 'var(--text)',
                   }}
                   title={`${cell.day} · ${cell.slot} (${cell.sublabel}) · ${cell.value} post`}
                 >

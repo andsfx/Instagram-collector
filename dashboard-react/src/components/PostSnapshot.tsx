@@ -55,9 +55,9 @@ export function PostSnapshot({ data }: { data: DashboardRecord }) {
 
       <div className="summary-strip-grid">
         {view.summaryCards.map((card) => (
-          <article key={card.label} className="summary-strip-card">
+          <article key={card.label} className={`summary-strip-card ${card.label === 'Total post teranalisis' ? 'is-emphasis' : ''}`}>
             <div className="stat-label">{card.label}</div>
-            <div className="big-value">{card.value}</div>
+            <div className="big-value editorial-value">{card.value}</div>
           </article>
         ))}
       </div>
@@ -65,11 +65,11 @@ export function PostSnapshot({ data }: { data: DashboardRecord }) {
       {view.cards.length ? (
         <div className="snapshot-grid">
           {view.cards.map((card) => (
-            <article key={card.account} className="snapshot-card">
+            <article key={card.account} className="snapshot-card editorial-snapshot-card">
               <div className="split-row">
                 <div>
                   <div className="stat-label">@{card.account}</div>
-                  <div className="big-value">{card.averagePostEr > 0 ? `${(card.averagePostEr * 100).toFixed(2)}%` : '-'}</div>
+                  <div className="big-value editorial-value">{card.averagePostEr > 0 ? `${(card.averagePostEr * 100).toFixed(2)}%` : '-'}</div>
                 </div>
                 <span className="badge badge-brand">ER rata-rata</span>
               </div>

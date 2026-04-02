@@ -11,11 +11,11 @@ export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[]
     >
       <div className="tile-grid">
         {accounts.map((acc) => (
-          <article key={acc.key} className="account-card">
+          <article key={acc.key} className="account-card editorial-account-card">
             <div className="split-row">
               <div>
                 <div className="stat-label">Akun</div>
-                <div className="big-value">{acc.name}</div>
+                <div className="big-value editorial-value">{acc.name}</div>
               </div>
               <div className="chip-row">
                 <span className={`chip ${acc.change1d > 0 ? 'chip-success' : acc.change1d < 0 ? 'chip-danger' : 'chip-warning'}`}>
@@ -35,6 +35,7 @@ export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[]
               <div className="metric-row"><span className="metric-name">Avg Likes</span><span className="metric-value">{formatCompact.format(acc.avgLikes)}</span></div>
               <div className="metric-row"><span className="metric-name">Avg Comments</span><span className="metric-value">{formatCompact.format(acc.avgComments)}</span></div>
             </div>
+            <div className="helper-copy">Growth 7 hari {acc.change7dPct >= 0 ? 'menguat' : 'melemah'} {acc.change7dPct >= 0 ? '+' : ''}{acc.change7dPct.toFixed(2)}% dengan engagement {acc.engagementRate.toFixed(2)}%.</div>
           </article>
         ))}
       </div>

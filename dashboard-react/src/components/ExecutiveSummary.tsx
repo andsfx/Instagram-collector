@@ -11,14 +11,14 @@ export function ExecutiveSummary({ summary }: { summary: ExecutiveSummaryData })
       <div className="insight-grid">
         <div className="summary-grid">
           {summary.kpis.map((kpi) => (
-            <article key={kpi.key} className="kpi-card">
+            <article key={kpi.key} className="kpi-card editorial-kpi">
               <div className="stat-label">{kpi.label}</div>
-              <div className="stat-value">{kpi.value}</div>
+              <div className="stat-value editorial-value">{kpi.value}</div>
               <div className="stat-detail">{kpi.account ? `Akun: @${kpi.account}` : 'Lintas akun / insight agregat'}</div>
             </article>
           ))}
         </div>
-        <aside className="insight-card">
+        <aside className="insight-card section-note-card">
           <div className="eyebrow">Interpretasi</div>
           <h3 className="section-title">Apa yang paling penting dibaca tim hari ini</h3>
           <ul className="bullet-list">

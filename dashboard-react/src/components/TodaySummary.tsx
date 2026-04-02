@@ -11,9 +11,9 @@ export function TodaySummary({ today }: { today: TodaySummaryData }) {
     >
       <div className="tile-grid">
         {today.items.map((item) => (
-          <article key={item.label} className="insight-card">
+          <article key={item.label} className="insight-card section-card-premium">
             <div className="micro-label">{item.label}</div>
-            <div className="big-value">{item.value}</div>
+            <div className="big-value editorial-value">{item.value}</div>
             <div className="micro-detail">{item.detail}</div>
           </article>
         ))}

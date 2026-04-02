@@ -26,7 +26,7 @@ export function DailyMetrics({ data }: { data: DashboardRecord }) {
       actions={<span className="badge badge-brand">{view.disclosurePill}</span>}
     >
       <div className="daily-toolbar">
-        <div className="section-heading">
+        <div className="section-heading daily-toolbar-copy">
           <div className="section-title">{view.disclosureTitle}</div>
           <p className="section-description">{view.disclosureHint}</p>
         </div>
@@ -50,11 +50,11 @@ export function DailyMetrics({ data }: { data: DashboardRecord }) {
         </div>
       </div>
 
-      <article className="daily-card">
+      <article className="daily-card editorial-table-card">
         <div className="split-row">
           <div>
             <div className="stat-label">Akun aktif</div>
-            <div className="big-value">@{view.selectedAccount}</div>
+            <div className="big-value editorial-value">@{view.selectedAccount}</div>
           </div>
           <span className="badge badge-brand">{rangeDays} hari</span>
         </div>

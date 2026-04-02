@@ -30,19 +30,19 @@ export function ContentBreakdown({ data }: { data: DashboardRecord }) {
       description="Ringkasan ini fokus pada distribusi format dan best post, agar tim cepat melihat pola konten dominan tanpa tabel panjang."
     >
       <div className="summary-strip-grid">
-        <article className="summary-strip-card">
+        <article className="summary-strip-card is-emphasis">
           <div className="stat-label">Format terbanyak</div>
-          <div className="big-value">{highlights.topFormatLabel}</div>
+          <div className="big-value editorial-value">{highlights.topFormatLabel}</div>
           <div className="helper-copy">{highlights.topFormatCount > 0 ? `${highlights.topFormatCount} post pada dataset terbaru` : 'Belum ada data format.'}</div>
         </article>
         <article className="summary-strip-card">
           <div className="stat-label">ER tertinggi</div>
-          <div className="big-value">{highlights.topErAccount ? `@${highlights.topErAccount}` : '-'}</div>
+          <div className="big-value editorial-value">{highlights.topErAccount ? `@${highlights.topErAccount}` : '-'}</div>
           <div className="helper-copy">{highlights.topErAccount ? `${highlights.topErValue.toFixed(2)}% engagement rate` : 'Belum ada data ER.'}</div>
         </article>
         <article className="summary-strip-card">
           <div className="stat-label">Best post owner</div>
-          <div className="big-value">{highlights.bestPostOwner ? `@${highlights.bestPostOwner}` : '-'}</div>
+          <div className="big-value editorial-value">{highlights.bestPostOwner ? `@${highlights.bestPostOwner}` : '-'}</div>
           <div className="helper-copy">
             {highlights.bestPostOwner ? `${highlights.bestPostLikes} interactions${highlights.bestPostType ? ` · ${highlights.bestPostType}` : ''}` : 'Belum ada best post.'}
           </div>
@@ -51,9 +51,9 @@ export function ContentBreakdown({ data }: { data: DashboardRecord }) {
       {meaningful.length ? (
         <div className="breakdown-grid">
           {meaningful.map((row) => (
-            <article key={row.account} className="breakdown-card">
+            <article key={row.account} className="breakdown-card editorial-breakdown-card">
               <div className="stat-label">@{row.account}</div>
-              <div className="big-value">{row.posts} post</div>
+              <div className="big-value editorial-value">{row.posts} post</div>
               <div className="chip-row">
                 {typeof row.reels === 'number' ? <span className="chip chip-brand">Reels {row.reels}</span> : null}
                 {typeof row.carousels === 'number' ? <span className="chip chip-brand">Carousel {row.carousels}</span> : null}

@@ -65,15 +65,22 @@
 }
 
 .heatmap-legend-box.is-0 { background: var(--panel); }
-.heatmap-legend-box.is-1 { background: rgba(225, 48, 108, 0.12); }
-.heatmap-legend-box.is-2 { background: rgba(225, 48, 108, 0.3); }
-.heatmap-legend-box.is-3 { background: rgba(225, 48, 108, 0.55); }
-.heatmap-legend-box.is-4 { background: rgba(225, 48, 108, 0.85); }
+.heatmap-legend-box.is-1 { background: rgba(232, 104, 58, 0.12); }
+.heatmap-legend-box.is-2 { background: rgba(232, 104, 58, 0.3); }
+.heatmap-legend-box.is-3 { background: rgba(176, 61, 34, 0.55); }
+.heatmap-legend-box.is-4 { background: rgba(142, 51, 32, 0.88); }
 
 .heatmap-cell {
-  border: 1px solid rgba(33, 82, 217, 0.08);
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--border));
   font-weight: 800;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.editorial-heatmap-shell {
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel-muted) 90%, var(--brand-soft) 10%), var(--panel));
+  border: 1px solid color-mix(in srgb, var(--brand) 12%, var(--border));
 }
 
 .chart-wrap {
@@ -104,8 +111,8 @@
   gap: 10px;
   padding: 14px;
   border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, rgba(33, 82, 217, 0.05), rgba(225, 48, 108, 0.05));
-  border: 1px solid rgba(33, 82, 217, 0.12);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand-soft-2) 72%, var(--panel)), color-mix(in srgb, var(--brand-soft) 82%, var(--panel)));
+  border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--border));
 }
 
 .daily-table-wrap {
@@ -198,4 +205,13 @@
 
 .chart-wrap-lg {
   height: 340px;
+}
+
+.editorial-chart-card {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, var(--brand-soft) 8%), var(--panel));
+  border-color: color-mix(in srgb, var(--brand) 14%, var(--border));
+}
+
+.editorial-chart-card-hero {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand-soft) 58%, var(--panel)), var(--panel));
 }

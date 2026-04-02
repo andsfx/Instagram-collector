@@ -10,7 +10,7 @@ export function InsightsPanel({ insights }: { insights: InsightsData }) {
     >
       <div className="tile-grid">
         {insights.items.map((item) => (
-          <article key={item.title} className="insight-tile">
+          <article key={item.title} className="insight-tile section-note-card">
             <div className={`badge ${item.tone === 'positive' ? 'badge-success' : item.tone === 'warning' ? 'badge-warning' : item.tone === 'danger' ? 'badge-danger' : 'badge-brand'}`}>
               {item.label}
             </div>

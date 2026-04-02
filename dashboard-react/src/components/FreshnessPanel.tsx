@@ -9,22 +9,22 @@ export function FreshnessPanel({ freshness }: { freshness: FreshnessSummary }) {
       description="Panel ini menggantikan status freshness utama dari dashboard legacy dalam format yang lebih padat."
     >
       <div className="meta-grid">
-        <div className="stat-card">
+        <div className="stat-card section-card-premium">
           <div className="stat-label">Latest Date</div>
           <div className="stat-value">{freshness.latestDateLabel}</div>
           <div className="stat-detail">Tanggal observasi terbaru di dataset dashboard.</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card section-card-premium">
           <div className="stat-label">Generated</div>
           <div className="stat-value">{freshness.generatedAtLabel}</div>
           <div className="stat-detail">Waktu pembuatan file dashboard yang sedang dibaca aplikasi React.</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card section-card-premium">
           <div className="stat-label">Akun Dipantau</div>
           <div className="stat-value">{freshness.accountCount}</div>
           <div className="stat-detail">Total akun yang ikut masuk ke perbandingan dan ranking.</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card section-card-premium">
           <div className="stat-label">Histori</div>
           <div className="stat-value">{freshness.historyDays} hari</div>
           <div className="stat-detail">Rentang histori yang tersedia untuk membaca tren utama.</div>

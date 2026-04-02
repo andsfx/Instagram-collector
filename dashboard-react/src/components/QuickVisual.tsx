@@ -42,7 +42,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
       description="Kita mulai dengan line chart untuk tren followers dan bar chart untuk ranking engagement, sesuai kebutuhan analytics inti dashboard ini."
     >
       <div className="chart-grid">
-        <article className="chart-card chart-card-mobile-wide">
+        <article className="chart-card chart-card-mobile-wide editorial-chart-card">
           <div className="section-heading">
             <h3 className="section-title">Tren followers 10 hari terakhir</h3>
             <p className="section-description">Membantu membaca momentum tanpa harus membuka tabel histori harian.</p>
@@ -72,7 +72,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
             </div>
           </div>
         </article>
-        <article className="chart-card chart-card-mobile-wide">
+        <article className="chart-card chart-card-mobile-wide editorial-chart-card">
           <div className="section-heading">
             <h3 className="section-title">Engagement rate ranking</h3>
             <p className="section-description">Bar chart memudahkan membandingkan kategori yang sudah terurut.</p>
@@ -91,7 +91,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
             </div>
           </div>
         </article>
-        <article className="chart-card">
+        <article className="chart-card editorial-chart-card">
           <div className="section-heading">
             <h3 className="section-title">Share of followers</h3>
             <p className="section-description">Doughnut legacy diganti pie chart untuk memperlihatkan distribusi audiens antar akun.</p>
@@ -110,7 +110,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
             </ResponsiveContainer>
           </div>
         </article>
-        <article className="chart-card">
+        <article className="chart-card editorial-chart-card">
           <div className="section-heading">
             <h3 className="section-title">Radar comparison</h3>
             <p className="section-description">Membandingkan profil akun relatif terhadap pemimpin masing-masing metrik.</p>
@@ -138,7 +138,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
             </div>
           </div>
         </article>
-        <article className="chart-card chart-card-mobile-wide">
+        <article className="chart-card chart-card-mobile-wide editorial-chart-card">
           <div className="section-heading">
             <h3 className="section-title">Engagement trend</h3>
             <p className="section-description">Versi React dari grafik ER trend legacy untuk melihat kualitas interaksi dari waktu ke waktu.</p>
@@ -160,7 +160,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
             </div>
           </div>
         </article>
-        <article className="chart-card chart-card-wide">
+        <article className="chart-card chart-card-wide editorial-chart-card editorial-chart-card-hero">
           <div className="section-heading">
             <h3 className="section-title">Projection trend</h3>
             <p className="section-description">Proyeksi followers jangka pendek berdasarkan tren linear sederhana, untuk menggantikan projection chart legacy.</p>

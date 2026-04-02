@@ -85,7 +85,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
       </div>
 
       <div className="h2h-layout">
-        <article className="insight-card">
+        <article className="insight-card section-note-card">
           <div className="split-row">
             <div>
               <div className="stat-label">Quick Verdict</div>
@@ -105,7 +105,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
           <div className="helper-copy">Selisih followers saat ini: {view.gapFollowers.toLocaleString('id-ID')}</div>
         </article>
 
-        <article className="comparison-card">
+        <article className="comparison-card editorial-table-card">
           <div className="comparison-head">
             <span>@{view.accountA}</span>
             <span>Metrik</span>
@@ -123,7 +123,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         </article>
       </div>
 
-      <article className="chart-card">
+      <article className="chart-card editorial-chart-card">
         <div className="section-heading">
           <h3 className="section-title">Trend {view.trendTitle}</h3>
           <p className="section-description">{view.trendDescription}</p>
@@ -137,8 +137,8 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
                 <XAxis dataKey="date" stroke={chartAxisColor} fontSize={12} />
                 <YAxis stroke={chartAxisColor} fontSize={12} />
                 <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--text)' }} itemStyle={{ color: 'var(--text)' }} />
-                <Line type="monotone" dataKey={view.accountA} stroke="#2152d9" strokeWidth={2.4} dot={false} />
-                <Line type="monotone" dataKey={view.accountB} stroke="#e1306c" strokeWidth={2.4} dot={false} />
+                <Line type="monotone" dataKey={view.accountA} stroke="var(--brand)" strokeWidth={2.4} dot={false} />
+                <Line type="monotone" dataKey={view.accountB} stroke="var(--success)" strokeWidth={2.4} dot={false} />
               </LineChart>
               </ResponsiveContainer>
             </div>
