@@ -45,53 +45,55 @@ export function SectionNav({
   }, [items])
 
   return (
-    <nav className="section-nav panel" aria-label="Section navigation">
-      <div className="section-nav-links section-nav-links-primary">
-        {primaryItems.map((item) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            className={`section-nav-link ${activeId === item.id ? 'is-active' : ''}`}
-            aria-current={activeId === item.id ? 'location' : undefined}
-          >
-            {item.label}
-          </a>
-        ))}
+    <nav className="section-nav" aria-label="Section navigation">
+      <div className="section-nav-content">
+        <div className="section-nav-links section-nav-links-primary">
+          {primaryItems.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`section-nav-link ${activeId === item.id ? 'is-active' : ''}`}
+              aria-current={activeId === item.id ? 'location' : undefined}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+        <div className="section-nav-links section-nav-links-desktop">
+          {items.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`section-nav-link ${activeId === item.id ? 'is-active' : ''}`}
+              aria-current={activeId === item.id ? 'location' : undefined}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+        {secondaryItems.length ? (
+          <label className="section-nav-more" aria-label="Navigasi section tambahan">
+            <span className="section-nav-more-label">Lainnya</span>
+            <select
+              className="section-nav-more-select"
+              defaultValue=""
+              onChange={(event) => {
+                if (!event.target.value) return
+                window.location.hash = event.target.value
+                event.target.value = ''
+              }}
+            >
+              <option value="">Section lain</option>
+              {secondaryItems.map((item) => (
+                <option key={item.id} value={item.id}>{item.label}</option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+        <button type="button" className="theme-toggle" onClick={onToggleTheme} aria-label="Toggle dark mode" aria-pressed={theme === 'dark'}>
+          {theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
+        </button>
       </div>
-      <div className="section-nav-links section-nav-links-desktop">
-        {items.map((item) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            className={`section-nav-link ${activeId === item.id ? 'is-active' : ''}`}
-            aria-current={activeId === item.id ? 'location' : undefined}
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
-      {secondaryItems.length ? (
-        <label className="section-nav-more" aria-label="Navigasi section tambahan">
-          <span className="section-nav-more-label">Lainnya</span>
-          <select
-            className="section-nav-more-select"
-            defaultValue=""
-            onChange={(event) => {
-              if (!event.target.value) return
-              window.location.hash = event.target.value
-              event.target.value = ''
-            }}
-          >
-            <option value="">Section lain</option>
-            {secondaryItems.map((item) => (
-              <option key={item.id} value={item.id}>{item.label}</option>
-            ))}
-          </select>
-        </label>
-      ) : null}
-      <button type="button" className="theme-toggle" onClick={onToggleTheme} aria-label="Toggle dark mode" aria-pressed={theme === 'dark'}>
-        {theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
-      </button>
     </nav>
   )
 }

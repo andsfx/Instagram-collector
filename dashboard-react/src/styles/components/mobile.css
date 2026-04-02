@@ -20,6 +20,11 @@
     width: min(100vw - 20px, 100%);
   }
 
+  .hero-content,
+  .section-nav-content {
+    width: min(100vw - 20px, 100%);
+  }
+
   .hero,
   .panel-section {
     padding: 18px;
@@ -71,6 +76,10 @@
   }
 
   .section-nav {
+    padding: 8px 0;
+  }
+
+  .section-nav-content {
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;

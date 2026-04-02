@@ -83,7 +83,6 @@ export default function App() {
     { id: 'section-overview', label: 'Overview' },
     { id: 'section-h2h', label: 'Head-to-Head' },
     { id: 'section-heatmap', label: 'Heatmap' },
-    { id: 'section-insights', label: 'Insights' },
     { id: 'section-visual', label: 'Visual' },
   ]
 
