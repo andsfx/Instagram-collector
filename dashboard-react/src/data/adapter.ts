@@ -84,6 +84,8 @@ export function adaptDashboardData(input: DashboardApi): DashboardRecord {
   return {
     generatedAt: input.generated_at,
     generatedAtWib: input.generated_at_wib,
+    version: input.version,
+    sources: input.sources,
     latestDate: input.latest.date,
     accounts: input.accounts,
     latest: latestEntries,

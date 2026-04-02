@@ -1,75 +1,83 @@
-import { SectionCard } from './ui'
 import type { DashboardRecord } from '../data/types'
+import { EmptyState, SectionCard } from './ui'
 
-// Content breakdown based on posts per account when available
 export function ContentBreakdown({ data }: { data: DashboardRecord }) {
   const latest = data.latest
-  const accounts = data.accounts
+  const perAccount = data.accounts.map((account) => {
+    const breakdown = data.content_breakdown?.[account]
+    const posts = breakdown?.posts ?? latest[account]?.posts ?? 0
 
-  // Helper to normalize breakdown per account
-  const breakdownFor = (acc: string) => {
-    const cb = (data as any).content_breakdown?.[acc]
-    const piTop = (data as any).post_insights?.[acc]?.top_interactions?.[0]
-    // bestPost can come from content_breakdown or fall back to top_interactions or undefined
-    const bestPost = cb?.bestPost ?? piTop ?? undefined
     return {
-      posts: cb?.posts ?? latest?.[acc]?.posts ?? 0,
-      reels: cb?.reels ?? undefined,
-      carousels: cb?.carousels ?? cb?.carousel ?? undefined,
-      images: cb?.images ?? cb?.image ?? undefined,
-      videos: cb?.videos ?? cb?.video ?? undefined,
-      bestPost: bestPost,
+      account,
+      posts,
+      reels: breakdown?.reels,
+      carousels: breakdown?.carousels,
+      images: breakdown?.images,
+      videos: breakdown?.videos,
+      bestPost: breakdown?.bestPost,
     }
-  }
+  })
 
-  const perAccount = accounts.map((acc) => ({ account: acc, ...breakdownFor(acc) }))
-  // Only consider accounts with meaningful data (at least one data point > 0)
-  const meaningful = perAccount.filter((a) => (a.posts ?? 0) > 0 || (a.reels ?? 0) > 0 || (a.carousels ?? 0) > 0 || (a.images ?? 0) > 0 || (a.videos ?? 0) > 0)
-  const maxPosts = meaningful.length > 0 ? Math.max(1, ...meaningful.map((a) => a.posts ?? 0)) : 1
-  const hasData = meaningful.length > 0
+  const meaningful = perAccount.filter((row) => (row.posts ?? 0) > 0)
+  const maxPosts = meaningful.length ? Math.max(...meaningful.map((row) => row.posts)) : 1
 
   return (
-    <SectionCard title="Content Breakdown">
-      {hasData ? (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {meaningful.map((p) => (
-            <div key={p.account} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-              <div className="text-xs font-medium uppercase tracking-wide text-slate-600 mb-1">{p.account}</div>
-              <div className="flex items-center gap-2 mb-2 text-xs text-slate-600">
-                {p.reels !== undefined && (
-                  <span className="px-2 py-1 rounded-full bg-slate-200">Reels: {p.reels}</span>
-                )}
-                {p.carousels !== undefined && (
-                  <span className="px-2 py-1 rounded-full bg-slate-200">Carousels: {p.carousels}</span>
-                )}
-                {p.images !== undefined && (
-                  <span className="px-2 py-1 rounded-full bg-slate-200">Images: {p.images}</span>
-                )}
-                {p.videos !== undefined && (
-                  <span className="px-2 py-1 rounded-full bg-slate-200">Videos: {p.videos}</span>
-                )}
+    <SectionCard
+      eyebrow="Content Breakdown"
+      title="Komposisi format konten per akun"
+      description="Ringkasan ini fokus pada distribusi format dan best post, agar tim cepat melihat pola konten dominan tanpa tabel panjang."
+    >
+      {meaningful.length ? (
+        <div className="breakdown-grid">
+          {meaningful.map((row) => (
+            <article key={row.account} className="breakdown-card">
+              <div className="stat-label">@{row.account}</div>
+              <div className="big-value">{row.posts} post</div>
+              <div className="chip-row">
+                {typeof row.reels === 'number' ? <span className="chip chip-brand">Reels {row.reels}</span> : null}
+                {typeof row.carousels === 'number' ? <span className="chip chip-brand">Carousel {row.carousels}</span> : null}
+                {typeof row.images === 'number' ? <span className="chip chip-brand">Image {row.images}</span> : null}
+                {typeof row.videos === 'number' ? <span className="chip chip-brand">Video {row.videos}</span> : null}
               </div>
-              <div className="h-4 w-full rounded bg-slate-200" aria-label={`posts-${p.account}`}>
+              <div className="helper-copy">Volume posting relatif terhadap akun lain pada snapshot terbaru.</div>
+              <div
+                aria-label={`posts-${row.account}`}
+                style={{
+                  width: '100%',
+                  height: 16,
+                  borderRadius: 999,
+                  background: '#e8eef8',
+                  overflow: 'hidden',
+                }}
+              >
                 <div
-                  style={{ width: `${(p.posts / maxPosts) * 100}%` }}
-                  className="h-4 rounded bg-pink-500"
+                  style={{
+                    width: `${(row.posts / maxPosts) * 100}%`,
+                    height: '100%',
+                    borderRadius: 999,
+                    background: 'linear-gradient(90deg, #2152d9, #e1306c)',
+                  }}
                 />
               </div>
-              <div className="mt-1 text-xs text-slate-600">Posts: {p.posts}</div>
-              {p.bestPost && (
-                <div className="mt-2 text-xs text-slate-700">
-                  Best post: {p.bestPost.url ?? p.bestPost.id ?? 'unknown'}
-                  {p.bestPost.type ? ` • type: ${p.bestPost.type}` : ''}
-                  {typeof p.bestPost.interactions === 'number' ? ` • interactions: ${p.bestPost.interactions}` : ''}
+              {row.bestPost ? (
+                <div className="featured-post">
+                  <div className="micro-label">Best Post</div>
+                  <div className="table-strong">{row.bestPost.type ?? 'Format belum diketahui'}</div>
+                  <div className="table-muted">
+                    {typeof row.bestPost.interactions === 'number' ? `${row.bestPost.interactions} interactions` : 'Interaksi belum tersedia'}
+                  </div>
+                  {row.bestPost.url ? (
+                    <a className="accent-link" href={row.bestPost.url} target="_blank" rel="noreferrer">
+                      Buka postingan terbaik
+                    </a>
+                  ) : null}
                 </div>
-              )}
-            </div>
+              ) : null}
+            </article>
           ))}
         </div>
       ) : (
-        <div className="text-sm text-slate-600">
-          Data breakdown konten belum tersedia. Data post-level per akun belum diteruskan dari pipeline saat ini.
-        </div>
+        <EmptyState>Data breakdown konten belum tersedia dari pipeline saat ini.</EmptyState>
       )}
     </SectionCard>
   )

@@ -1,61 +1,60 @@
-import { SectionCard } from './ui'
 import type { DashboardRecord } from '../data/types'
+import { formatInteger, formatPostDate, getLatestPost } from '../data/selectors'
+import { EmptyState, SectionCard } from './ui'
 
-// Simple post snapshot using available per-account latest data
 export function PostSnapshot({ data }: { data: DashboardRecord }) {
-  // Build a snapshot list: top by followers for display reliability
-  const rankingList = data.rankings.by_followers ?? []
-  const snapshot = rankingList.slice(0, 4).map((r) => {
-    const pi = (data as any).post_insights?.[r.account]
-    const posts = Array.isArray(pi?.posts) ? pi.posts : []
-    const getPostTime = (post: any) => {
-      const raw = post?.timestamp ?? post?.published_at ?? null
-      return raw ? new Date(raw).getTime() : -1
-    }
-    let latestPost: any = undefined
-    if (posts.length > 0) {
-      latestPost = posts.reduce((a: any, b: any) => (getPostTime(b) > getPostTime(a) ? b : a))
-    } else if (Array.isArray(pi?.top_interactions) && pi.top_interactions.length > 0) {
-      latestPost = pi.top_interactions[0]
-    }
-    const followers = r.followers
-      ?? (data as any).content_breakdown?.[r.account]?.followers
-      ?? (data as any).post_insights?.[r.account]?.followers
-      ?? 0
+  const snapshot = (data.rankings.by_followers ?? []).slice(0, 4).map((rankingRow) => {
+    const postInsight = data.post_insights?.[rankingRow.account]
+    const latestPost = getLatestPost(postInsight?.posts) ?? postInsight?.top_interactions?.[0] ?? null
+
     return {
-      account: r.account,
+      account: rankingRow.account,
+      followers: rankingRow.followers,
       latestPost,
-      followers,
     }
   })
 
-  // Validation: ensure we actually have data to show
-  const hasData = data.accounts.length > 0 && snapshot.length > 0
-
   return (
-    <SectionCard title="Post Snapshot">
-      {hasData ? (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          {snapshot.map((s) => (
-            <div key={s.account} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-              <div className="text-xs font-medium uppercase text-slate-600">{s.account}</div>
-              <div className="mt-1 text-sm text-slate-700">
-                Followers: {Number(s.followers).toLocaleString('id-ID')}
-              </div>
-              {s.latestPost && (
-                <div className="mt-1 text-xs text-slate-600">
-                  {`Latest post: ${s.latestPost.shortcode ?? s.latestPost.id ?? s.latestPost.url ?? ''} `}
-                  {s.latestPost.type ? `(${s.latestPost.type})` : ''}
-                  {` • interactions: ${s.latestPost.interactions ?? 0}`}
+    <SectionCard
+      eyebrow="Post Snapshot"
+      title="Cuplikan posting terbaru dari akun paling besar"
+      description="Migrasi awal ini belum memindahkan semua filter legacy, tetapi sudah memindahkan inti snapshot post-level yang paling berguna untuk monitoring harian."
+    >
+      {snapshot.length ? (
+        <div className="snapshot-grid">
+          {snapshot.map((row) => (
+            <article key={row.account} className="snapshot-card">
+              <div className="split-row">
+                <div>
+                  <div className="stat-label">@{row.account}</div>
+                  <div className="big-value">{formatInteger.format(row.followers)}</div>
                 </div>
+                <span className="badge badge-brand">followers</span>
+              </div>
+              {row.latestPost ? (
+                <div className="featured-post">
+                  <div className="micro-label">Latest Post</div>
+                  <div className="table-strong">{row.latestPost.type ?? 'Format tidak diketahui'}</div>
+                  <div className="table-muted">Dipublikasikan {formatPostDate(row.latestPost.published_at ?? row.latestPost.timestamp)}</div>
+                  <div className="chip-row">
+                    <span className="chip chip-success">{row.latestPost.interactions ?? 0} interactions</span>
+                    {typeof row.latestPost.likes === 'number' ? <span className="chip chip-brand">{row.latestPost.likes} likes</span> : null}
+                    {typeof row.latestPost.comments === 'number' ? <span className="chip chip-warning">{row.latestPost.comments} comments</span> : null}
+                  </div>
+                  {row.latestPost.url ? (
+                    <a className="accent-link" href={row.latestPost.url} target="_blank" rel="noreferrer">
+                      Buka postingan
+                    </a>
+                  ) : null}
+                </div>
+              ) : (
+                <EmptyState>Belum ada data posting terbaru untuk akun ini.</EmptyState>
               )}
-            </div>
+            </article>
           ))}
         </div>
       ) : (
-        <div className="text-sm text-slate-600">
-          Data snapshot posting belum tersedia. Ranking per akun atau data akun belum tersedia dari pipeline.
-        </div>
+        <EmptyState>Data snapshot posting belum tersedia dari pipeline saat ini.</EmptyState>
       )}
     </SectionCard>
   )

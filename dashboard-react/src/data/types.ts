@@ -18,6 +18,11 @@ export interface GrowthEntry {
 export interface DashboardRecord {
   generatedAt: string
   generatedAtWib: string
+  version: number
+  sources: {
+    stats: string
+    engagement: string
+  }
   latestDate: string
   accounts: AccountKey[]
   latest: Record<AccountKey, MetricEntry>

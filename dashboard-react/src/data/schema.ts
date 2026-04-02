@@ -12,6 +12,11 @@ const metricSchema = z.object({
 export const dashboardSchema = z.object({
   generated_at: z.string(),
   generated_at_wib: z.string(),
+  version: z.number(),
+  sources: z.object({
+    stats: z.string(),
+    engagement: z.string(),
+  }),
   accounts: z.array(z.string()),
   latest: z.record(metricSchema).and(z.object({ date: z.string() })),
   growth: z.record(z.object({
