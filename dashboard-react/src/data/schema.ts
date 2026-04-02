@@ -18,7 +18,9 @@ export const dashboardSchema = z.object({
     engagement: z.string(),
   }),
   accounts: z.array(z.string()),
-  latest: z.record(metricSchema).and(z.object({ date: z.string() })),
+  latest: z.object({
+    date: z.string(),
+  }).catchall(metricSchema),
   growth: z.record(z.object({
     followers_change_1d: z.number(),
     followers_change_7d: z.number(),
