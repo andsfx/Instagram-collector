@@ -67,8 +67,10 @@
   }
 
   .section-nav {
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
   }
 
   .section-nav-links {
@@ -76,11 +78,29 @@
     padding: 0 4px 2px;
   }
 
+  .section-nav-links-desktop {
+    display: none;
+  }
+
+  .section-nav-links-primary {
+    display: flex;
+  }
+
+  .section-nav-more {
+    display: inline-flex;
+    justify-self: end;
+  }
+
   .section-nav-link,
   .theme-toggle {
     min-height: 38px;
     padding: 9px 12px;
     font-size: 0.88rem;
+  }
+
+  .theme-toggle {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .meta-grid,

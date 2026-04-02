@@ -56,6 +56,11 @@ export interface FreshnessSummary {
   sourceLabel: string
 }
 
+export interface HeroMetaItem {
+  value: string
+  label: string
+}
+
 export function getFreshnessSummary(data: DashboardRecord): FreshnessSummary {
   return {
     latestDateLabel: formatDateLabel(data.latestDate),
@@ -64,6 +69,23 @@ export function getFreshnessSummary(data: DashboardRecord): FreshnessSummary {
     historyDays: data.history.length,
     sourceLabel: [data.sources.stats, data.sources.engagement].filter(Boolean).join(' + '),
   }
+}
+
+export function getHeroMeta(data: DashboardRecord): HeroMetaItem[] {
+  return [
+    {
+      value: formatInteger.format(data.accounts.length),
+      label: 'Akun dipantau',
+    },
+    {
+      value: formatDateLabel(data.latestDate),
+      label: 'Observasi terbaru',
+    },
+    {
+      value: `${data.history.length} hari`,
+      label: 'Histori aktif',
+    },
+  ]
 }
 
 export interface ExecutiveSummaryData {

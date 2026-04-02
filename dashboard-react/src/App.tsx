@@ -4,7 +4,7 @@ import { FreshnessPanel } from './components/FreshnessPanel'
 import { ExecutiveSummary } from './components/ExecutiveSummary'
 import { TodaySummary } from './components/TodaySummary'
 import { useDashboardData } from './hooks/useDashboardData'
-import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getInsightsData, getQuickVisualData, getTodaySummary } from './data/selectors'
+import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeroMeta, getInsightsData, getQuickVisualData, getTodaySummary } from './data/selectors'
 import { getSummaryStrip } from './data/selectors'
 import { AccountOverviewGrid } from './components/AccountOverviewGrid'
 import { RankingGrowth } from './components/RankingGrowth'
@@ -73,6 +73,7 @@ export default function App() {
   const accountSummaries = getAccountSummaries(data)
   const insights = getInsightsData(data)
   const summaryStrip = getSummaryStrip(data)
+  const heroMeta = getHeroMeta(data)
   const sections: SectionNavItem[] = [
     { id: 'section-freshness', label: 'Status' },
     { id: 'section-summary', label: 'Summary' },
@@ -89,7 +90,7 @@ export default function App() {
   return (
     <main id="main-content" className="app-shell stack-lg">
       <a className="skip-link" href="#section-freshness">Lewati navigasi dan langsung ke konten</a>
-      <HeaderBar onRefresh={retry} />
+      <HeaderBar onRefresh={retry} heroMeta={heroMeta} />
       <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} />
       <section id="section-freshness" className="section-anchor"><FreshnessPanel freshness={freshness} /></section>
       <section id="section-summary" className="section-anchor stack-lg"><ExecutiveSummary summary={executive} /><TodaySummary today={today} /><SummaryStrip items={summaryStrip} /></section>

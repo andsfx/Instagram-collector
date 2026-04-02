@@ -38,8 +38,8 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
   return (
     <SectionCard
       eyebrow="Quick Visual"
-      title="Dua visual inti untuk membaca arah persaingan"
-      description="Kita mulai dengan line chart untuk tren followers dan bar chart untuk ranking engagement, sesuai kebutuhan analytics inti dashboard ini."
+      title="Chart suite editorial untuk membaca posisi, kualitas interaksi, dan proyeksi"
+      description="Section ini merangkum beberapa visual utama sekaligus agar tim bisa membaca skala audiens, kualitas engagement, share, profil akun, dan proyeksi jangka pendek dalam satu area analitik yang konsisten."
     >
       <div className="chart-grid">
         <article className="chart-card chart-card-mobile-wide editorial-chart-card">

@@ -1,9 +1,11 @@
-export function HeaderBar({ onRefresh }: { onRefresh: () => void }) {
+import type { HeroMetaItem } from '../data/selectors'
+
+export function HeaderBar({ onRefresh, heroMeta }: { onRefresh: () => void; heroMeta: HeroMetaItem[] }) {
   return (
     <header className="panel hero">
       <div className="split-row">
         <div className="hero-topline">Competitor Intelligence Brief</div>
-        <button type="button" className="hero-secondary" onClick={onRefresh}>Refresh data</button>
+        <button type="button" className="hero-secondary hero-refresh" onClick={onRefresh}>Muat ulang data terbaru</button>
       </div>
       <div className="hero-copy">
         <h1>Editorial dashboard untuk membaca performa Instagram kompetitor dengan lebih tajam.</h1>
@@ -16,18 +18,12 @@ export function HeaderBar({ onRefresh }: { onRefresh: () => void }) {
         <a className="hero-secondary" href="#section-ranking">Buka ranking lengkap</a>
       </div>
       <div className="hero-meta">
-        <div className="hero-meta-item">
-          <div className="hero-meta-value">5</div>
-          <div className="hero-meta-label">Akun dipantau</div>
-        </div>
-        <div className="hero-meta-item">
-          <div className="hero-meta-value">Live</div>
-          <div className="hero-meta-label">Runtime data</div>
-        </div>
-        <div className="hero-meta-item">
-          <div className="hero-meta-value">Daily</div>
-          <div className="hero-meta-label">Monitoring cadence</div>
-        </div>
+        {heroMeta.map((item) => (
+          <div key={item.label} className="hero-meta-item">
+            <div className="hero-meta-value">{item.value}</div>
+            <div className="hero-meta-label">{item.label}</div>
+          </div>
+        ))}
       </div>
     </header>
   )
