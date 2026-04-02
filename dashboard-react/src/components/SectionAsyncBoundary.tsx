@@ -27,10 +27,14 @@ class AsyncErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <section className="panel panel-section section-card">
+        <section className="grid gap-[22px] rounded-panel-lg border border-border bg-[color:color-mix(in_srgb,var(--panel)_92%,transparent)] p-7 shadow-panel-sm backdrop-blur-[16px]">
           <ErrorState title={this.props.fallbackTitle} description={this.state.message || this.props.fallbackDescription} />
           <div>
-            <button type="button" className="retry-button" onClick={this.props.onReset}>
+            <button
+              type="button"
+              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-border bg-brand-soft px-3.5 py-2.5 font-bold text-brand transition hover:-translate-y-px"
+              onClick={this.props.onReset}
+            >
               Coba muat ulang section
             </button>
           </div>
@@ -73,7 +77,7 @@ export function SectionAsyncBoundary({
 
 export function SectionLoadingFallback({ title, description }: { title: string; description: string }) {
   return (
-    <section className="panel panel-section">
+    <section className="rounded-panel-lg border border-border bg-[color:color-mix(in_srgb,var(--panel)_92%,transparent)] p-7 shadow-panel-sm backdrop-blur-[16px]">
       <LoadingState title={title} description={description} />
     </section>
   )

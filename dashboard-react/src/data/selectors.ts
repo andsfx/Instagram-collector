@@ -1000,7 +1000,7 @@ export function getDailyMetricsView(data: DashboardRecord, selectedAccount?: str
     accounts,
     selectedAccount: account,
     rows,
-    mobileRows: rows.slice(0, 3),
+    mobileRows: rows,
     summaryRows,
     disclosureTitle,
     disclosureHint: 'Gunakan untuk mengecek detail followers, following, dan jumlah post tiap akun per hari.',

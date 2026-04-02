@@ -2,12 +2,22 @@ import type { SummaryStripItem } from '../data/selectors'
 
 export function SummaryStrip({ items }: { items: SummaryStripItem[] }) {
   return (
-    <section className="summary-strip-grid">
+    <section className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-5">
       {items.map((item) => (
-        <article key={item.label} className={`summary-strip-card ${item.emphasis ? 'is-emphasis' : ''}`}>
-          <div className="stat-label">{item.label}</div>
-          <div className={`big-value ${item.emphasis ? 'editorial-value' : ''}`}>{item.value}</div>
-          <div className="helper-copy">{item.detail}</div>
+        <article
+          key={item.label}
+          className={[
+            'rounded-[22px] border p-4 shadow-panel-sm',
+            item.emphasis
+              ? 'border-[color:color-mix(in_srgb,var(--brand)_22%,var(--border))] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft-2)_90%,var(--panel)),color-mix(in_srgb,var(--brand-soft)_65%,var(--panel)))]'
+              : 'border-border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_88%,var(--brand-soft)_12%),var(--panel))]',
+          ].join(' ')}
+        >
+          <div className="text-xs font-extrabold uppercase tracking-[0.08em] text-text-soft">{item.label}</div>
+          <div className={item.emphasis ? 'mt-2.5 font-display text-[clamp(1.5rem,1.2rem+0.75vw,2.2rem)] leading-none text-brand-strong' : 'mt-2.5 font-display text-[clamp(1.3rem,1.1rem+0.5vw,1.85rem)] leading-[1.1] tracking-[-0.03em] text-text'}>
+            {item.value}
+          </div>
+          <div className="mt-2.5 text-[0.92rem] leading-[1.6] text-text-muted">{item.detail}</div>
         </article>
       ))}
     </section>

@@ -1,9 +1,6 @@
 @import './tokens.css';
 @import './base.css';
-@import './layout.css';
-@import './components/shell.css';
-@import './components/cards.css';
-@import './components/data-display.css';
-@import './components/charts.css';
-@import './components/states.css';
-@import './components/mobile.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
