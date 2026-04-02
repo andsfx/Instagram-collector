@@ -50,6 +50,26 @@
   color: var(--text-muted);
 }
 
+.heatmap-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.heatmap-legend-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.heatmap-legend-box.is-0 { background: var(--panel); }
+.heatmap-legend-box.is-1 { background: rgba(225, 48, 108, 0.12); }
+.heatmap-legend-box.is-2 { background: rgba(225, 48, 108, 0.3); }
+.heatmap-legend-box.is-3 { background: rgba(225, 48, 108, 0.55); }
+.heatmap-legend-box.is-4 { background: rgba(225, 48, 108, 0.85); }
+
 .heatmap-cell {
   border: 1px solid rgba(33, 82, 217, 0.08);
   font-weight: 800;
@@ -144,6 +164,10 @@
   min-width: 320px;
   border-collapse: collapse;
   margin-top: 14px;
+}
+
+.daily-table-expanded {
+  min-width: 760px;
 }
 
 .daily-table th,

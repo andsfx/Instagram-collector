@@ -74,6 +74,14 @@ export function adaptDashboardData(input: DashboardApi): DashboardRecord {
           followers: pi?.followers ?? undefined,
           posts: Array.isArray(pi?.posts) ? pi.posts : undefined,
           top_interactions: Array.isArray(pi?.top_interactions) ? pi.top_interactions : undefined,
+          average_likes: pi?.average_likes ?? undefined,
+          average_comments: pi?.average_comments ?? undefined,
+          average_post_er: pi?.average_post_er ?? undefined,
+          dominant_type: pi?.dominant_type ?? undefined,
+          top_hashtags: Array.isArray(pi?.top_hashtags) ? pi.top_hashtags : undefined,
+          campaign_terms: Array.isArray(pi?.campaign_terms) ? pi.campaign_terms : undefined,
+          viral_posts: pi?.viral_posts ?? undefined,
+          underperform_posts: pi?.underperform_posts ?? undefined,
         }
         return [acc, shaped]
       }

@@ -26,6 +26,16 @@ export function Heatmap({ data }: { data: DashboardRecord }) {
         <span className="badge badge-success">Jendela terbaik: {heatmap.bestWindow}</span>
       </div>
 
+      <div className="heatmap-legend" aria-label="Legenda intensitas heatmap">
+        <span className="table-muted">Rendah</span>
+        <span className="heatmap-legend-box is-0" />
+        <span className="heatmap-legend-box is-1" />
+        <span className="heatmap-legend-box is-2" />
+        <span className="heatmap-legend-box is-3" />
+        <span className="heatmap-legend-box is-4" />
+        <span className="table-muted">Tinggi</span>
+      </div>
+
       <div className="heatmap-scroll-shell">
         <div className="heatmap-grid" role="table" aria-label={`Heatmap waktu posting untuk @${account}`}>
           <div className="heatmap-header heatmap-corner" />

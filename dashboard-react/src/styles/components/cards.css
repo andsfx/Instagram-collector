@@ -90,6 +90,18 @@
   gap: 12px;
 }
 
+.summary-strip-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.03);
+}
+
+.summary-strip-card.is-emphasis {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 5%, var(--panel)), var(--panel));
+}
+
 .stat-label,
 .micro-label {
   color: var(--text-soft);

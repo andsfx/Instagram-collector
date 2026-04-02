@@ -1,8 +1,10 @@
+import { getContentHighlights } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
 import { EmptyState, SectionCard } from './ui'
 
 export function ContentBreakdown({ data }: { data: DashboardRecord }) {
   const latest = data.latest
+  const highlights = getContentHighlights(data)
   const perAccount = data.accounts.map((account) => {
     const breakdown = data.content_breakdown?.[account]
     const posts = breakdown?.posts ?? latest[account]?.posts ?? 0
@@ -27,6 +29,25 @@ export function ContentBreakdown({ data }: { data: DashboardRecord }) {
       title="Komposisi format konten per akun"
       description="Ringkasan ini fokus pada distribusi format dan best post, agar tim cepat melihat pola konten dominan tanpa tabel panjang."
     >
+      <div className="summary-strip-grid">
+        <article className="summary-strip-card">
+          <div className="stat-label">Format terbanyak</div>
+          <div className="big-value">{highlights.topFormatLabel}</div>
+          <div className="helper-copy">{highlights.topFormatCount > 0 ? `${highlights.topFormatCount} post pada dataset terbaru` : 'Belum ada data format.'}</div>
+        </article>
+        <article className="summary-strip-card">
+          <div className="stat-label">ER tertinggi</div>
+          <div className="big-value">{highlights.topErAccount ? `@${highlights.topErAccount}` : '-'}</div>
+          <div className="helper-copy">{highlights.topErAccount ? `${highlights.topErValue.toFixed(2)}% engagement rate` : 'Belum ada data ER.'}</div>
+        </article>
+        <article className="summary-strip-card">
+          <div className="stat-label">Best post owner</div>
+          <div className="big-value">{highlights.bestPostOwner ? `@${highlights.bestPostOwner}` : '-'}</div>
+          <div className="helper-copy">
+            {highlights.bestPostOwner ? `${highlights.bestPostLikes} interactions${highlights.bestPostType ? ` · ${highlights.bestPostType}` : ''}` : 'Belum ada best post.'}
+          </div>
+        </article>
+      </div>
       {meaningful.length ? (
         <div className="breakdown-grid">
           {meaningful.map((row) => (
@@ -40,24 +61,8 @@ export function ContentBreakdown({ data }: { data: DashboardRecord }) {
                 {typeof row.videos === 'number' ? <span className="chip chip-brand">Video {row.videos}</span> : null}
               </div>
               <div className="helper-copy">Volume posting relatif terhadap akun lain pada snapshot terbaru.</div>
-              <div
-                aria-label={`posts-${row.account}`}
-                style={{
-                  width: '100%',
-                  height: 16,
-                  borderRadius: 999,
-                  background: '#e8eef8',
-                  overflow: 'hidden',
-                }}
-              >
-                <div
-                  style={{
-                    width: `${(row.posts / maxPosts) * 100}%`,
-                    height: '100%',
-                    borderRadius: 999,
-                    background: 'linear-gradient(90deg, #2152d9, #e1306c)',
-                  }}
-                />
+              <div className="breakdown-progress" aria-label={`posts-${row.account}`}>
+                <div className="breakdown-progress-fill" style={{ width: `${(row.posts / maxPosts) * 100}%` }} />
               </div>
               {row.bestPost ? (
                 <div className="featured-post">

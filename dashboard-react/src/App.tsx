@@ -5,6 +5,7 @@ import { ExecutiveSummary } from './components/ExecutiveSummary'
 import { TodaySummary } from './components/TodaySummary'
 import { useDashboardData } from './hooks/useDashboardData'
 import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getInsightsData, getQuickVisualData, getTodaySummary } from './data/selectors'
+import { getSummaryStrip } from './data/selectors'
 import { AccountOverviewGrid } from './components/AccountOverviewGrid'
 import { RankingGrowth } from './components/RankingGrowth'
 import { ContentBreakdown } from './components/ContentBreakdown'
@@ -15,6 +16,7 @@ import { InsightsPanel } from './components/InsightsPanel'
 import { useTheme } from './hooks/useTheme'
 import { ErrorState, LoadingState } from './components/ui'
 import { SectionAsyncBoundary, SectionLoadingFallback } from './components/SectionAsyncBoundary'
+import { SummaryStrip } from './components/SummaryStrip'
 
 const QuickVisual = lazy(async () => {
   const module = await import('./components/QuickVisual')
@@ -70,6 +72,7 @@ export default function App() {
   const quickVisual = getQuickVisualData(data)
   const accountSummaries = getAccountSummaries(data)
   const insights = getInsightsData(data)
+  const summaryStrip = getSummaryStrip(data)
   const sections: SectionNavItem[] = [
     { id: 'section-freshness', label: 'Status' },
     { id: 'section-summary', label: 'Summary' },
@@ -86,10 +89,10 @@ export default function App() {
   return (
     <main id="main-content" className="app-shell stack-lg">
       <a className="skip-link" href="#section-freshness">Lewati navigasi dan langsung ke konten</a>
-      <HeaderBar />
+      <HeaderBar onRefresh={retry} />
       <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} />
       <section id="section-freshness" className="section-anchor"><FreshnessPanel freshness={freshness} /></section>
-      <section id="section-summary" className="section-anchor stack-lg"><ExecutiveSummary summary={executive} /><TodaySummary today={today} /></section>
+      <section id="section-summary" className="section-anchor stack-lg"><ExecutiveSummary summary={executive} /><TodaySummary today={today} /><SummaryStrip items={summaryStrip} /></section>
       <section id="section-daily" className="section-anchor"><DailyMetrics data={data} /></section>
       <section id="section-ranking" className="section-anchor"><RankingGrowth data={data} /></section>
       <section id="section-content" className="section-anchor stack-lg"><ContentBreakdown data={data} /><PostSnapshot data={data} /></section>

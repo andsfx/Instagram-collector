@@ -7,6 +7,8 @@ export interface MetricEntry {
   avg_likes: number | null
   avg_comments: number | null
   engagement_rate: number | null
+  verified?: boolean | null
+  ff_ratio?: number | null
 }
 
 export interface GrowthEntry {
@@ -91,12 +93,23 @@ export interface PostInsightPost {
   comments?: number
   type?: string
   caption?: string
+  caption_snippet?: string
+  post_er?: number
+  performance_label?: 'viral' | 'normal' | 'underperform' | string
 }
 
 export interface PostInsightsAccountShape {
   followers?: number
   posts?: PostInsightPost[]
   top_interactions?: PostInsightPost[]
+   average_likes?: number
+   average_comments?: number
+   average_post_er?: number
+   dominant_type?: string
+   top_hashtags?: string[]
+   campaign_terms?: string[]
+   viral_posts?: number
+   underperform_posts?: number
 }
 
 export interface PostInsightsByAccount {

@@ -58,6 +58,7 @@
 
   .meta-grid,
   .summary-grid,
+  .summary-strip-grid,
   .tile-grid,
   .snapshot-grid,
   .daily-grid,
@@ -102,6 +103,19 @@
   .control-field-inline {
     min-width: 0;
     width: 100%;
+  }
+
+  .daily-toolbar {
+    flex-direction: column;
+  }
+
+  .daily-toolbar-controls {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .post-toolbar-controls {
+    grid-template-columns: 1fr;
   }
 
   .chip-row {

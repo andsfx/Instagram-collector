@@ -712,3 +712,442 @@ export function getInsightsData(data: DashboardRecord): InsightsData {
 
   return { items }
 }
+
+export interface SummaryStripItem {
+  label: string
+  value: string
+  detail: string
+  emphasis?: boolean
+}
+
+export function getSummaryStrip(data: DashboardRecord): SummaryStripItem[] {
+  const topFollowers = data.rankings.by_followers[0]
+  const topEngagement = data.rankings.by_engagement_rate[0]
+  const fastestGrowth = Object.entries(data.growth)
+    .map(([account, growth]) => ({ account, ...growth }))
+    .sort((left, right) => right.followers_change_1d - left.followers_change_1d)[0]
+
+  const contentHighlights = getContentHighlights(data)
+
+  return [
+    {
+      label: 'Pemimpin Followers',
+      value: topFollowers ? `@${topFollowers.account}` : '-',
+      detail: topFollowers ? `${formatInteger.format(topFollowers.followers)} followers` : 'Belum ada data followers.',
+      emphasis: true,
+    },
+    {
+      label: 'ER Tertinggi',
+      value: topEngagement ? `@${topEngagement.account}` : '-',
+      detail: topEngagement ? `${topEngagement.engagement_rate.toFixed(2)}% engagement rate` : 'Belum ada data ER.',
+    },
+    {
+      label: 'Pertumbuhan Tercepat',
+      value: fastestGrowth ? `@${fastestGrowth.account}` : '-',
+      detail: fastestGrowth ? `${fastestGrowth.followers_change_1d >= 0 ? '+' : ''}${formatInteger.format(fastestGrowth.followers_change_1d)} hari ini` : 'Belum ada data growth harian.',
+    },
+    {
+      label: 'Format Dominan',
+      value: contentHighlights.topFormatLabel,
+      detail: contentHighlights.topFormatCount > 0 ? `${formatInteger.format(contentHighlights.topFormatCount)} post pada dataset terbaru` : 'Belum ada data konten.',
+    },
+    {
+      label: 'Pembaruan Terakhir',
+      value: formatDateTimeLabel(data.generatedAtWib),
+      detail: 'Data followers harian dan engagement terbaru',
+    },
+  ]
+}
+
+export type RankingSortKey = 'rank' | 'username' | 'followers' | 'following' | 'posts' | 'avgLikes' | 'avgComments' | 'er' | 'verified' | 'gap'
+export type SortDirection = 'asc' | 'desc'
+
+export interface RankingTableRow {
+  rank: number
+  account: string
+  followers: number
+  following: number
+  posts: number
+  avgLikes: number
+  avgComments: number
+  engagementRate: number
+  verified: boolean
+  gapVsBrand: number
+}
+
+export function sortRankingRows(rows: RankingTableRow[], sortKey: RankingSortKey, direction: SortDirection) {
+  const multiplier = direction === 'asc' ? 1 : -1
+
+  return [...rows].sort((left, right) => {
+    let compare = 0
+
+    switch (sortKey) {
+      case 'rank':
+        compare = left.rank - right.rank
+        break
+      case 'username':
+        compare = left.account.localeCompare(right.account)
+        break
+      case 'followers':
+        compare = left.followers - right.followers
+        break
+      case 'following':
+        compare = left.following - right.following
+        break
+      case 'posts':
+        compare = left.posts - right.posts
+        break
+      case 'avgLikes':
+        compare = left.avgLikes - right.avgLikes
+        break
+      case 'avgComments':
+        compare = left.avgComments - right.avgComments
+        break
+      case 'er':
+        compare = left.engagementRate - right.engagementRate
+        break
+      case 'verified':
+        compare = Number(left.verified) - Number(right.verified)
+        break
+      case 'gap':
+        compare = left.gapVsBrand - right.gapVsBrand
+        break
+    }
+
+    if (compare === 0) {
+      compare = left.rank - right.rank
+    }
+
+    return compare * multiplier
+  })
+}
+
+export function getRankingTableRows(data: DashboardRecord): RankingTableRow[] {
+  const brand = getBrandAccount(data)
+  const brandFollowers = brand ? (metricFor(data, brand).followers ?? 0) : 0
+  const rankMap = new Map(data.rankings.by_followers.map((row) => [row.account, row.rank]))
+
+  return data.accounts.map((account) => {
+    const latest = metricFor(data, account)
+
+    return {
+      rank: rankMap.get(account) ?? 0,
+      account,
+      followers: latest.followers ?? 0,
+      following: latest.following ?? 0,
+      posts: latest.posts ?? 0,
+      avgLikes: latest.avg_likes ?? 0,
+      avgComments: latest.avg_comments ?? 0,
+      engagementRate: latest.engagement_rate ?? 0,
+      verified: Boolean(latest.verified),
+      gapVsBrand: (latest.followers ?? 0) - brandFollowers,
+    }
+  })
+}
+
+function appendLatestToHistory(data: DashboardRecord) {
+  const history = [...data.history].sort((left, right) => new Date(left.date).getTime() - new Date(right.date).getTime())
+  if (!history.length) return history
+
+  const last = history[history.length - 1]
+  if (last.date === data.latestDate) {
+    return history
+  }
+
+  history.push({
+    date: data.latestDate,
+    values: Object.fromEntries(data.accounts.map((account) => [account, metricFor(data, account)])),
+  })
+
+  return history
+}
+
+function formatDelta(value: number) {
+  if (value > 0) return `+${formatInteger.format(value)}`
+  if (value < 0) return formatInteger.format(value)
+  return '--'
+}
+
+export interface DailyMetricsRow {
+  date: string
+  dayLabel: string
+  fullDateLabel: string
+  followers: number
+  following: number
+  posts: number
+  deltaFollowers: number
+  deltaFollowing: number
+  deltaPosts: number
+  isBaseline: boolean
+}
+
+export interface DailySummaryRow {
+  label: string
+  followers: number
+  following: number
+  posts: number
+}
+
+export interface DailyMetricsView {
+  accounts: string[]
+  selectedAccount: string
+  rows: DailyMetricsRow[]
+  mobileRows: DailyMetricsRow[]
+  summaryRows: DailySummaryRow[]
+  disclosureTitle: string
+  disclosureHint: string
+  disclosurePill: string
+}
+
+export function getDailyMetricsView(data: DashboardRecord, selectedAccount?: string, rangeDays = 7): DailyMetricsView {
+  const history = appendLatestToHistory(data)
+  const accounts = data.accounts
+  const account = selectedAccount && accounts.includes(selectedAccount) ? selectedAccount : accounts[0]
+
+  const deltas = accounts.map((item) => {
+    const series = history.filter((row) => row.values[item]?.followers != null)
+    const latest = series[series.length - 1]?.values[item]
+    const previous = series[series.length - 2]?.values[item]
+    return {
+      account: item,
+      change: latest && previous ? (latest.followers ?? 0) - (previous.followers ?? 0) : 0,
+    }
+  }).sort((left, right) => Math.abs(right.change) - Math.abs(left.change))
+
+  const top = deltas[0]
+  const disclosureTitle = !top
+    ? 'Buka untuk melihat riwayat followers, following, dan jumlah post per akun'
+    : top.change > 0
+      ? `Akun paling naik hari ini: @${top.account} (${formatDelta(top.change)})`
+      : top.change < 0
+        ? `Perubahan terbesar hari ini: @${top.account} (${formatDelta(top.change)})`
+        : 'Belum ada perubahan followers menonjol hari ini'
+
+  const accountHistory = history.map((row, index) => {
+    const previous = index > 0 ? history[index - 1]?.values[account] : null
+    const current = row.values[account]
+    const date = new Date(row.date)
+
+    return {
+      date: row.date,
+      dayLabel: date.toLocaleDateString('id-ID', { weekday: 'long' }),
+      fullDateLabel: date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
+      followers: current?.followers ?? 0,
+      following: current?.following ?? 0,
+      posts: current?.posts ?? 0,
+      deltaFollowers: previous ? (current?.followers ?? 0) - (previous.followers ?? 0) : 0,
+      deltaFollowing: previous ? (current?.following ?? 0) - (previous.following ?? 0) : 0,
+      deltaPosts: previous ? (current?.posts ?? 0) - (previous.posts ?? 0) : 0,
+      isBaseline: index === 0,
+    }
+  }).reverse()
+
+  const rows = accountHistory.slice(0, rangeDays)
+
+  function makeSummary(label: string, subset: DailyMetricsRow[]) {
+    const validRows = subset.filter((row) => !row.isBaseline)
+    if (!validRows.length) {
+      return { label, followers: 0, following: 0, posts: 0 }
+    }
+
+    if (label.startsWith('Rata-rata')) {
+      return {
+        label,
+        followers: Math.round(validRows.reduce((sum, row) => sum + row.deltaFollowers, 0) / validRows.length),
+        following: Math.round(validRows.reduce((sum, row) => sum + row.deltaFollowing, 0) / validRows.length),
+        posts: Math.round(validRows.reduce((sum, row) => sum + row.deltaPosts, 0) / validRows.length),
+      }
+    }
+
+    return {
+      label,
+      followers: validRows.reduce((sum, row) => sum + row.deltaFollowers, 0),
+      following: validRows.reduce((sum, row) => sum + row.deltaFollowing, 0),
+      posts: validRows.reduce((sum, row) => sum + row.deltaPosts, 0),
+    }
+  }
+
+  const summaryRows = [
+    makeSummary('Rata-rata harian', accountHistory),
+    makeSummary('Rata-rata 7 hari', accountHistory.slice(0, 7)),
+    makeSummary('Total 14 hari', accountHistory.slice(0, 14)),
+    makeSummary('Total 30 hari', accountHistory.slice(0, 30)),
+  ]
+
+  return {
+    accounts,
+    selectedAccount: account,
+    rows,
+    mobileRows: rows.slice(0, 3),
+    summaryRows,
+    disclosureTitle,
+    disclosureHint: 'Gunakan untuk mengecek detail followers, following, dan jumlah post tiap akun per hari.',
+    disclosurePill: top && top.change !== 0 ? 'Ada pergerakan' : 'Lihat detail',
+  }
+}
+
+export interface ContentHighlightsData {
+  topFormatLabel: string
+  topFormatCount: number
+  topErAccount: string | null
+  topErValue: number
+  bestPostOwner: string | null
+  bestPostLikes: number
+  bestPostType: string | null
+}
+
+export function getContentHighlights(data: DashboardRecord): ContentHighlightsData {
+  const totals = { reels: 0, carousels: 0, images: 0, videos: 0 }
+  let bestOwner: string | null = null
+  let bestLikes = 0
+  let bestType: string | null = null
+  let topErAccount: string | null = null
+  let topErValue = 0
+
+  data.accounts.forEach((account) => {
+    const breakdown = data.content_breakdown?.[account]
+    if (!breakdown) return
+
+    totals.reels += Number(breakdown.reels ?? 0)
+    totals.carousels += Number(breakdown.carousels ?? 0)
+    totals.images += Number(breakdown.images ?? 0)
+    totals.videos += Number(breakdown.videos ?? 0)
+
+    const erValue = metricFor(data, account).engagement_rate ?? 0
+    if (erValue > topErValue) {
+      topErValue = erValue
+      topErAccount = account
+    }
+
+    const likes = Number(breakdown.bestPost?.interactions ?? 0)
+    if (likes > bestLikes) {
+      bestLikes = likes
+      bestOwner = account
+      bestType = breakdown.bestPost?.type ?? null
+    }
+  })
+
+  const [topFormatKey, topFormatCount] = Object.entries(totals).sort((left, right) => right[1] - left[1])[0] ?? ['reels', 0]
+  const topFormatLabelMap = { reels: 'Reels', carousels: 'Carousel', images: 'Image', videos: 'Video' }
+
+  return {
+    topFormatLabel: topFormatLabelMap[topFormatKey as keyof typeof topFormatLabelMap] ?? topFormatKey,
+    topFormatCount,
+    topErAccount,
+    topErValue,
+    bestPostOwner: bestOwner,
+    bestPostLikes: bestLikes,
+    bestPostType: bestType,
+  }
+}
+
+export type PostSnapshotSort = 'viral_posts' | 'average_post_er' | 'average_likes' | 'campaign_terms' | 'username'
+export type PostPerformanceFilter = 'all' | 'viral' | 'normal' | 'underperform'
+
+export interface PostSnapshotCardData {
+  account: string
+  averageLikes: number
+  averageComments: number
+  averagePostEr: number
+  dominantType: string | null
+  campaignTerms: string[]
+  topHashtags: string[]
+  viralPosts: number
+  underperformPosts: number
+  visiblePosts: PostInsightPost[]
+  featuredPost: PostInsightPost | null
+  insightText: string
+}
+
+export interface PostSnapshotView {
+  accounts: string[]
+  selectedAccount: string
+  sortBy: PostSnapshotSort
+  filterBy: PostPerformanceFilter
+  summaryCards: Array<{ label: string; value: string }>
+  cards: PostSnapshotCardData[]
+}
+
+export function getPostSnapshotView(
+  data: DashboardRecord,
+  selectedAccount: string,
+  sortBy: PostSnapshotSort,
+  filterBy: PostPerformanceFilter,
+): PostSnapshotView {
+  const accounts = data.accounts
+  const scopedAccounts = selectedAccount === 'all' ? accounts : accounts.filter((account) => account === selectedAccount)
+
+  const cards = scopedAccounts.map((account) => {
+    const insight = data.post_insights?.[account]
+    const posts = insight?.posts ?? []
+    const visiblePosts = filterBy === 'all' ? posts : posts.filter((post) => post.performance_label === filterBy)
+    const featuredPost = visiblePosts[0] ?? posts[0] ?? null
+    const viralPosts = Number(insight?.viral_posts ?? 0)
+    const underperformPosts = Number(insight?.underperform_posts ?? 0)
+
+    let insightText = `Format ${(insight?.dominant_type ?? 'unknown')} masih jadi kekuatan utama @${account}.`
+    if (viralPosts > underperformPosts) {
+      insightText = `${formatInteger.format(viralPosts)} postingan terakhir @${account} masuk kategori viral atau stabil kuat.`
+    } else if (underperformPosts >= 3) {
+      insightText = `Beberapa postingan @${account} masih perlu optimasi agar performanya lebih konsisten.`
+    }
+
+    return {
+      account,
+      averageLikes: Number(insight?.average_likes ?? 0),
+      averageComments: Number(insight?.average_comments ?? 0),
+      averagePostEr: Number(insight?.average_post_er ?? 0),
+      dominantType: insight?.dominant_type ?? null,
+      campaignTerms: insight?.campaign_terms ?? [],
+      topHashtags: insight?.top_hashtags ?? [],
+      viralPosts,
+      underperformPosts,
+      visiblePosts,
+      featuredPost,
+      insightText,
+    }
+  }).sort((left, right) => {
+    switch (sortBy) {
+      case 'average_post_er':
+        return right.averagePostEr - left.averagePostEr
+      case 'average_likes':
+        return right.averageLikes - left.averageLikes
+      case 'campaign_terms':
+        return right.campaignTerms.length - left.campaignTerms.length
+      case 'username':
+        return left.account.localeCompare(right.account)
+      case 'viral_posts':
+      default:
+        return right.viralPosts - left.viralPosts
+    }
+  })
+
+  const topCampaignCount = new Map<string, number>()
+  cards.forEach((card) => {
+    card.campaignTerms.forEach((term) => {
+      topCampaignCount.set(term, (topCampaignCount.get(term) ?? 0) + 1)
+    })
+  })
+
+  const topCampaign = [...topCampaignCount.entries()].sort((left, right) => right[1] - left[1])[0]?.[0] ?? '-'
+  const topViral = [...cards].sort((left, right) => right.viralPosts - left.viralPosts)[0]
+  const topEr = [...cards].sort((left, right) => right.averagePostEr - left.averagePostEr)[0]
+  const totalPosts = cards.reduce((sum, card) => sum + card.visiblePosts.length, 0)
+  const totalViral = cards.reduce((sum, card) => sum + card.viralPosts, 0)
+  const totalUnderperform = cards.reduce((sum, card) => sum + card.underperformPosts, 0)
+
+  return {
+    accounts,
+    selectedAccount,
+    sortBy,
+    filterBy,
+    summaryCards: [
+      { label: 'Total post teranalisis', value: formatInteger.format(totalPosts) },
+      { label: 'Viral / perlu optimasi', value: `${formatInteger.format(totalViral)} / ${formatInteger.format(totalUnderperform)}` },
+      { label: 'Tema campaign teratas', value: topCampaign },
+      { label: 'Akun paling viral', value: topViral ? `@${topViral.account}` : '-' },
+      { label: 'Akun dengan ER tertinggi', value: topEr ? `@${topEr.account}` : '-' },
+    ],
+    cards,
+  }
+}
