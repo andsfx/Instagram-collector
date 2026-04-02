@@ -88,7 +88,7 @@ export default function App() {
 
   return (
     <main id="main-content" className="app-shell stack-lg">
-      <a className="skip-link" href="#section-freshness">Lewati navigasi dan langsung ke konten</a>
+      <a className="skip-link" href="#section-summary">Lewati navigasi dan langsung ke konten</a>
       <section className="section-bleed section-shell-hero">
         <div className="section-inner section-inner-wide">
           <HeaderBar onRefresh={retry} heroMeta={heroMeta} />

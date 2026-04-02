@@ -81,7 +81,7 @@
 
   .section-nav-content {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 10px;
   }
@@ -112,8 +112,12 @@
   }
 
   .theme-toggle {
-    grid-column: 1 / -1;
-    width: 100%;
+    width: auto;
+    justify-self: end;
+  }
+
+  .section-nav-more-select {
+    max-width: 124px;
   }
 
   .meta-grid,
