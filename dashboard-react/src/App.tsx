@@ -90,56 +90,107 @@ export default function App() {
   return (
     <main id="main-content" className="app-shell stack-lg">
       <a className="skip-link" href="#section-freshness">Lewati navigasi dan langsung ke konten</a>
-      <HeaderBar onRefresh={retry} heroMeta={heroMeta} />
-      <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} />
-      <section id="section-freshness" className="section-anchor"><FreshnessPanel freshness={freshness} /></section>
-      <section id="section-summary" className="section-anchor stack-lg"><ExecutiveSummary summary={executive} /><TodaySummary today={today} /><SummaryStrip items={summaryStrip} /></section>
-      <section id="section-daily" className="section-anchor"><DailyMetrics data={data} /></section>
-      <section id="section-ranking" className="section-anchor"><RankingGrowth data={data} /></section>
-      <section id="section-content" className="section-anchor stack-lg"><ContentBreakdown data={data} /><PostSnapshot data={data} /></section>
-      <section id="section-overview" className="section-anchor"><AccountOverviewGrid accounts={accountSummaries} /></section>
-      <section id="section-h2h" className="section-anchor">
-        <SectionAsyncBoundary
-          resetKey={asyncResetKey}
-          onReset={retryAsyncSection}
-          loadingTitle="Memuat perbandingan akun"
-          loadingDescription="Head-to-head sedang disiapkan."
-          errorTitle="Gagal memuat head-to-head"
-          errorDescription="Chunk section perbandingan akun gagal dimuat."
-        >
-          <Suspense fallback={<SectionLoadingFallback title="Memuat perbandingan akun" description="Head-to-head sedang disiapkan." />}>
-            <HeadToHead data={data} />
-          </Suspense>
-        </SectionAsyncBoundary>
+      <section className="section-bleed section-shell-hero">
+        <div className="section-inner section-inner-wide">
+          <HeaderBar onRefresh={retry} heroMeta={heroMeta} />
+        </div>
       </section>
-      <section id="section-heatmap" className="section-anchor">
-        <SectionAsyncBoundary
-          resetKey={asyncResetKey + 1}
-          onReset={retryAsyncSection}
-          loadingTitle="Memuat heatmap waktu posting"
-          loadingDescription="Agregasi slot waktu sedang dihitung."
-          errorTitle="Gagal memuat heatmap"
-          errorDescription="Chunk heatmap gagal dimuat."
-        >
-          <Suspense fallback={<SectionLoadingFallback title="Memuat heatmap waktu posting" description="Agregasi slot waktu sedang dihitung." />}>
-            <Heatmap data={data} />
-          </Suspense>
-        </SectionAsyncBoundary>
+
+      <section className="section-bleed section-shell-nav">
+        <div className="section-inner section-inner-wide">
+          <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} />
+        </div>
       </section>
-      <section id="section-insights" className="section-anchor"><InsightsPanel insights={insights} /></section>
-      <section id="section-visual" className="section-anchor">
-        <SectionAsyncBoundary
-          resetKey={asyncResetKey + 2}
-          onReset={retryAsyncSection}
-          loadingTitle="Memuat chart suite"
-          loadingDescription="Visual analytics tambahan sedang di-load terpisah."
-          errorTitle="Gagal memuat chart suite"
-          errorDescription="Chunk visual analytics gagal dimuat."
-        >
-          <Suspense fallback={<SectionLoadingFallback title="Memuat chart suite" description="Visual analytics tambahan sedang di-load terpisah." />}>
-            <QuickVisual data={quickVisual} />
-          </Suspense>
-        </SectionAsyncBoundary>
+
+      <section id="section-summary" className="section-anchor section-bleed section-shell-summary">
+        <div className="section-inner section-inner-wide stack-lg">
+          <ExecutiveSummary summary={executive} />
+          <TodaySummary today={today} />
+          <SummaryStrip items={summaryStrip} />
+          <InsightsPanel insights={insights} />
+        </div>
+      </section>
+
+      <section id="section-freshness" className="section-anchor section-bleed">
+        <div className="section-inner">
+          <FreshnessPanel freshness={freshness} />
+        </div>
+      </section>
+
+      <section id="section-daily" className="section-anchor section-bleed">
+        <div className="section-inner">
+          <DailyMetrics data={data} />
+        </div>
+      </section>
+
+      <section id="section-ranking" className="section-anchor section-bleed">
+        <div className="section-inner">
+          <RankingGrowth data={data} />
+        </div>
+      </section>
+
+      <section id="section-content" className="section-anchor section-bleed">
+        <div className="section-inner stack-lg">
+          <ContentBreakdown data={data} />
+          <PostSnapshot data={data} />
+        </div>
+      </section>
+
+      <section id="section-overview" className="section-anchor section-bleed">
+        <div className="section-inner">
+          <AccountOverviewGrid accounts={accountSummaries} />
+        </div>
+      </section>
+
+      <section id="section-h2h" className="section-anchor section-bleed">
+        <div className="section-inner">
+          <SectionAsyncBoundary
+            resetKey={asyncResetKey}
+            onReset={retryAsyncSection}
+            loadingTitle="Memuat perbandingan akun"
+            loadingDescription="Head-to-head sedang disiapkan."
+            errorTitle="Gagal memuat head-to-head"
+            errorDescription="Chunk section perbandingan akun gagal dimuat."
+          >
+            <Suspense fallback={<SectionLoadingFallback title="Memuat perbandingan akun" description="Head-to-head sedang disiapkan." />}>
+              <HeadToHead data={data} />
+            </Suspense>
+          </SectionAsyncBoundary>
+        </div>
+      </section>
+
+      <section id="section-heatmap" className="section-anchor section-bleed">
+        <div className="section-inner">
+          <SectionAsyncBoundary
+            resetKey={asyncResetKey + 1}
+            onReset={retryAsyncSection}
+            loadingTitle="Memuat heatmap waktu posting"
+            loadingDescription="Agregasi slot waktu sedang dihitung."
+            errorTitle="Gagal memuat heatmap"
+            errorDescription="Chunk heatmap gagal dimuat."
+          >
+            <Suspense fallback={<SectionLoadingFallback title="Memuat heatmap waktu posting" description="Agregasi slot waktu sedang dihitung." />}>
+              <Heatmap data={data} />
+            </Suspense>
+          </SectionAsyncBoundary>
+        </div>
+      </section>
+
+      <section id="section-visual" className="section-anchor section-bleed">
+        <div className="section-inner">
+          <SectionAsyncBoundary
+            resetKey={asyncResetKey + 2}
+            onReset={retryAsyncSection}
+            loadingTitle="Memuat chart suite"
+            loadingDescription="Visual analytics tambahan sedang di-load terpisah."
+            errorTitle="Gagal memuat chart suite"
+            errorDescription="Chunk visual analytics gagal dimuat."
+          >
+            <Suspense fallback={<SectionLoadingFallback title="Memuat chart suite" description="Visual analytics tambahan sedang di-load terpisah." />}>
+              <QuickVisual data={quickVisual} />
+            </Suspense>
+          </SectionAsyncBoundary>
+        </div>
       </section>
     </main>
   )

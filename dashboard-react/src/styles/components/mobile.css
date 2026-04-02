@@ -12,8 +12,12 @@
 
 @media (max-width: 720px) {
   .app-shell {
-    width: min(100vw - 20px, 100%);
     padding: 18px 0 56px;
+  }
+
+  .section-inner,
+  .section-inner-wide {
+    width: min(100vw - 20px, 100%);
   }
 
   .hero,
