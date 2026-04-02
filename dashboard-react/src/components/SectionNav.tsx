@@ -50,12 +50,13 @@ export function SectionNav({
             key={item.id}
             href={`#${item.id}`}
             className={`section-nav-link ${activeId === item.id ? 'is-active' : ''}`}
+            aria-current={activeId === item.id ? 'location' : undefined}
           >
             {item.label}
           </a>
         ))}
       </div>
-      <button type="button" className="theme-toggle" onClick={onToggleTheme} aria-label="Toggle dark mode">
+      <button type="button" className="theme-toggle" onClick={onToggleTheme} aria-label="Toggle dark mode" aria-pressed={theme === 'dark'}>
         {theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
       </button>
     </nav>

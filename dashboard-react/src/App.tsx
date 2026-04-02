@@ -84,7 +84,8 @@ export default function App() {
   ]
 
   return (
-    <main className="app-shell stack-lg">
+    <main id="main-content" className="app-shell stack-lg">
+      <a className="skip-link" href="#section-freshness">Lewati navigasi dan langsung ke konten</a>
       <HeaderBar />
       <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} />
       <section id="section-freshness" className="section-anchor"><FreshnessPanel freshness={freshness} /></section>

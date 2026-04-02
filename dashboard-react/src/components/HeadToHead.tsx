@@ -17,6 +17,15 @@ import {
 import type { DashboardRecord } from '../data/types'
 import { SectionCard } from './ui'
 
+const chartAxisColor = 'var(--chart-axis)'
+const chartGridColor = 'var(--chart-grid)'
+const chartTooltipStyle = {
+  backgroundColor: 'var(--chart-tooltip-bg)',
+  border: '1px solid var(--chart-tooltip-border)',
+  borderRadius: '12px',
+  color: 'var(--text)',
+}
+
 export function HeadToHead({ data }: { data: DashboardRecord }) {
   const defaults = useMemo(() => getHeadToHeadDefaults(data), [data])
   const [accountA, setAccountA] = useState(defaults.accountA)
@@ -124,10 +133,10 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
             <div className="chart-wrap chart-min-wide">
               <ResponsiveContainer width="100%" height="100%">
               <LineChart data={view.trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#dbe4f0" />
-                <XAxis dataKey="date" stroke="#6b7c93" fontSize={12} />
-                <YAxis stroke="#6b7c93" fontSize={12} />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+                <XAxis dataKey="date" stroke={chartAxisColor} fontSize={12} />
+                <YAxis stroke={chartAxisColor} fontSize={12} />
+                <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--text)' }} itemStyle={{ color: 'var(--text)' }} />
                 <Line type="monotone" dataKey={view.accountA} stroke="#2152d9" strokeWidth={2.4} dot={false} />
                 <Line type="monotone" dataKey={view.accountB} stroke="#e1306c" strokeWidth={2.4} dot={false} />
               </LineChart>

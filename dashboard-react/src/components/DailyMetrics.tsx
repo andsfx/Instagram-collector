@@ -48,13 +48,13 @@ export function DailyMetrics({ data }: { data: DashboardRecord }) {
               </table>
             </div>
             <div className="daily-mobile-list" aria-hidden="true">
-              {recentHistory.map((row) => {
+              {recentHistory.slice(0, 3).map((row, index) => {
                 const metrics = row.values[account]
 
                 return (
                   <div key={`${account}-${row.date}-mobile`} className="daily-mobile-item">
                     <div className="daily-mobile-date">
-                      {new Date(row.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
+                      {index === 0 ? 'Terbaru' : new Date(row.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
                     </div>
                     <div className="daily-mobile-metrics">
                       <div className="daily-mobile-row"><span>Followers</span><strong>{formatInteger.format(metrics?.followers ?? 0)}</strong></div>
@@ -64,6 +64,7 @@ export function DailyMetrics({ data }: { data: DashboardRecord }) {
                   </div>
                 )
               })}
+              <div className="daily-mobile-summary">Menampilkan 3 observasi terbaru. Gunakan layar lebih lebar untuk histori 7 hari penuh.</div>
             </div>
           </article>
         ))}
