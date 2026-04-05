@@ -576,6 +576,7 @@ function main() {
   });
 
   const latestDate = history.length ? history[history.length - 1].date : null;
+  const latestRow = history.length ? history[history.length - 1] : null;
   const latest = { date: latestDate };
   const growth = {};
   const rankings = { by_followers: [], by_engagement_rate: [], by_avg_likes: [] };
@@ -583,7 +584,7 @@ function main() {
 
   for (const accountCfg of accountsCfg) {
     const username = accountCfg.username;
-    const last = latestDate ? history.find((h) => h.date === latestDate)?.[username] || {} : {};
+    const last = latestRow?.[username] || {};
     latest[username] = {
       followers: last.followers ?? null,
       following: last.following ?? null,
