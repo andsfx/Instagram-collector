@@ -48,7 +48,7 @@ export function RankingGrowth({ data }: { data: DashboardRecord }) {
     <SectionCard
       eyebrow="Ranking & Growth"
       title="Posisi audiens dan momentum pertumbuhan"
-      description="Section ini sekarang menggabungkan ringkasan ranking cepat dengan tabel kompetitor penuh yang bisa diurutkan seperti versi legacy."
+      description="Section ini menggabungkan ringkasan ranking cepat dengan tabel kompetitor penuh yang tetap mudah dibaca saat dipresentasikan."
     >
       <div className="grid gap-5 desktop:grid-cols-[minmax(0,1.18fr)_minmax(320px,0.82fr)]">
         <article className="grid gap-5 rounded-[26px] border border-[color:color-mix(in_srgb,var(--brand)_18%,var(--border))] bg-[radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--brand-soft-2)_52%,transparent),transparent_36%),linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_56%,var(--panel)),var(--panel))] p-6 shadow-panel-md">

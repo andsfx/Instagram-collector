@@ -25,7 +25,7 @@ export function PostSnapshot({ data }: { data: DashboardRecord }) {
   const view = useMemo(() => getPostSnapshotView(data, selectedAccount, sortBy, filterBy), [data, filterBy, selectedAccount, sortBy])
 
   return (
-    <SectionCard eyebrow="Post Snapshot" title="12-post snapshot lintas akun" description="Section ini sekarang mendekati versi legacy dengan filter akun, pengurutan, filter performa post, dan ringkasan campaign.">
+    <SectionCard eyebrow="Post Snapshot" title="12-post snapshot lintas akun" description="Section ini menjaga filter akun, pengurutan, performa post, dan ringkasan campaign dalam susunan yang lebih bersih.">
       <div className="grid gap-[14px] lg:grid-cols-3">
         <label className="grid gap-2">
           <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-text-soft">Akun</span>

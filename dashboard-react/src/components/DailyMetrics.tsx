@@ -22,7 +22,7 @@ export function DailyMetrics({ data }: { data: DashboardRecord }) {
     <SectionCard
       eyebrow="Daily Metrics"
       title="Riwayat detail akun per hari"
-      description="Section ini sekarang mendekati versi legacy dengan selector akun, rentang waktu, delta harian, dan ringkasan rata-rata maupun total."
+      description="Section ini mempertahankan kontrol harian lengkap, tetapi dibingkai ulang agar tetap rapi saat dibaca sebagai materi presentasi."
       actions={<span className="inline-flex items-center rounded-full bg-[linear-gradient(180deg,var(--brand-soft),color-mix(in_srgb,var(--brand-soft-2)_72%,var(--panel)))] px-2.5 py-1.5 text-xs font-bold text-brand">{view.disclosurePill}</span>}
     >
       <div className="flex flex-col gap-4 rounded-panel-md border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_88%,var(--brand-soft)_12%),var(--panel))] p-[18px] lg:flex-row lg:items-start lg:justify-between">

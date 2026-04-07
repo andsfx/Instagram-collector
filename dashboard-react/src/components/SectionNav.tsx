@@ -20,10 +20,10 @@ export function SectionNav({
   const activeSecondaryId = secondaryItems.some((item) => item.id === activeId) ? activeId : ''
   const navLinkClassName = (isActive: boolean) =>
     [
-      'inline-flex min-h-[38px] items-center justify-center whitespace-nowrap rounded-full border px-3 py-[9px] text-[0.82rem] font-bold transition mobile:text-[0.88rem]',
+      'inline-flex min-h-[38px] items-center justify-center whitespace-nowrap rounded-full border px-3 py-[9px] text-[0.82rem] font-semibold transition mobile:text-[0.88rem]',
       isActive
-        ? 'border-[color:color-mix(in_srgb,var(--brand)_24%,var(--border))] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_84%,var(--panel)),color-mix(in_srgb,var(--brand-soft-2)_64%,var(--panel)))] text-brand'
-        : 'border-transparent bg-transparent text-text-muted hover:border-[color:color-mix(in_srgb,var(--brand)_24%,var(--border))] hover:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_84%,var(--panel)),color-mix(in_srgb,var(--brand-soft-2)_64%,var(--panel)))] hover:text-brand',
+        ? 'border-[color:color-mix(in_srgb,var(--brand)_18%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_88%,transparent)] text-brand shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--brand)_8%,transparent)]'
+        : 'border-transparent bg-transparent text-text-muted hover:border-[color:color-mix(in_srgb,var(--brand)_18%,var(--border))] hover:bg-[color:color-mix(in_srgb,var(--panel)_76%,transparent)] hover:text-brand',
     ].join(' ')
 
   useEffect(() => {
@@ -54,10 +54,10 @@ export function SectionNav({
 
   return (
     <nav
-      className="sticky top-3 z-nav bg-[linear-gradient(180deg,color-mix(in_srgb,var(--bg)_52%,transparent),transparent)] px-0 py-2 backdrop-blur-[12px]"
+      className="sticky top-3 z-nav bg-[linear-gradient(180deg,color-mix(in_srgb,var(--bg)_68%,transparent),transparent)] px-0 py-2 backdrop-blur-[12px]"
       aria-label="Section navigation"
     >
-      <div className="grid w-full gap-2 rounded-[24px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_94%,transparent),color-mix(in_srgb,var(--panel)_88%,transparent))] px-3 py-2.5 shadow-[0_14px_30px_rgba(42,42,42,0.08)] mobile:flex mobile:items-center mobile:justify-between mobile:gap-3.5 mobile:rounded-full mobile:px-3.5 mobile:py-2.5">
+      <div className="grid w-full gap-2 rounded-[24px] border border-[color:color-mix(in_srgb,var(--border)_92%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_98%,transparent),color-mix(in_srgb,var(--panel)_92%,transparent))] px-3 py-2.5 shadow-panel-sm mobile:flex mobile:items-center mobile:justify-between mobile:gap-3 mobile:rounded-full mobile:px-3.5 mobile:py-2.5">
         <div className="grid grid-cols-1 items-center gap-2 mobile:hidden">
           <div className="mx-[-4px] flex gap-1.5 overflow-x-auto px-1 pb-0.5">
           {primaryItems.map((item) => (
@@ -103,7 +103,7 @@ export function SectionNav({
         ) : null}
         <button
           type="button"
-          className="hidden min-h-[38px] items-center justify-center justify-self-end rounded-full border border-transparent px-3 py-[9px] text-[0.88rem] font-bold text-text-muted transition hover:border-[color:color-mix(in_srgb,var(--brand)_24%,var(--border))] hover:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_84%,var(--panel)),color-mix(in_srgb,var(--brand-soft-2)_64%,var(--panel)))] hover:text-brand mobile:inline-flex mobile:px-3.5"
+          className="hidden min-h-[38px] items-center justify-center justify-self-end rounded-full border border-[color:color-mix(in_srgb,var(--border)_92%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_82%,transparent)] px-3 py-[9px] text-[0.84rem] font-semibold text-text-muted transition hover:border-[color:color-mix(in_srgb,var(--brand)_18%,var(--border))] hover:text-brand mobile:inline-flex mobile:px-3.5"
           onClick={onToggleTheme}
           aria-label="Toggle dark mode"
           aria-pressed={theme === 'dark'}

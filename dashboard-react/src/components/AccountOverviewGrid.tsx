@@ -7,7 +7,7 @@ export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[]
     <SectionCard
       eyebrow="Overview Akun"
       title="Perbandingan cepat tiap akun"
-      description="Kartu ini mempertahankan metrik inti legacy, tetapi dibersihkan supaya lebih mudah dipindai dan tidak terlalu dekoratif."
+      description="Kartu ini merangkum metrik inti tiap akun dalam format yang lebih tenang, singkat, dan mudah dibandingkan."
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {accounts.map((acc) => (

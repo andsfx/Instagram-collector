@@ -16,7 +16,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
   const view = useMemo(() => getHeadToHeadData(data, accountA, accountB, metric), [accountA, accountB, data, metric])
 
   return (
-    <SectionCard eyebrow="Head-to-Head" title="Bandingkan dua akun pada metrik yang paling penting" description="Migrasi ini mempertahankan pola perbandingan cepat legacy, tetapi dengan struktur kontrol dan visual yang lebih rapi.">
+    <SectionCard eyebrow="Head-to-Head" title="Bandingkan dua akun pada metrik yang paling penting" description="Perbandingan dua akun ini dipertahankan lengkap, dengan struktur kontrol dan visual yang lebih tenang.">
       <div className="grid gap-[14px] lg:grid-cols-3">
         <label className="grid gap-2"><span className="text-xs font-extrabold uppercase tracking-[0.08em] text-text-soft">Akun A</span><select className="min-h-[42px] rounded-xl border border-border bg-panel px-3.5 py-2.5 text-text" value={accountA} onChange={(event) => setAccountA(event.target.value)}>{data.accounts.map((account) => <option key={account} value={account}>@{account}</option>)}</select></label>
         <label className="grid gap-2"><span className="text-xs font-extrabold uppercase tracking-[0.08em] text-text-soft">Akun B</span><select className="min-h-[42px] rounded-xl border border-border bg-panel px-3.5 py-2.5 text-text" value={accountB} onChange={(event) => setAccountB(event.target.value)}>{data.accounts.map((account) => <option key={account} value={account}>@{account}</option>)}</select></label>

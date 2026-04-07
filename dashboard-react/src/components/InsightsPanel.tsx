@@ -13,7 +13,7 @@ export function InsightsPanel({ insights }: { insights: InsightsData }) {
     <SectionCard
       eyebrow="Insights"
       title="Rekomendasi cepat untuk membaca situasi kompetitor"
-      description="Panel ini memindahkan insight interpretatif dari legacy dashboard ke format rekomendasi yang lebih ringkas dan konsisten."
+      description="Panel ini merangkum insight interpretatif ke format rekomendasi yang lebih ringkas dan konsisten."
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {insights.items.map((item) => (

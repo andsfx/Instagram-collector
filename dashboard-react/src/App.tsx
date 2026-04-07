@@ -45,16 +45,16 @@ export default function App() {
   if (loading) {
     return (
       <main className="grid min-h-screen place-items-center p-4 sm:p-6">
-        <section className="grid w-[min(920px,calc(100vw-32px))] gap-5 rounded-panel-lg border border-border bg-[color:color-mix(in_srgb,var(--panel)_92%,transparent)] p-5 shadow-panel-sm backdrop-blur-[16px] sm:p-7">
+        <section className="grid w-[min(960px,calc(100vw-32px))] gap-5 rounded-[32px] border border-border bg-[color:color-mix(in_srgb,var(--panel)_96%,transparent)] p-5 shadow-panel-md backdrop-blur-[18px] sm:p-7">
           <div className="grid gap-3.5">
-            <div className="inline-flex w-fit items-center rounded-full border border-[color:color-mix(in_srgb,var(--brand)_16%,var(--border))] bg-[linear-gradient(180deg,var(--brand-soft),color-mix(in_srgb,var(--brand-soft-2)_75%,var(--panel)))] px-3.5 py-2 text-xs font-extrabold uppercase tracking-[0.08em] text-brand shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
-              Competitor Intelligence Brief
+            <div className="inline-flex w-fit items-center rounded-full border border-[color:color-mix(in_srgb,var(--brand)_14%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_84%,transparent)] px-3.5 py-2 text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-brand">
+              Preparing board view
             </div>
             <div className="grid max-w-copy gap-2.5">
-              <h1 className="m-0 font-display text-[clamp(2rem,1.5rem+1.2vw,2.8rem)] leading-[1.05] tracking-[-0.03em] text-text">Dashboard sedang disiapkan.</h1>
+              <h1 className="m-0 font-display text-[clamp(2rem,1.5rem+1.2vw,2.8rem)] font-semibold leading-[1.05] tracking-[-0.04em] text-text">Dashboard sedang disiapkan.</h1>
               <p className="m-0 text-base text-text-muted">
-                Data runtime sedang divalidasi, dirapikan, dan disusun ke dalam brief analitik
-                supaya tampilan pertama tetap terasa stabil.
+                Data runtime sedang divalidasi dan disusun ke format presentasi yang lebih bersih
+                agar tampilan pertama tetap stabil saat dibuka.
               </p>
             </div>
           </div>
@@ -63,14 +63,14 @@ export default function App() {
             description="Data sedang divalidasi dan diadaptasi dari endpoint runtime dashboard."
           />
           <div
-            className="grid gap-3.5 rounded-panel-md border border-[color:color-mix(in_srgb,var(--brand)_12%,var(--border))] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_92%,var(--brand-soft)_8%),var(--panel))] p-3.5 sm:p-5"
+            className="grid gap-3.5 rounded-[24px] border border-[color:color-mix(in_srgb,var(--brand)_12%,var(--border))] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_98%,transparent),color-mix(in_srgb,var(--panel-muted)_92%,transparent))] p-3.5 sm:p-5"
             aria-hidden="true"
           >
-            <div className="min-h-28 animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_65%,var(--panel)),var(--panel-muted))] sm:min-h-[140px]" />
+            <div className="min-h-28 animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_35%,var(--panel)),var(--panel-muted))] sm:min-h-[140px]" />
             <div className="grid gap-3.5 sm:grid-cols-[1.4fr_1fr_1fr]">
-              <div className="min-h-[92px] animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_65%,var(--panel)),var(--panel-muted))] sm:min-h-[172px]" />
-              <div className="min-h-[92px] animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_65%,var(--panel)),var(--panel-muted))] sm:min-h-[118px]" />
-              <div className="min-h-[92px] animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_65%,var(--panel)),var(--panel-muted))] sm:min-h-[118px]" />
+              <div className="min-h-[92px] animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_35%,var(--panel)),var(--panel-muted))] sm:min-h-[172px]" />
+              <div className="min-h-[92px] animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_35%,var(--panel)),var(--panel-muted))] sm:min-h-[118px]" />
+              <div className="min-h-[92px] animate-pulse rounded-[18px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(90deg,var(--panel-muted),color-mix(in_srgb,var(--brand-soft)_35%,var(--panel)),var(--panel-muted))] sm:min-h-[118px]" />
             </div>
           </div>
         </section>
@@ -81,13 +81,13 @@ export default function App() {
   if (error || !data) {
     return (
       <main className="grid min-h-screen place-items-center p-4 sm:p-6">
-        <section className="grid w-[min(920px,calc(100vw-32px))] gap-5 rounded-panel-lg border border-[rgba(196,56,78,0.2)] bg-[rgba(255,245,246,0.95)] p-5 shadow-panel-sm backdrop-blur-[16px] sm:p-7">
+        <section className="grid w-[min(960px,calc(100vw-32px))] gap-5 rounded-[32px] border border-[color:color-mix(in_srgb,var(--danger)_26%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_94%,white)] p-5 shadow-panel-md backdrop-blur-[18px] sm:p-7">
           <div className="grid gap-3.5">
-            <div className="inline-flex w-fit items-center rounded-full border border-[color:color-mix(in_srgb,var(--brand)_16%,var(--border))] bg-[linear-gradient(180deg,var(--brand-soft),color-mix(in_srgb,var(--brand-soft-2)_75%,var(--panel)))] px-3.5 py-2 text-xs font-extrabold uppercase tracking-[0.08em] text-brand shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+            <div className="inline-flex w-fit items-center rounded-full border border-[color:color-mix(in_srgb,var(--danger)_22%,var(--border))] bg-[color:color-mix(in_srgb,var(--danger)_8%,var(--panel))] px-3.5 py-2 text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-danger">
               Runtime Data Unavailable
             </div>
             <div className="grid max-w-copy gap-2.5">
-              <h1 className="m-0 font-display text-[clamp(2rem,1.5rem+1.2vw,2.8rem)] leading-[1.05] tracking-[-0.03em] text-text">Dashboard belum bisa ditampilkan.</h1>
+              <h1 className="m-0 font-display text-[clamp(2rem,1.5rem+1.2vw,2.8rem)] font-semibold leading-[1.05] tracking-[-0.04em] text-text">Dashboard belum bisa ditampilkan.</h1>
               <p className="m-0 text-base text-text-muted">
                 Endpoint runtime belum mengembalikan payload yang valid, jadi shell utama
                 ditahan dulu agar pengguna tidak masuk ke tampilan yang terputus.
@@ -109,28 +109,47 @@ export default function App() {
     )
   }
 
-  const freshness = getFreshnessSummary(data)
-  const executive = getExecutiveSummary(data)
-  const today = getTodaySummary(data)
-  const quickVisual = getQuickVisualData(data)
-  const accountSummaries = getAccountSummaries(data)
-  const insights = getInsightsData(data)
-  const summaryStrip = getSummaryStrip(data)
-  const heroMeta = getHeroMeta(data)
+  const heroData = {
+    heroMeta: getHeroMeta(data),
+    highlights: getSummaryStrip(data),
+  }
+
+  const growthSectionData = {
+    quickVisual: getQuickVisualData(data),
+    data,
+  }
+
+  const summarySectionData = {
+    executive: getExecutiveSummary(data),
+    today: getTodaySummary(data),
+    insights: getInsightsData(data),
+    summaryStrip: heroData.highlights,
+  }
+
+  const comparisonSectionData = {
+    accountSummaries: getAccountSummaries(data),
+    data,
+  }
+
+  const patternSectionData = {
+    data,
+  }
+
+  const appendixSectionData = {
+    freshness: getFreshnessSummary(data),
+  }
+
   const sections: SectionNavItem[] = [
-    { id: 'section-freshness', label: 'Status' },
+    { id: 'section-growth', label: 'Growth' },
     { id: 'section-summary', label: 'Summary' },
-    { id: 'section-daily', label: 'Daily' },
-    { id: 'section-ranking', label: 'Ranking' },
     { id: 'section-content', label: 'Content' },
-    { id: 'section-overview', label: 'Overview' },
-    { id: 'section-h2h', label: 'Head-to-Head' },
-    { id: 'section-heatmap', label: 'Heatmap' },
-    { id: 'section-visual', label: 'Visual' },
+    { id: 'section-comparison', label: 'Comparison' },
+    { id: 'section-pattern', label: 'Pattern' },
+    { id: 'section-appendix', label: 'Appendix' },
   ]
 
   return (
-    <main id="main-content" className="grid w-full gap-7 px-0 pb-[72px] pt-8 max-[720px]:gap-5 max-[720px]:pb-14 max-[720px]:pt-[18px]">
+    <main id="main-content" className="grid w-full gap-8 px-0 pb-[72px] pt-6 max-[720px]:gap-5 max-[720px]:pb-14 max-[720px]:pt-[18px]">
       <a
         className="absolute left-4 top-4 z-skip -translate-y-[160%] rounded-full bg-brand-strong px-3.5 py-2.5 font-bold text-white no-underline transition focus-visible:translate-y-0"
         href="#section-summary"
@@ -139,95 +158,21 @@ export default function App() {
       </a>
       <section className="w-full">
         <div className="mx-auto w-full max-w-shell px-3 max-[720px]:px-2.5">
-          <HeaderBar onRefresh={retry} heroMeta={heroMeta} highlights={summaryStrip.slice(0, 3)} />
+          <HeaderBar onRefresh={retry} heroMeta={heroData.heroMeta} highlights={heroData.highlights.slice(0, 3)} />
         </div>
       </section>
 
-      <section className="w-full pt-1">
+      <section className="w-full pt-1.5">
         <div className="mx-auto w-full max-w-shell px-3 max-[720px]:px-2.5">
           <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} />
         </div>
       </section>
 
       <section
-        id="section-summary"
-        className="w-full scroll-mt-[92px] pt-2"
+        id="section-growth"
+        className="w-full scroll-mt-[92px] pt-3"
       >
-        <div className="mx-auto grid w-full max-w-shell gap-7 rounded-[32px] border border-[color:color-mix(in_srgb,var(--brand)_10%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_30%,transparent),transparent_34%)] px-3 py-5 max-[720px]:gap-5 max-[720px]:rounded-[24px] max-[720px]:px-2.5 max-[720px]:py-4">
-          <ExecutiveSummary summary={executive} />
-          <TodaySummary today={today} />
-          <SummaryStrip items={summaryStrip} />
-          <InsightsPanel insights={insights} />
-        </div>
-      </section>
-
-      <section id="section-freshness" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto w-full max-w-[1320px] px-5 max-[720px]:px-2.5">
-          <FreshnessPanel freshness={freshness} />
-        </div>
-      </section>
-
-      <section id="section-daily" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto w-full max-w-[1320px] px-5 max-[720px]:px-2.5">
-          <DailyMetrics data={data} />
-        </div>
-      </section>
-
-      <section id="section-ranking" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto w-full max-w-[1320px] px-5 max-[720px]:px-2.5">
-          <RankingGrowth data={data} />
-        </div>
-      </section>
-
-      <section id="section-content" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto grid w-full max-w-[1320px] gap-7 px-5 max-[720px]:gap-5 max-[720px]:px-2.5">
-          <ContentBreakdown data={data} />
-          <PostSnapshot data={data} />
-        </div>
-      </section>
-
-      <section id="section-overview" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto w-full max-w-[1320px] px-5 max-[720px]:px-2.5">
-          <AccountOverviewGrid accounts={accountSummaries} />
-        </div>
-      </section>
-
-      <section id="section-h2h" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto w-full max-w-[1320px] px-5 max-[720px]:px-2.5">
-          <SectionAsyncBoundary
-            resetKey={asyncResetKey}
-            onReset={retryAsyncSection}
-            loadingTitle="Memuat perbandingan akun"
-            loadingDescription="Head-to-head sedang disiapkan."
-            errorTitle="Gagal memuat head-to-head"
-            errorDescription="Chunk section perbandingan akun gagal dimuat."
-          >
-            <Suspense fallback={<SectionLoadingFallback title="Memuat perbandingan akun" description="Head-to-head sedang disiapkan." />}>
-              <HeadToHead data={data} />
-            </Suspense>
-          </SectionAsyncBoundary>
-        </div>
-      </section>
-
-      <section id="section-heatmap" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto w-full max-w-[1320px] px-5 max-[720px]:px-2.5">
-          <SectionAsyncBoundary
-            resetKey={asyncResetKey + 1}
-            onReset={retryAsyncSection}
-            loadingTitle="Memuat heatmap waktu posting"
-            loadingDescription="Agregasi slot waktu sedang dihitung."
-            errorTitle="Gagal memuat heatmap"
-            errorDescription="Chunk heatmap gagal dimuat."
-          >
-            <Suspense fallback={<SectionLoadingFallback title="Memuat heatmap waktu posting" description="Agregasi slot waktu sedang dihitung." />}>
-              <Heatmap data={data} />
-            </Suspense>
-          </SectionAsyncBoundary>
-        </div>
-      </section>
-
-      <section id="section-visual" className="w-full scroll-mt-[92px]">
-        <div className="mx-auto w-full max-w-[1320px] px-5 max-[720px]:px-2.5">
+        <div className="mx-auto grid w-full max-w-shell gap-7 rounded-[34px] border border-[color:color-mix(in_srgb,var(--brand)_10%,var(--border))] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_56%,transparent),color-mix(in_srgb,var(--brand-soft)_12%,transparent)_48%,transparent)] px-3 py-5 shadow-panel-sm max-[720px]:gap-5 max-[720px]:rounded-[26px] max-[720px]:px-2.5 max-[720px]:py-3.5">
           <SectionAsyncBoundary
             resetKey={asyncResetKey + 2}
             onReset={retryAsyncSection}
@@ -237,9 +182,68 @@ export default function App() {
             errorDescription="Chunk visual analytics gagal dimuat."
           >
             <Suspense fallback={<SectionLoadingFallback title="Memuat chart suite" description="Visual analytics tambahan sedang di-load terpisah." />}>
-              <QuickVisual data={quickVisual} />
+              <QuickVisual data={growthSectionData.quickVisual} />
             </Suspense>
           </SectionAsyncBoundary>
+        </div>
+      </section>
+
+      <section id="section-summary" className="w-full scroll-mt-[92px] pt-2">
+        <div className="mx-auto grid w-full max-w-shell gap-7 rounded-[30px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_24%,transparent),transparent_32%)] px-3 py-4 max-[720px]:gap-5 max-[720px]:rounded-[24px] max-[720px]:px-2.5 max-[720px]:py-3">
+          <ExecutiveSummary summary={summarySectionData.executive} />
+          <TodaySummary today={summarySectionData.today} />
+          <SummaryStrip items={summarySectionData.summaryStrip} />
+          <InsightsPanel insights={summarySectionData.insights} />
+        </div>
+      </section>
+
+      <section id="section-content" className="w-full scroll-mt-[92px] pt-2">
+        <div className="mx-auto grid w-full max-w-shell gap-7 rounded-[32px] border border-[color:color-mix(in_srgb,var(--border)_82%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_52%,transparent),transparent_55%)] px-5 py-5 max-[720px]:gap-5 max-[720px]:rounded-[24px] max-[720px]:px-2.5 max-[720px]:py-3.5">
+          <ContentBreakdown data={data} />
+          <PostSnapshot data={data} />
+        </div>
+      </section>
+
+      <section id="section-comparison" className="w-full scroll-mt-[92px] pt-1">
+        <div className="mx-auto grid w-full max-w-[1320px] gap-7 px-5 max-[720px]:gap-5 max-[720px]:px-2.5">
+          <RankingGrowth data={growthSectionData.data} />
+          <AccountOverviewGrid accounts={comparisonSectionData.accountSummaries} />
+          <SectionAsyncBoundary
+            resetKey={asyncResetKey}
+            onReset={retryAsyncSection}
+            loadingTitle="Memuat perbandingan akun"
+            loadingDescription="Head-to-head sedang disiapkan."
+            errorTitle="Gagal memuat head-to-head"
+            errorDescription="Chunk section perbandingan akun gagal dimuat."
+          >
+            <Suspense fallback={<SectionLoadingFallback title="Memuat perbandingan akun" description="Head-to-head sedang disiapkan." />}>
+              <HeadToHead data={comparisonSectionData.data} />
+            </Suspense>
+          </SectionAsyncBoundary>
+        </div>
+      </section>
+
+      <section id="section-pattern" className="w-full scroll-mt-[92px] pt-2">
+        <div className="mx-auto grid w-full max-w-shell gap-7 rounded-[30px] border border-[color:color-mix(in_srgb,var(--border)_78%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_44%,transparent),transparent_58%)] px-5 py-5 max-[720px]:gap-5 max-[720px]:rounded-[24px] max-[720px]:px-2.5 max-[720px]:py-3.5">
+          <DailyMetrics data={patternSectionData.data} />
+          <SectionAsyncBoundary
+            resetKey={asyncResetKey + 1}
+            onReset={retryAsyncSection}
+            loadingTitle="Memuat heatmap waktu posting"
+            loadingDescription="Agregasi slot waktu sedang dihitung."
+            errorTitle="Gagal memuat heatmap"
+            errorDescription="Chunk heatmap gagal dimuat."
+          >
+            <Suspense fallback={<SectionLoadingFallback title="Memuat heatmap waktu posting" description="Agregasi slot waktu sedang dihitung." />}>
+              <Heatmap data={patternSectionData.data} />
+            </Suspense>
+          </SectionAsyncBoundary>
+        </div>
+      </section>
+
+      <section id="section-appendix" className="w-full scroll-mt-[92px] pt-1">
+        <div className="mx-auto w-full max-w-[1240px] px-5 max-[720px]:px-2.5">
+          <FreshnessPanel freshness={appendixSectionData.freshness} />
         </div>
       </section>
     </main>

@@ -24,16 +24,18 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    radial-gradient(circle at top left, rgba(232, 104, 58, 0.10), transparent 28%),
-    radial-gradient(circle at top right, rgba(244, 200, 167, 0.24), transparent 24%),
+    radial-gradient(circle at top left, rgba(91, 124, 250, 0.1), transparent 30%),
+    radial-gradient(circle at top right, rgba(217, 77, 139, 0.12), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), transparent 32%),
     var(--bg);
   color: var(--text);
 }
 
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(circle at top left, rgba(242, 139, 86, 0.13), transparent 28%),
-    radial-gradient(circle at top right, rgba(139, 61, 32, 0.22), transparent 24%),
+    radial-gradient(circle at top left, rgba(91, 124, 250, 0.18), transparent 30%),
+    radial-gradient(circle at top right, rgba(255, 95, 149, 0.16), transparent 24%),
+    linear-gradient(180deg, rgba(10, 16, 28, 0.8), transparent 32%),
     var(--bg);
 }
 
