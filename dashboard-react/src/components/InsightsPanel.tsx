@@ -5,8 +5,8 @@ export function InsightsPanel({ insights }: { insights: InsightsData }) {
   return (
     <SectionCard
       eyebrow="Insights"
-      title="Rekomendasi cepat untuk membaca situasi kompetitor"
-      description="Chapter ini berfungsi sebagai jembatan dari angka ke keputusan, jadi treatment-nya lebih ringan dan lebih tenang daripada panel KPI."
+      title="Catatan keputusan"
+      description="Poin singkat untuk membantu pembacaan dan tindak lanjut."
     >
       <div className="grid gap-4 md:grid-cols-3">
         {insights.items.map((item) => (

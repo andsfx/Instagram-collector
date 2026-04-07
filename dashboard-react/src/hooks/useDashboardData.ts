@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { adaptDashboardData } from '../data/adapter'
 import { dashboardSchema } from '../data/schema'
 import type { DashboardRecord } from '../data/types'
@@ -9,49 +9,110 @@ interface DashboardState {
   data: DashboardRecord | null
   loading: boolean
   error: string | null
+}
+
+interface UseDashboardDataResult extends DashboardState {
   retry: () => void
 }
 
-export function useDashboardData(): DashboardState {
-  const [state, setState] = useState<DashboardState>({
-    data: null,
-    loading: true,
-    error: null,
-    retry: () => {},
+let dashboardCache: DashboardRecord | null = null
+let inflightRequest: Promise<DashboardRecord> | null = null
+let inflightController: AbortController | null = null
+let inflightSubscribers = 0
+
+async function requestDashboardData(forceRefresh = false): Promise<DashboardRecord> {
+  if (forceRefresh) {
+    dashboardCache = null
+  }
+
+  if (!forceRefresh && dashboardCache) {
+    return dashboardCache
+  }
+
+  if (inflightRequest) {
+    return inflightRequest
+  }
+
+  inflightController = new AbortController()
+
+  inflightRequest = fetch(DASHBOARD_DATA_ENDPOINT, {
+    headers: {
+      Accept: 'application/json',
+    },
+    signal: inflightController.signal,
   })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Gagal mengambil data runtime (${response.status})`)
+      }
+
+      const payload = await response.json()
+      const parsed = dashboardSchema.parse(payload)
+      const adapted = adaptDashboardData(parsed)
+      dashboardCache = adapted
+      return adapted
+    })
+    .finally(() => {
+      inflightRequest = null
+      inflightController = null
+    })
+
+  return inflightRequest
+}
+
+function retainInflightRequest() {
+  inflightSubscribers += 1
+}
+
+function releaseInflightRequest() {
+  inflightSubscribers = Math.max(0, inflightSubscribers - 1)
+
+  if (inflightSubscribers === 0 && inflightController) {
+    inflightController.abort()
+    inflightController = null
+    inflightRequest = null
+  }
+}
+
+export function useDashboardData(): UseDashboardDataResult {
+  const [state, setState] = useState<DashboardState>(() => ({
+    data: dashboardCache,
+    loading: dashboardCache === null,
+    error: null,
+  }))
   const [reloadToken, setReloadToken] = useState(0)
+  const retry = useCallback(() => {
+    dashboardCache = null
+    setReloadToken((current) => current + 1)
+  }, [])
 
   useEffect(() => {
     let active = true
-
-    const retry = () => {
-      setReloadToken((current) => current + 1)
-    }
+    const forceRefresh = reloadToken > 0
+    retainInflightRequest()
 
     async function load() {
+      if (!forceRefresh && dashboardCache) {
+        if (active) {
+          setState({
+            data: dashboardCache,
+            loading: false,
+            error: null,
+          })
+        }
+        return
+      }
+
       if (active) {
         setState((current) => ({
-          ...current,
+          data: current.data,
           loading: true,
           error: null,
-          retry,
         }))
       }
 
       try {
-        const response = await fetch(DASHBOARD_DATA_ENDPOINT, {
-          headers: {
-            Accept: 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error(`Gagal mengambil data runtime (${response.status})`)
-        }
-
-        const payload = await response.json()
-        const parsed = dashboardSchema.parse(payload)
-        const adapted = adaptDashboardData(parsed)
+        const adapted = await requestDashboardData(forceRefresh)
 
         if (!active) return
 
@@ -59,16 +120,15 @@ export function useDashboardData(): DashboardState {
           data: adapted,
           loading: false,
           error: null,
-          retry,
         })
       } catch (error) {
         if (!active) return
+        if (error instanceof DOMException && error.name === 'AbortError') return
 
         setState({
-          data: null,
+          data: dashboardCache,
           loading: false,
           error: error instanceof Error ? error.message : 'Gagal memuat data dashboard',
-          retry,
         })
       }
     }
@@ -77,8 +137,12 @@ export function useDashboardData(): DashboardState {
 
     return () => {
       active = false
+      releaseInflightRequest()
     }
   }, [reloadToken])
 
-  return state
+  return {
+    ...state,
+    retry,
+  }
 }

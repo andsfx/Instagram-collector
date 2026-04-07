@@ -6,34 +6,34 @@ export function FreshnessPanel({ freshness }: { freshness: FreshnessSummary }) {
     <SectionCard
       eyebrow="Status Data"
       title="Konteks update dan sumber data"
-      description="Panel ini menggantikan status freshness utama dari dashboard legacy dalam format yang lebih padat."
+      description="Appendix ini diringankan menjadi catatan sumber dan freshness, jadi berfungsi seperti technical footer alih-alih panel dashboard terpisah."
     >
-      <div className="meta-grid">
-        <div className="stat-card section-card-premium">
-          <div className="stat-label">Latest Date</div>
-          <div className="stat-value">{freshness.latestDateLabel}</div>
-          <div className="stat-detail">Tanggal observasi terbaru di dataset dashboard.</div>
+      <div className="grid gap-4 border-t border-slate-200/80 pt-5 dark:border-white/10 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-1.5">
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Latest Date</div>
+          <div className="font-display text-[clamp(1.2rem,1.04rem+0.4vw,1.5rem)] font-semibold tracking-[-0.03em] text-slate-950 dark:text-white">{freshness.latestDateLabel}</div>
+          <div className="text-[0.9rem] leading-6 text-slate-600 dark:text-slate-300">Tanggal observasi terbaru di dataset dashboard.</div>
         </div>
-        <div className="stat-card section-card-premium">
-          <div className="stat-label">Generated</div>
-          <div className="stat-value">{freshness.generatedAtLabel}</div>
-          <div className="stat-detail">Waktu pembuatan file dashboard yang sedang dibaca aplikasi React.</div>
+        <div className="grid gap-1.5">
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Generated</div>
+          <div className="font-display text-[clamp(1.2rem,1.04rem+0.4vw,1.5rem)] font-semibold tracking-[-0.03em] text-slate-950 dark:text-white">{freshness.generatedAtLabel}</div>
+          <div className="text-[0.9rem] leading-6 text-slate-600 dark:text-slate-300">Waktu pembuatan file dashboard yang sedang dibaca aplikasi React.</div>
         </div>
-        <div className="stat-card section-card-premium">
-          <div className="stat-label">Akun Dipantau</div>
-          <div className="stat-value">{freshness.accountCount}</div>
-          <div className="stat-detail">Total akun yang ikut masuk ke perbandingan dan ranking.</div>
+        <div className="grid gap-1.5">
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Akun Dipantau</div>
+          <div className="font-display text-[clamp(1.2rem,1.04rem+0.4vw,1.5rem)] font-semibold tracking-[-0.03em] text-slate-950 dark:text-white">{freshness.accountCount}</div>
+          <div className="text-[0.9rem] leading-6 text-slate-600 dark:text-slate-300">Total akun yang ikut masuk ke perbandingan dan ranking.</div>
         </div>
-        <div className="stat-card section-card-premium">
-          <div className="stat-label">Histori</div>
-          <div className="stat-value">{freshness.historyDays} hari</div>
-          <div className="stat-detail">Rentang histori yang tersedia untuk membaca tren utama.</div>
+        <div className="grid gap-1.5">
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Histori</div>
+          <div className="font-display text-[clamp(1.2rem,1.04rem+0.4vw,1.5rem)] font-semibold tracking-[-0.03em] text-slate-950 dark:text-white">{freshness.historyDays} hari</div>
+          <div className="text-[0.9rem] leading-6 text-slate-600 dark:text-slate-300">Rentang histori yang tersedia untuk membaca tren utama.</div>
         </div>
       </div>
-      <div className="badge-row">
-        <span className="badge badge-brand">Sumber: {freshness.sourceLabel}</span>
-        <span className="badge badge-success">Payload tervalidasi zod</span>
-        <span className="badge badge-warning">Data saat ini dibundle ketika build</span>
+      <div className="flex flex-wrap gap-2 border-t border-slate-200/80 pt-5 dark:border-white/10">
+        <span className="inline-flex items-center rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold text-brand">Sumber: {freshness.sourceLabel}</span>
+        <span className="inline-flex items-center rounded-full bg-success-soft px-3 py-1 text-xs font-semibold text-success">Payload tervalidasi zod</span>
+        <span className="inline-flex items-center rounded-full bg-warning-soft px-3 py-1 text-xs font-semibold text-warning">Data saat ini dibundle ketika build</span>
       </div>
     </SectionCard>
   )

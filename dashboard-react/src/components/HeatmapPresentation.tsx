@@ -11,7 +11,7 @@ export function HeatmapPresentation({ data }: { data: DashboardRecord }) {
     <SectionCard
       eyebrow="Heatmap"
       title="Distribusi waktu posting per akun"
-      description="Heatmap ini dipadatkan untuk chapter pattern, jadi legenda, selector, dan grid lebih ringan tanpa mengurangi keterbacaan slot terbaik."
+      description="Heatmap diperlakukan sebagai lembar referensi waktu, jadi legenda, selector, dan grid dibawa ke format appendix yang lebih sunyi."
       actions={
         <label className="grid gap-1.5">
           <span className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Akun</span>
@@ -21,7 +21,7 @@ export function HeatmapPresentation({ data }: { data: DashboardRecord }) {
         </label>
       }
     >
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 border-t border-slate-200/80 pt-5 dark:border-white/10">
         <span className="inline-flex items-center rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold text-brand">Total post dianalisis: {heatmap.totalPosts}</span>
         <span className="inline-flex items-center rounded-full bg-success-soft px-3 py-1 text-xs font-semibold text-success">Jendela terbaik: {heatmap.bestWindow}</span>
       </div>
@@ -36,7 +36,7 @@ export function HeatmapPresentation({ data }: { data: DashboardRecord }) {
         <span>Tinggi</span>
       </div>
 
-      <div className="overflow-x-auto rounded-[1.4rem] border border-slate-200/80 bg-white/78 p-3 dark:border-white/10 dark:bg-slate-950/50">
+      <div className="overflow-x-auto border-t border-slate-200/80 pt-5 dark:border-white/10">
         <div className="grid min-w-[520px] grid-cols-[90px_repeat(4,minmax(88px,1fr))] gap-2" role="table" aria-label={`Heatmap waktu posting untuk @${account}`}>
           <div className="rounded-[0.9rem] border border-transparent" />
           {heatmap.matrix[0]?.map((cell) => (

@@ -38,7 +38,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
     <SectionCard
       eyebrow="Head-to-Head"
       title="Bandingkan dua akun pada metrik yang paling penting"
-      description="Section ini merangkum verdict cepat, perbandingan metrik utama, dan trend dua akun dalam susunan yang lebih mudah dipresentasikan."
+      description="Bagian ini dipadatkan menjadi briefing comparison: pilih dua akun, baca verdict, lalu lihat trend tanpa harus menyeberang ke banyak panel."
     >
       <div className="grid gap-3 md:grid-cols-3">
         <label className="grid gap-1.5">
@@ -98,31 +98,18 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         ))}
       </div>
 
-      <div className="grid gap-5 desktop:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-        <article className="grid gap-4 rounded-[26px] border border-[color:color-mix(in_srgb,var(--brand)_16%,var(--border))] bg-[radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--brand-soft-2)_44%,transparent),transparent_36%),linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_42%,var(--panel)),var(--panel))] p-5 shadow-panel-md">
-          <div className="flex items-start justify-between gap-3">
-            <div className="grid gap-1.5">
-              <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-brand">Quick Verdict</div>
-              <div className="font-display text-[clamp(1.24rem,1.05rem+0.45vw,1.7rem)] font-semibold leading-[1.04] text-text">
-                @{view.accountA} vs @{view.accountB}
-              </div>
+      <div className="grid gap-6 border-t border-slate-200/80 pt-6 dark:border-white/10 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-brand">Quick Verdict</div>
+            <div className="font-display text-[clamp(1.3rem,1.1rem+0.5vw,1.8rem)] font-semibold leading-[1.04] text-text">
+              @{view.accountA} vs @{view.accountB}
             </div>
-            <div className="flex flex-wrap justify-end gap-2">
-              <span className="inline-flex items-center rounded-full bg-[color:color-mix(in_srgb,var(--brand-soft)_86%,var(--panel))] px-2.5 py-1 text-[0.76rem] font-bold text-brand">
-                @{view.accountA}: {view.winsA}
-              </span>
-              <span className="inline-flex items-center rounded-full bg-warning-soft px-2.5 py-1 text-[0.76rem] font-bold text-warning">
-                @{view.accountB}: {view.winsB}
-              </span>
-            </div>
+            <p className="m-0 text-[0.95rem] leading-[1.65] text-text">{view.verdict}</p>
+            <p className="m-0 text-[0.92rem] leading-[1.6] text-text-muted">{view.subverdict}</p>
           </div>
 
-          <p className="m-0 font-display text-[clamp(1.08rem,0.96rem+0.28vw,1.3rem)] font-semibold leading-[1.2] text-text">
-            {view.verdict}
-          </p>
-          <p className="m-0 text-[0.92rem] leading-[1.6] text-text-muted">{view.subverdict}</p>
-
-          <div className="grid gap-2 rounded-[20px] border border-[color:color-mix(in_srgb,var(--border)_82%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_74%,transparent)] p-4">
+          <div className="grid gap-2 border-t border-slate-200/70 pt-4 dark:border-white/10">
             <div className="flex items-center justify-between text-[0.82rem] text-text-soft">
               <span>Distribusi kemenangan per metrik</span>
               <span>Gap followers: {view.gapFollowers.toLocaleString('id-ID')}</span>
@@ -133,28 +120,36 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
                 <div className="bg-warning" style={{ width: `${Math.max((view.winsB / Math.max(view.winsA + view.winsB, 1)) * 100, view.winsB ? 18 : 0)}%` }} />
               </div>
             </div>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <span className="inline-flex items-center rounded-full bg-[color:color-mix(in_srgb,var(--brand-soft)_86%,var(--panel))] px-2.5 py-1 text-[0.76rem] font-bold text-brand">
+                @{view.accountA}: {view.winsA}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-warning-soft px-2.5 py-1 text-[0.76rem] font-bold text-warning">
+                @{view.accountB}: {view.winsB}
+              </span>
+            </div>
           </div>
-        </article>
+        </div>
 
-        <article className="grid gap-3 rounded-[26px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_92%,transparent),color-mix(in_srgb,var(--panel-muted)_72%,transparent))] p-5 shadow-panel-sm">
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] gap-3 rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_82%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_76%,transparent)] px-4 py-3 text-[0.76rem] font-extrabold uppercase tracking-[0.08em] text-text-soft">
+        <div className="grid gap-2 border-t border-slate-200/70 pt-4 dark:border-white/10 xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0">
+          <div className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] gap-3 text-[0.76rem] font-extrabold uppercase tracking-[0.08em] text-text-soft">
             <span>@{view.accountA}</span>
             <span className="text-center">Metrik</span>
             <span className="text-right">@{view.accountB}</span>
           </div>
           <div className="grid gap-2">
             {view.comparisonRows.map((row) => (
-              <div key={row.label} className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] items-center gap-3 rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_84%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_82%,transparent)] px-4 py-3">
+              <div key={row.label} className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] items-center gap-3 border-b border-slate-200/70 py-3 last:border-b-0 dark:border-white/10">
                 <div className={`text-sm font-semibold ${row.rawA > row.rawB ? 'text-brand' : 'text-text'}`}>{row.valueA}</div>
                 <div className="text-center text-[0.82rem] font-semibold uppercase tracking-[0.06em] text-text-soft">{row.label}</div>
                 <div className={`text-right text-sm font-semibold ${row.rawB > row.rawA ? 'text-success' : 'text-text'}`}>{row.valueB}</div>
               </div>
             ))}
           </div>
-        </article>
+        </div>
       </div>
 
-      <article className="grid gap-4 rounded-[28px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_94%,transparent),color-mix(in_srgb,var(--panel-muted)_74%,transparent))] p-5 shadow-panel-sm">
+      <article className="grid gap-4 border-t border-slate-200/80 pt-6 dark:border-white/10">
         <div className="grid gap-1.5">
           <div className="text-xs font-extrabold uppercase tracking-[0.12em] text-text-soft">Trend</div>
           <h3 className="font-display text-[clamp(1.14rem,1rem+0.42vw,1.5rem)] font-semibold leading-[1.08] text-text">Trend {view.trendTitle}</h3>
