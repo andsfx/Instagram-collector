@@ -7,3 +7,7 @@
 @import './components/charts.css';
 @import './components/states.css';
 @import './components/mobile.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

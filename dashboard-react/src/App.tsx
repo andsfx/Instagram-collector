@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useState, type ReactNode } from 'react'
 import { HeaderBar } from './components/HeaderBar'
 import { FreshnessPanel } from './components/FreshnessPanel'
 import { ExecutiveSummary } from './components/ExecutiveSummary'
@@ -7,8 +7,8 @@ import { useDashboardData } from './hooks/useDashboardData'
 import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeroMeta, getInsightsData, getQuickVisualData, getTodaySummary } from './data/selectors'
 import { getSummaryStrip } from './data/selectors'
 import { AccountOverviewGrid } from './components/AccountOverviewGrid'
-import { RankingGrowth } from './components/RankingGrowth'
-import { ContentBreakdown } from './components/ContentBreakdown'
+import { RankingGrowthPresentation } from './components/RankingGrowthPresentation'
+import { ContentBreakdownPresentation } from './components/ContentBreakdownPresentation'
 import { PostSnapshot } from './components/PostSnapshot'
 import { DailyMetrics } from './components/DailyMetrics'
 import { SectionNav, type SectionNavItem } from './components/SectionNav'
@@ -17,6 +17,7 @@ import { useTheme } from './hooks/useTheme'
 import { ErrorState, LoadingState } from './components/ui'
 import { SectionAsyncBoundary, SectionLoadingFallback } from './components/SectionAsyncBoundary'
 import { SummaryStrip } from './components/SummaryStrip'
+import { FeaturedGrowthChart } from './components/FeaturedGrowthChart'
 
 const QuickVisual = lazy(async () => {
   const module = await import('./components/QuickVisual')
@@ -29,9 +30,43 @@ const HeadToHead = lazy(async () => {
 })
 
 const Heatmap = lazy(async () => {
-  const module = await import('./components/Heatmap')
-  return { default: module.Heatmap }
+  const module = await import('./components/HeatmapPresentation')
+  return { default: module.HeatmapPresentation }
 })
+
+function ChapterShell({
+  kicker,
+  title,
+  description,
+  tone = 'neutral',
+  children,
+}: {
+  kicker: string
+  title: string
+  description: string
+  tone?: 'neutral' | 'accent'
+  children: ReactNode
+}) {
+  return (
+    <div
+      className={[
+        'rounded-[2.4rem] border p-4 shadow-[0_28px_80px_-46px_rgba(15,23,42,0.42)] backdrop-blur sm:p-6 lg:p-8',
+        tone === 'accent'
+          ? 'border-[color:color-mix(in_srgb,var(--brand)_18%,white)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_14%,white),rgba(255,255,255,0.7))] dark:border-[color:color-mix(in_srgb,var(--brand)_16%,transparent)] dark:bg-[linear-gradient(180deg,rgba(51,65,85,0.56),rgba(15,23,42,0.5))]'
+          : 'border-slate-200/80 bg-white/60 dark:border-white/10 dark:bg-slate-950/42',
+      ].join(' ')}
+    >
+      <div className="mb-5 grid gap-2 lg:mb-6 lg:grid-cols-[minmax(0,1fr)_minmax(240px,0.8fr)] lg:items-end lg:gap-6">
+        <div className="grid gap-2">
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">{kicker}</div>
+          <h2 className="font-display text-[clamp(1.45rem,1.16rem+0.65vw,2rem)] font-semibold leading-[1] tracking-[-0.04em] text-slate-950 dark:text-white">{title}</h2>
+        </div>
+        <p className="max-w-[48ch] text-[0.94rem] leading-7 text-slate-600 dark:text-slate-300">{description}</p>
+      </div>
+      <div className="space-y-5 sm:space-y-6">{children}</div>
+    </div>
+  )
+}
 
 export default function App() {
   const { data, error, loading, retry } = useDashboardData()
@@ -44,7 +79,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <main className="loader panel">
+      <main className="flex min-h-screen items-center justify-center px-6 py-16">
         <LoadingState
           title="Memuat dashboard React..."
           description="Data sedang divalidasi dan diadaptasi dari endpoint runtime dashboard."
@@ -55,10 +90,14 @@ export default function App() {
 
   if (error || !data) {
     return (
-      <main className="error-panel panel section-card">
+      <main className="flex min-h-screen items-center justify-center px-6 py-16">
         <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Permintaan ke endpoint runtime gagal.'} />
         <div>
-          <button type="button" className="retry-button" onClick={retry}>
+          <button
+            type="button"
+            className="mt-4 inline-flex items-center rounded-full bg-slate-950 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100"
+            onClick={retry}
+          >
             Coba ambil ulang data
           </button>
         </div>
@@ -75,120 +114,144 @@ export default function App() {
   const summaryStrip = getSummaryStrip(data)
   const heroMeta = getHeroMeta(data)
   const sections: SectionNavItem[] = [
-    { id: 'section-freshness', label: 'Status' },
+    { id: 'section-growth', label: 'Growth' },
     { id: 'section-summary', label: 'Summary' },
-    { id: 'section-daily', label: 'Daily' },
-    { id: 'section-ranking', label: 'Ranking' },
     { id: 'section-content', label: 'Content' },
-    { id: 'section-overview', label: 'Overview' },
-    { id: 'section-h2h', label: 'Head-to-Head' },
-    { id: 'section-heatmap', label: 'Heatmap' },
-    { id: 'section-visual', label: 'Visual' },
+    { id: 'section-comparison', label: 'Comparison' },
+    { id: 'section-pattern', label: 'Pattern' },
+    { id: 'section-appendix', label: 'Appendix' },
   ]
 
+  const shell = 'mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8'
+  const chapterBase = 'relative py-6 sm:py-8 lg:py-10'
+
   return (
-    <main id="main-content" className="app-shell stack-lg">
-      <a className="skip-link" href="#section-summary">Lewati navigasi dan langsung ke konten</a>
-      <section className="section-bleed section-shell-hero">
-        <div className="section-inner section-inner-wide">
+    <main id="main-content" className="relative min-h-screen overflow-x-clip pb-20">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[36rem] bg-[radial-gradient(circle_at_top_left,rgba(244,114,182,0.14),transparent_32%),radial-gradient(circle_at_top_right,rgba(99,102,241,0.12),transparent_28%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.2),transparent_30%),radial-gradient(circle_at_top_right,rgba(129,140,248,0.16),transparent_28%)]" />
+      <a
+        className="absolute left-4 top-4 z-50 -translate-y-16 rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white shadow-lg transition focus:translate-y-0 dark:bg-white dark:text-slate-950"
+        href="#section-summary"
+      >
+        Lewati navigasi dan langsung ke konten
+      </a>
+
+      <section className="relative pt-6 sm:pt-8 lg:pt-12">
+        <div className={`${shell} max-w-[1320px]`}>
           <HeaderBar onRefresh={retry} heroMeta={heroMeta} />
         </div>
       </section>
 
-      <section className="section-bleed section-shell-nav">
-        <div className="section-inner section-inner-wide">
+      <section className="sticky top-3 z-30 py-4 sm:top-4">
+        <div className={`${shell} max-w-[1320px]`}>
           <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} />
         </div>
       </section>
 
-      <section id="section-summary" className="section-anchor section-bleed section-shell-summary">
-        <div className="section-inner section-inner-wide stack-lg">
-          <ExecutiveSummary summary={executive} />
-          <TodaySummary today={today} />
-          <SummaryStrip items={summaryStrip} />
-          <InsightsPanel insights={insights} />
+      <section id="section-growth" className={`${chapterBase} scroll-mt-28`}>
+        <div className={`${shell} space-y-5 sm:space-y-6`}>
+          <FeaturedGrowthChart data={quickVisual} />
+          <div className="rounded-[2rem] border border-white/60 bg-white/72 p-5 shadow-[0_28px_80px_-42px_rgba(15,23,42,0.38)] backdrop-blur dark:border-white/10 dark:bg-slate-950/58 sm:p-6 lg:p-8">
+            <RankingGrowthPresentation data={data} />
+          </div>
         </div>
       </section>
 
-      <section id="section-freshness" className="section-anchor section-bleed">
-        <div className="section-inner">
-          <FreshnessPanel freshness={freshness} />
-        </div>
-      </section>
-
-      <section id="section-daily" className="section-anchor section-bleed">
-        <div className="section-inner">
-          <DailyMetrics data={data} />
-        </div>
-      </section>
-
-      <section id="section-ranking" className="section-anchor section-bleed">
-        <div className="section-inner">
-          <RankingGrowth data={data} />
-        </div>
-      </section>
-
-      <section id="section-content" className="section-anchor section-bleed">
-        <div className="section-inner stack-lg">
-          <ContentBreakdown data={data} />
-          <PostSnapshot data={data} />
-        </div>
-      </section>
-
-      <section id="section-overview" className="section-anchor section-bleed">
-        <div className="section-inner">
-          <AccountOverviewGrid accounts={accountSummaries} />
-        </div>
-      </section>
-
-      <section id="section-h2h" className="section-anchor section-bleed">
-        <div className="section-inner">
-          <SectionAsyncBoundary
-            resetKey={asyncResetKey}
-            onReset={retryAsyncSection}
-            loadingTitle="Memuat perbandingan akun"
-            loadingDescription="Head-to-head sedang disiapkan."
-            errorTitle="Gagal memuat head-to-head"
-            errorDescription="Chunk section perbandingan akun gagal dimuat."
+      <section id="section-summary" className={`${chapterBase} scroll-mt-28`}>
+        <div className={shell}>
+          <ChapterShell
+            kicker="Executive Summary"
+            title="Angka kunci, interpretasi, dan konteks rapat dalam satu chapter."
+            description="Bagian ini merangkum pembacaan utama sebelum tim masuk ke konten, comparison, dan pola audiens yang lebih teknis."
+            tone="accent"
           >
-            <Suspense fallback={<SectionLoadingFallback title="Memuat perbandingan akun" description="Head-to-head sedang disiapkan." />}>
-              <HeadToHead data={data} />
-            </Suspense>
-          </SectionAsyncBoundary>
+            <ExecutiveSummary summary={executive} />
+            <TodaySummary today={today} />
+            <SummaryStrip items={summaryStrip} />
+            <InsightsPanel insights={insights} />
+          </ChapterShell>
         </div>
       </section>
 
-      <section id="section-heatmap" className="section-anchor section-bleed">
-        <div className="section-inner">
-          <SectionAsyncBoundary
-            resetKey={asyncResetKey + 1}
-            onReset={retryAsyncSection}
-            loadingTitle="Memuat heatmap waktu posting"
-            loadingDescription="Agregasi slot waktu sedang dihitung."
-            errorTitle="Gagal memuat heatmap"
-            errorDescription="Chunk heatmap gagal dimuat."
+      <section id="section-content" className={`${chapterBase} scroll-mt-28`}>
+        <div className={shell}>
+          <ChapterShell
+            kicker="Content Performance"
+            title="Format konten, best post, dan bukti performa kreatif."
+            description="Chapter ini mengubah blok konten lama menjadi story section yang lebih mudah dipindai saat presentasi."
           >
-            <Suspense fallback={<SectionLoadingFallback title="Memuat heatmap waktu posting" description="Agregasi slot waktu sedang dihitung." />}>
-              <Heatmap data={data} />
-            </Suspense>
-          </SectionAsyncBoundary>
+            <ContentBreakdownPresentation data={data} />
+            <PostSnapshot data={data} />
+          </ChapterShell>
         </div>
       </section>
 
-      <section id="section-visual" className="section-anchor section-bleed">
-        <div className="section-inner">
-          <SectionAsyncBoundary
-            resetKey={asyncResetKey + 2}
-            onReset={retryAsyncSection}
-            loadingTitle="Memuat chart suite"
-            loadingDescription="Visual analytics tambahan sedang di-load terpisah."
-            errorTitle="Gagal memuat chart suite"
-            errorDescription="Chunk visual analytics gagal dimuat."
+      <section id="section-comparison" className={`${chapterBase} scroll-mt-28`}>
+        <div className={shell}>
+          <ChapterShell
+            kicker="Comparison"
+            title="Perbandingan akun dibuat lebih tajam dan lebih layak presentasi."
+            description="Dari overview card sampai head-to-head, chapter ini menjaga detail tetap lengkap tanpa terasa seperti tabel operasional mentah."
           >
-            <Suspense fallback={<SectionLoadingFallback title="Memuat chart suite" description="Visual analytics tambahan sedang di-load terpisah." />}>
-              <QuickVisual data={quickVisual} />
-            </Suspense>
-          </SectionAsyncBoundary>
+            <AccountOverviewGrid accounts={accountSummaries} />
+            <SectionAsyncBoundary
+              resetKey={asyncResetKey}
+              onReset={retryAsyncSection}
+              loadingTitle="Memuat perbandingan akun"
+              loadingDescription="Head-to-head sedang disiapkan."
+              errorTitle="Gagal memuat head-to-head"
+              errorDescription="Chunk section perbandingan akun gagal dimuat."
+            >
+              <Suspense fallback={<SectionLoadingFallback title="Memuat perbandingan akun" description="Head-to-head sedang disiapkan." />}>
+                <HeadToHead data={data} />
+              </Suspense>
+            </SectionAsyncBoundary>
+          </ChapterShell>
+        </div>
+      </section>
+
+      <section id="section-pattern" className={`${chapterBase} scroll-mt-28`}>
+        <div className={shell}>
+          <ChapterShell
+            kicker="Pattern & Appendix"
+            title="Pola harian, timing, dan visual pendukung diturunkan ke chapter analitik."
+            description="Bagian ini tetap lengkap untuk eksplorasi, tetapi bobot visualnya lebih tenang agar tidak mengganggu flow presentasi utama."
+          >
+            <DailyMetrics data={data} />
+            <SectionAsyncBoundary
+              resetKey={asyncResetKey + 1}
+              onReset={retryAsyncSection}
+              loadingTitle="Memuat heatmap waktu posting"
+              loadingDescription="Agregasi slot waktu sedang dihitung."
+              errorTitle="Gagal memuat heatmap"
+              errorDescription="Chunk heatmap gagal dimuat."
+            >
+              <Suspense fallback={<SectionLoadingFallback title="Memuat heatmap waktu posting" description="Agregasi slot waktu sedang dihitung." />}>
+                <Heatmap data={data} />
+              </Suspense>
+            </SectionAsyncBoundary>
+            <SectionAsyncBoundary
+              resetKey={asyncResetKey + 2}
+              onReset={retryAsyncSection}
+              loadingTitle="Memuat chart suite"
+              loadingDescription="Visual analytics tambahan sedang di-load terpisah."
+              errorTitle="Gagal memuat chart suite"
+              errorDescription="Chunk visual analytics gagal dimuat."
+            >
+              <Suspense fallback={<SectionLoadingFallback title="Memuat chart suite" description="Visual analytics tambahan sedang di-load terpisah." />}>
+                <div className="rounded-[2rem] border border-slate-200/80 bg-white/72 p-5 shadow-[0_18px_50px_-40px_rgba(15,23,42,0.38)] backdrop-blur dark:border-white/10 dark:bg-slate-950/52 sm:p-6">
+                  <QuickVisual data={quickVisual} />
+                </div>
+              </Suspense>
+            </SectionAsyncBoundary>
+          </ChapterShell>
+        </div>
+      </section>
+
+      <section id="section-appendix" className="scroll-mt-28 pb-6 pt-4 sm:pb-10">
+        <div className={shell}>
+          <div className="rounded-[1.75rem] border border-slate-200/80 bg-white/72 p-4 shadow-[0_18px_50px_-40px_rgba(15,23,42,0.5)] backdrop-blur dark:border-white/10 dark:bg-slate-950/50 sm:p-5">
+            <FreshnessPanel freshness={freshness} />
+          </div>
         </div>
       </section>
     </main>

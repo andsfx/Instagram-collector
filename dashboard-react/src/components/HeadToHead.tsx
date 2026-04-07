@@ -38,24 +38,33 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
     <SectionCard
       eyebrow="Head-to-Head"
       title="Bandingkan dua akun pada metrik yang paling penting"
-      description="Migrasi ini mempertahankan pola perbandingan cepat legacy, tetapi dengan struktur kontrol dan visual yang lebih rapi."
+      description="Section ini merangkum verdict cepat, perbandingan metrik utama, dan trend dua akun dalam susunan yang lebih mudah dipresentasikan."
     >
-      <div className="controls-row">
-        <label className="control-field">
-          <span className="stat-label">Akun A</span>
-          <select value={accountA} onChange={(event) => setAccountA(event.target.value)}>
-            {data.accounts.map((account) => <option key={account} value={account}>@{account}</option>)}
-          </select>
-        </label>
-        <label className="control-field">
-          <span className="stat-label">Akun B</span>
-          <select value={accountB} onChange={(event) => setAccountB(event.target.value)}>
-            {data.accounts.map((account) => <option key={account} value={account}>@{account}</option>)}
-          </select>
-        </label>
-        <label className="control-field">
-          <span className="stat-label">Preset</span>
+      <div className="grid gap-3 md:grid-cols-3">
+        <label className="grid gap-1.5">
+          <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Akun A</span>
           <select
+            className="min-h-[44px] rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
+            value={accountA}
+            onChange={(event) => setAccountA(event.target.value)}
+          >
+            {data.accounts.map((account) => <option key={account} value={account}>@{account}</option>)}
+          </select>
+        </label>
+        <label className="grid gap-1.5">
+          <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Akun B</span>
+          <select
+            className="min-h-[44px] rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
+            value={accountB}
+            onChange={(event) => setAccountB(event.target.value)}
+          >
+            {data.accounts.map((account) => <option key={account} value={account}>@{account}</option>)}
+          </select>
+        </label>
+        <label className="grid gap-1.5">
+          <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Preset</span>
+          <select
+            className="min-h-[44px] rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
             defaultValue=""
             onChange={(event) => {
               const resolved = resolveHeadToHeadPreset(data, event.target.value, accountA, accountB)
@@ -70,12 +79,17 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         </label>
       </div>
 
-      <div className="chip-row">
+      <div className="flex flex-wrap gap-2">
         {view.metricOptions.map((option) => (
           <button
             key={option.value}
             type="button"
-            className={`metric-chip ${metric === option.value ? 'is-active' : ''}`}
+            className={[
+              'inline-flex min-h-[38px] items-center justify-center rounded-full border px-3 py-2 text-[0.84rem] font-semibold transition',
+              metric === option.value
+                ? 'border-[color:color-mix(in_srgb,var(--brand)_18%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_84%,transparent)] text-brand'
+                : 'border-[color:color-mix(in_srgb,var(--border)_84%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_72%,transparent)] text-text-muted hover:border-[color:color-mix(in_srgb,var(--brand)_18%,var(--border))] hover:text-brand',
+            ].join(' ')}
             aria-pressed={metric === option.value}
             onClick={() => setMetric(option.value)}
           >
@@ -84,67 +98,87 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         ))}
       </div>
 
-      <div className="h2h-layout">
-        <article className="insight-card section-note-card">
-          <div className="split-row">
-            <div>
-              <div className="stat-label">Quick Verdict</div>
-              <div className="section-title">@{view.accountA} vs @{view.accountB}</div>
+      <div className="grid gap-5 desktop:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <article className="grid gap-4 rounded-[26px] border border-[color:color-mix(in_srgb,var(--brand)_16%,var(--border))] bg-[radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--brand-soft-2)_44%,transparent),transparent_36%),linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_42%,var(--panel)),var(--panel))] p-5 shadow-panel-md">
+          <div className="flex items-start justify-between gap-3">
+            <div className="grid gap-1.5">
+              <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-brand">Quick Verdict</div>
+              <div className="font-display text-[clamp(1.24rem,1.05rem+0.45vw,1.7rem)] font-semibold leading-[1.04] text-text">
+                @{view.accountA} vs @{view.accountB}
+              </div>
             </div>
-            <div className="chip-row">
-              <span className="chip chip-brand">@{view.accountA}: {view.winsA}</span>
-              <span className="chip chip-warning">@{view.accountB}: {view.winsB}</span>
+            <div className="flex flex-wrap justify-end gap-2">
+              <span className="inline-flex items-center rounded-full bg-[color:color-mix(in_srgb,var(--brand-soft)_86%,var(--panel))] px-2.5 py-1 text-[0.76rem] font-bold text-brand">
+                @{view.accountA}: {view.winsA}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-warning-soft px-2.5 py-1 text-[0.76rem] font-bold text-warning">
+                @{view.accountB}: {view.winsB}
+              </span>
             </div>
           </div>
-          <p className="section-description">{view.verdict}</p>
-          <p className="helper-copy">{view.subverdict}</p>
-          <div className="score-track" aria-label="Distribusi kemenangan per metrik">
-            <div className="score-side is-a" style={{ width: `${Math.max((view.winsA / Math.max(view.winsA + view.winsB, 1)) * 100, view.winsA ? 18 : 0)}%` }} />
-            <div className="score-side is-b" style={{ width: `${Math.max((view.winsB / Math.max(view.winsA + view.winsB, 1)) * 100, view.winsB ? 18 : 0)}%` }} />
+
+          <p className="m-0 font-display text-[clamp(1.08rem,0.96rem+0.28vw,1.3rem)] font-semibold leading-[1.2] text-text">
+            {view.verdict}
+          </p>
+          <p className="m-0 text-[0.92rem] leading-[1.6] text-text-muted">{view.subverdict}</p>
+
+          <div className="grid gap-2 rounded-[20px] border border-[color:color-mix(in_srgb,var(--border)_82%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_74%,transparent)] p-4">
+            <div className="flex items-center justify-between text-[0.82rem] text-text-soft">
+              <span>Distribusi kemenangan per metrik</span>
+              <span>Gap followers: {view.gapFollowers.toLocaleString('id-ID')}</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-[color:color-mix(in_srgb,var(--panel-muted)_78%,transparent)]" aria-label="Distribusi kemenangan per metrik">
+              <div className="flex h-full w-full">
+                <div className="bg-brand" style={{ width: `${Math.max((view.winsA / Math.max(view.winsA + view.winsB, 1)) * 100, view.winsA ? 18 : 0)}%` }} />
+                <div className="bg-warning" style={{ width: `${Math.max((view.winsB / Math.max(view.winsA + view.winsB, 1)) * 100, view.winsB ? 18 : 0)}%` }} />
+              </div>
+            </div>
           </div>
-          <div className="helper-copy">Selisih followers saat ini: {view.gapFollowers.toLocaleString('id-ID')}</div>
         </article>
 
-        <article className="comparison-card editorial-table-card">
-          <div className="comparison-head">
+        <article className="grid gap-3 rounded-[26px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_92%,transparent),color-mix(in_srgb,var(--panel-muted)_72%,transparent))] p-5 shadow-panel-sm">
+          <div className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] gap-3 rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_82%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_76%,transparent)] px-4 py-3 text-[0.76rem] font-extrabold uppercase tracking-[0.08em] text-text-soft">
             <span>@{view.accountA}</span>
-            <span>Metrik</span>
-            <span>@{view.accountB}</span>
+            <span className="text-center">Metrik</span>
+            <span className="text-right">@{view.accountB}</span>
           </div>
-          <div className="comparison-list">
+          <div className="grid gap-2">
             {view.comparisonRows.map((row) => (
-              <div key={row.label} className="comparison-row">
-                <div className={`comparison-value ${row.rawA > row.rawB ? 'is-win' : ''}`}>{row.valueA}</div>
-                <div className="comparison-label">{row.label}</div>
-                <div className={`comparison-value ${row.rawB > row.rawA ? 'is-win' : ''}`}>{row.valueB}</div>
+              <div key={row.label} className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] items-center gap-3 rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_84%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_82%,transparent)] px-4 py-3">
+                <div className={`text-sm font-semibold ${row.rawA > row.rawB ? 'text-brand' : 'text-text'}`}>{row.valueA}</div>
+                <div className="text-center text-[0.82rem] font-semibold uppercase tracking-[0.06em] text-text-soft">{row.label}</div>
+                <div className={`text-right text-sm font-semibold ${row.rawB > row.rawA ? 'text-success' : 'text-text'}`}>{row.valueB}</div>
               </div>
             ))}
           </div>
         </article>
       </div>
 
-      <article className="chart-card editorial-chart-card">
-        <div className="section-heading">
-          <h3 className="section-title">Trend {view.trendTitle}</h3>
-          <p className="section-description">{view.trendDescription}</p>
+      <article className="grid gap-4 rounded-[28px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_94%,transparent),color-mix(in_srgb,var(--panel-muted)_74%,transparent))] p-5 shadow-panel-sm">
+        <div className="grid gap-1.5">
+          <div className="text-xs font-extrabold uppercase tracking-[0.12em] text-text-soft">Trend</div>
+          <h3 className="font-display text-[clamp(1.14rem,1rem+0.42vw,1.5rem)] font-semibold leading-[1.08] text-text">Trend {view.trendTitle}</h3>
+          <p className="text-[0.95rem] text-text-muted">{view.trendDescription}</p>
         </div>
         {view.hasTrend ? (
-          <div className="chart-scroll-shell">
-            <div className="chart-wrap chart-min-wide">
+          <div className="w-full overflow-x-auto">
+            <div className="h-[320px] min-w-full mobile:min-w-[680px]">
               <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={view.trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
-                <XAxis dataKey="date" stroke={chartAxisColor} fontSize={12} />
-                <YAxis stroke={chartAxisColor} fontSize={12} />
-                <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--text)' }} itemStyle={{ color: 'var(--text)' }} />
-                <Line type="monotone" dataKey={view.accountA} stroke="var(--brand)" strokeWidth={2.4} dot={false} />
-                <Line type="monotone" dataKey={view.accountB} stroke="var(--success)" strokeWidth={2.4} dot={false} />
-              </LineChart>
+                <LineChart data={view.trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+                  <XAxis dataKey="date" stroke={chartAxisColor} fontSize={12} />
+                  <YAxis stroke={chartAxisColor} fontSize={12} />
+                  <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--text)' }} itemStyle={{ color: 'var(--text)' }} />
+                  <Line type="monotone" dataKey={view.accountA} stroke="var(--brand)" strokeWidth={2.4} dot={false} />
+                  <Line type="monotone" dataKey={view.accountB} stroke="var(--success)" strokeWidth={2.4} dot={false} />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
         ) : (
-          <div className="empty-state">Trend historis untuk metrik ini belum tersedia secara granular, jadi perbandingan difokuskan ke snapshot saat ini.</div>
+          <div className="rounded-[18px] border border-dashed border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_76%,transparent)] p-4 text-[0.92rem] text-text-muted">
+            Trend historis untuk metrik ini belum tersedia secara granular, jadi perbandingan difokuskan ke snapshot saat ini.
+          </div>
         )}
       </article>
     </SectionCard>

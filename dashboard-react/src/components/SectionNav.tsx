@@ -15,8 +15,6 @@ export function SectionNav({
   onToggleTheme: () => void
 }) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? '')
-  const primaryItems = items.slice(0, 5)
-  const secondaryItems = items.slice(5)
 
   useEffect(() => {
     const observers = items
@@ -31,7 +29,7 @@ export function SectionNav({
               setActiveId(item.id)
             }
           },
-          { rootMargin: '-30% 0px -55% 0px', threshold: 0.05 },
+          { rootMargin: '-28% 0px -58% 0px', threshold: 0.05 },
         )
 
         observer.observe(element)
@@ -45,55 +43,37 @@ export function SectionNav({
   }, [items])
 
   return (
-    <nav className="section-nav" aria-label="Section navigation">
-      <div className="section-nav-content">
-        <div className="section-nav-links section-nav-links-primary">
-          {primaryItems.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className={`section-nav-link ${activeId === item.id ? 'is-active' : ''}`}
-              aria-current={activeId === item.id ? 'location' : undefined}
-            >
-              {item.label}
-            </a>
-          ))}
-        </div>
-        <div className="section-nav-links section-nav-links-desktop">
+    <nav
+      className="flex items-center gap-3 rounded-[1.7rem] border border-white/60 bg-white/84 px-3 py-3 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.45)] backdrop-blur dark:border-white/10 dark:bg-slate-950/76"
+      aria-label="Section navigation"
+    >
+      <div className="min-w-0 flex-1 overflow-x-auto">
+        <div className="flex min-w-max items-center gap-2 pr-1">
           {items.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className={`section-nav-link ${activeId === item.id ? 'is-active' : ''}`}
+              className={`rounded-full px-3.5 py-2 text-sm font-medium whitespace-nowrap transition ${
+                activeId === item.id
+                  ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
+                  : 'bg-slate-100/90 text-slate-600 hover:bg-slate-200 hover:text-slate-950 dark:bg-white/6 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white'
+              }`}
               aria-current={activeId === item.id ? 'location' : undefined}
             >
               {item.label}
             </a>
           ))}
         </div>
-        {secondaryItems.length ? (
-          <label className="section-nav-more" aria-label="Navigasi section tambahan">
-            <span className="section-nav-more-label">Lainnya</span>
-            <select
-              className="section-nav-more-select"
-              defaultValue=""
-              onChange={(event) => {
-                if (!event.target.value) return
-                window.location.hash = event.target.value
-                event.target.value = ''
-              }}
-            >
-              <option value="">Section lain</option>
-              {secondaryItems.map((item) => (
-                <option key={item.id} value={item.id}>{item.label}</option>
-              ))}
-            </select>
-          </label>
-        ) : null}
-        <button type="button" className="theme-toggle" onClick={onToggleTheme} aria-label="Toggle dark mode" aria-pressed={theme === 'dark'}>
-          {theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
-        </button>
       </div>
+      <button
+        type="button"
+        className="inline-flex h-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-950 dark:border-white/10 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-white/20 dark:hover:text-white"
+        onClick={onToggleTheme}
+        aria-label="Toggle dark mode"
+        aria-pressed={theme === 'dark'}
+      >
+        {theme === 'dark' ? 'Light' : 'Dark'}
+      </button>
     </nav>
   )
 }

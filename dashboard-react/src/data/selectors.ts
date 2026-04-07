@@ -996,15 +996,15 @@ export function getDailyMetricsView(data: DashboardRecord, selectedAccount?: str
     makeSummary('Total 30 hari', accountHistory.slice(0, 30)),
   ]
 
-  return {
-    accounts,
-    selectedAccount: account,
-    rows,
-    mobileRows: rows.slice(0, 3),
-    summaryRows,
-    disclosureTitle,
-    disclosureHint: 'Gunakan untuk mengecek detail followers, following, dan jumlah post tiap akun per hari.',
-    disclosurePill: top && top.change !== 0 ? 'Ada pergerakan' : 'Lihat detail',
+    return {
+      accounts,
+      selectedAccount: account,
+      rows,
+      mobileRows: rows,
+      summaryRows,
+      disclosureTitle,
+      disclosureHint: 'Gunakan untuk mengecek detail followers, following, dan jumlah post tiap akun per hari.',
+      disclosurePill: top && top.change !== 0 ? 'Ada pergerakan' : 'Lihat detail',
   }
 }
 
