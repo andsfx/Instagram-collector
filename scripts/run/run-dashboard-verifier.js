@@ -57,7 +57,7 @@ function fetchJson(url) {
 function inferMainJobHealth(run) {
   const summaryText = String(run.summary || '').trim();
   if (run.status !== 'ok') {
-    return { ok: false, reason: `run status=${run.status}: ${summaryText || run.error || 'unknown error'}` };
+    return { ok: false, reason: `run status=${run.status}: ${summaryText || run.error || 'unknown error'}`, ambiguous: false };
   }
 
   const workflowErrorMatch = summaryText.match(/"workflowStatus"\s*:\s*"error"/i);
@@ -66,19 +66,22 @@ function inferMainJobHealth(run) {
   const messageMatch = summaryText.match(/"message"\s*:\s*"([^"]+)"/i);
 
   if (workflowErrorMatch) {
-    return {
-      ok: false,
-      reason: [errorStageMatch && errorStageMatch[1], errorCodeMatch && errorCodeMatch[1], messageMatch && messageMatch[1]]
-        .filter(Boolean)
-        .join(' | ') || 'workflowStatus=error'
-    };
+    const reason = [errorStageMatch && errorStageMatch[1], errorCodeMatch && errorCodeMatch[1], messageMatch && messageMatch[1]]
+      .filter(Boolean)
+      .join(' | ') || 'workflowStatus=error';
+    const ambiguous = /(process_timeout|NO_EXIT_CODE_0|\bRUNNING\b)/i.test(reason);
+    return { ok: false, reason, ambiguous };
   }
 
   if (/(APIFY_TOKEN|GOG_KEYRING_PASSWORD|GOG_ACCOUNT|autentikasi|auth|blocker)/i.test(summaryText)) {
-    return { ok: false, reason: summaryText };
+    return { ok: false, reason: summaryText, ambiguous: false };
   }
 
-  return { ok: true, reason: summaryText || 'ok' };
+  if (/(process_timeout|NO_EXIT_CODE_0|\bRUNNING\b)/i.test(summaryText)) {
+    return { ok: false, reason: summaryText, ambiguous: true };
+  }
+
+  return { ok: true, reason: summaryText || 'ok', ambiguous: false };
 }
 
 function validateLiveData(data) {
@@ -87,11 +90,34 @@ function validateLiveData(data) {
   if (!data.generated_at) return 'generated_at missing';
   if (!data.generated_at_wib) return 'generated_at_wib missing';
   if (!data.latest || typeof data.latest !== 'object') return 'latest missing';
+  if (!data.latest?.date) return 'latest.date missing';
   if (!Array.isArray(data.accounts)) return 'accounts missing';
+  if (!Array.isArray(data.history) || data.history.length === 0) return 'history missing';
+  if (!data.content_breakdown || typeof data.content_breakdown !== 'object') return 'content_breakdown missing';
+  if (!data.post_insights || typeof data.post_insights !== 'object') return 'post_insights missing';
 
   for (const account of REQUIRED_ACCOUNTS) {
     if (!data.accounts.includes(account)) return `missing account ${account}`;
-    if (!data.latest[account]) return `missing latest payload for ${account}`;
+
+    const latest = data.latest[account];
+    if (!latest || typeof latest !== 'object') return `missing latest payload for ${account}`;
+    if (!Number.isFinite(Number(latest.followers))) return `invalid followers for ${account}`;
+    if (!Number.isFinite(Number(latest.posts))) return `invalid posts for ${account}`;
+
+    const content = data.content_breakdown[account];
+    if (!content || typeof content !== 'object') return `missing content breakdown for ${account}`;
+    if (!Number.isFinite(Number(content.total_posts_analyzed)) || Number(content.total_posts_analyzed) <= 0) {
+      return `empty content breakdown for ${account}`;
+    }
+
+    const insights = data.post_insights[account];
+    if (!insights || typeof insights !== 'object') return `missing post insights for ${account}`;
+    if (!Array.isArray(insights.posts) || insights.posts.length === 0) return `empty post insights for ${account}`;
+  }
+
+  const latestHistoryDate = String(data.history[data.history.length - 1]?.date || '');
+  if (latestHistoryDate && latestHistoryDate !== String(data.latest.date || '')) {
+    return `latest.date mismatch with history tail (${data.latest.date} vs ${latestHistoryDate})`;
   }
 
   return null;
@@ -157,6 +183,14 @@ async function main() {
     result.freshness = freshness;
 
     if (!mainHealth.ok) {
+      if (mainHealth.ambiguous && freshness.buildFresh && freshness.sourceFresh) {
+        result.ok = true;
+        result.alertText = null;
+        result.mainJob.reason = `${mainHealth.reason} (suppressed: live dashboard already fresh)`;
+        console.log(JSON.stringify(result, null, 2));
+        process.exit(0);
+      }
+
       result.alertText = [
         'ALERT: Instagram daily dashboard automation failed.',
         `- main job status: ${mainRun.status}`,
