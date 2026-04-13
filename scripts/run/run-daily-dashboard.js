@@ -194,7 +194,7 @@ function main() {
     const buildOut = run('node', [path.join(repoRoot, 'scripts', 'export', 'build-dashboard-data.js')], { cwd: repoRoot });
     summary.dashboardBuild = extractTrailingJson(buildOut) || { status: 'unknown' };
 
-    const trackedPaths = ['dashboard/data.json'];
+    const trackedPaths = ['dashboard/data.json', 'dashboard/index.html'];
     summary.git.changed = hasChanges(repoRoot, trackedPaths);
 
     if (summary.git.changed && !skipCommit) {
@@ -232,7 +232,7 @@ function main() {
     summary.workflowStatus = 'success';
     summary.message = summary.git.changed
       ? 'Daily dashboard automation completed successfully.'
-      : 'Daily dashboard automation completed successfully with no dashboard/data.json changes.';
+      : 'Daily dashboard automation completed successfully with no dashboard asset changes.';
 
     console.log('\n=== DAILY DASHBOARD SUMMARY ===');
     console.log(JSON.stringify(summary, null, 2));

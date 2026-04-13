@@ -10,6 +10,30 @@ function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
 }
 
+function toAssetVersion(isoUtc) {
+  const d = new Date(isoUtc);
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mi = String(d.getUTCMinutes()).padStart(2, '0');
+  const ss = String(d.getUTCSeconds()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}_${hh}${mi}${ss}`;
+}
+
+function updateHtmlAssetVersion(repoRoot, assetVersion) {
+  const htmlPath = path.join(repoRoot, 'dashboard', 'index.html');
+  if (!fs.existsSync(htmlPath)) return { updated: false, assetVersion, htmlPath };
+  const original = fs.readFileSync(htmlPath, 'utf8');
+  const updated = original.replace(
+    /(<script src="\.\/js\/[^"]+\.js)(\?v=[^"]+)?("?><\/script>)/g,
+    `$1?v=${assetVersion}$3`
+  );
+  if (updated === original) return { updated: false, assetVersion, htmlPath };
+  fs.writeFileSync(htmlPath, updated);
+  return { updated: true, assetVersion, htmlPath };
+}
+
 function gogBin() {
   if (process.env.GOG_BIN) return process.env.GOG_BIN;
   return process.platform === 'win32' ? 'gog' : '/root/.local/bin/gog';
@@ -623,9 +647,11 @@ for (const username of accounts) {
 }
 
 const now = new Date();
+  const generatedAt = now.toISOString();
+  const assetVersion = toAssetVersion(generatedAt);
   const output = {
-    generated_at: now.toISOString(),
-    generated_at_wib: formatWib(now.toISOString()),
+    generated_at: generatedAt,
+    generated_at_wib: formatWib(generatedAt),
     version: 2,
     sources: { stats: 'socialblade', engagement: 'apify' },
     accounts,
@@ -647,7 +673,8 @@ const now = new Date();
   const outPath = path.join(repoRoot, 'dashboard', 'data.json');
   ensureDir(path.dirname(outPath));
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
-  console.log(JSON.stringify({ outPath, generated_at: output.generated_at, history_days: output.meta.history_days, accounts }, null, 2));
+  const assetUpdate = updateHtmlAssetVersion(repoRoot, assetVersion);
+  console.log(JSON.stringify({ outPath, generated_at: output.generated_at, history_days: output.meta.history_days, accounts, asset_version: assetVersion, index_html_updated: assetUpdate.updated }, null, 2));
 }
 
 main();
