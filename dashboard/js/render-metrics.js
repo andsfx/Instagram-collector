@@ -69,6 +69,7 @@ function renderDailyMetrics() {
       <div class="dm-toolbar-copy">
         <div class="dm-toolbar-k">Metrik Harian Akun</div>
         <div class="dm-toolbar-s">Riwayat followers, following, dan jumlah post per akun. Dibuka saat perlu analisis detail.</div>
+        <div class="dm-toolbar-s" style="margin-top:6px;font-size:12px;color:var(--t3)">Keterangan: <strong>0</strong> = tidak ada perubahan, <strong>--</strong> = belum ada pembanding dari hari sebelumnya.</div>
       </div>
       <div class="hm-select dm-toolbar-select">
         <label style="font-size:13px;font-weight:600;color:var(--t2)">Pilih akun:</label>
