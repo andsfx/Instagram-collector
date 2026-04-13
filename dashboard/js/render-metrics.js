@@ -148,7 +148,7 @@ function renderDailyMetrics() {
         if (isFirst) return '<span class="dm-d-z">--</span>';
         if (val > 0) return `<span class="dm-d-p">+${val.toLocaleString()}</span>`;
         if (val < 0) return `<span class="dm-d-n">${val.toLocaleString()}</span>`;
-        return '<span class="dm-d-z">--</span>';
+        return '<span class="dm-d-z">0</span>';
     };
 
     displayRows.forEach(r => {
@@ -289,7 +289,7 @@ window.filterMetricsTable = function(selectEl, account) {
         if (isFirst) return '<span class="dm-d-z">--</span>';
         if (val > 0) return `<span class="dm-d-p">+${val.toLocaleString()}</span>`;
         if (val < 0) return `<span class="dm-d-n">${val.toLocaleString()}</span>`;
-        return '<span class="dm-d-z">--</span>';
+        return '<span class="dm-d-z">0</span>';
     };
 
     let rowsHtml = '';
