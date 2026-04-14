@@ -2,6 +2,25 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
+function loadEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const lines = fs.readFileSync(filePath, 'utf8').split(/\r?\n/);
+  for (const line of lines) {
+    if (!line || /^\s*#/.test(line)) continue;
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!m) continue;
+    let [, key, value] = m;
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
+
+const REPO_ROOT = path.resolve(__dirname, '..', '..');
+loadEnvFile(path.join(REPO_ROOT, '.env.daily-dashboard'));
+loadEnvFile(path.join(REPO_ROOT, '.env'));
+
 const APIFY_TOKEN = process.env.APIFY_TOKEN;
 const ACTOR_ID = process.env.APIFY_ACTOR_ID || 'apify~instagram-scraper';
 
