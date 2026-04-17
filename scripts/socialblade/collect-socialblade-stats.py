@@ -25,14 +25,23 @@ def extract_from_embedded_json(html: str):
     }
 
     patterns = {
-        'followers': [r'"followers"\s*:\s*"?(\d+)"?'],
-        'following': [r'"following"\s*:\s*"?(\d+)"?'],
-        'posts_count': [r'"media_count"\s*:\s*"?(\d+)"?'],
+        'followers': [
+            r'"stats"\s*:\s*\{[^{}]*"followers"\s*:\s*"?(\d+)"?',
+            r'"followers"\s*:\s*"?(\d+)"?'
+        ],
+        'following': [
+            r'"stats"\s*:\s*\{[^{}]*"following"\s*:\s*"?(\d+)"?',
+            r'"following"\s*:\s*"?(\d+)"?'
+        ],
+        'posts_count': [
+            r'"stats"\s*:\s*\{[^{}]*"media_count"\s*:\s*"?(\d+)"?',
+            r'"media_count"\s*:\s*"?(\d+)"?'
+        ],
     }
 
     for key, pats in patterns.items():
         for pat in pats:
-            m = re.search(pat, html, re.I)
+            m = re.search(pat, html, re.I | re.S)
             if m:
                 result[key] = parse_number(m.group(1))
                 break
@@ -145,6 +154,11 @@ def main():
         'ok': True,
         'warnings': warnings,
         'url': url,
+        'debug': {
+            'embedded': embedded,
+            'html_blocks': blocks,
+            'html_has_followers_value': followers is not None,
+        }
     }
     out_path.write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps(result, indent=2))
