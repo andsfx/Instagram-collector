@@ -7,9 +7,9 @@ function setFreshnessBadge(type, extra){
   var el = document.getElementById('freshnessBadge');
   if (!el) return;
   el.className = 'status-badge ' + type;
-  if (type === 'fresh') el.textContent = extra ? ('Data terbaru • ' + extra) : 'Data terbaru';
-  else if (type === 'cached') el.textContent = extra ? ('Cache lokal • ' + extra) : 'Cache lokal';
-  else el.textContent = extra ? ('Perlu perhatian • ' + extra) : 'Perlu refresh';
+  if (type === 'fresh') el.textContent = extra ? ('Daily Snapshot Instagram • ' + extra) : 'Daily Snapshot Instagram';
+  else if (type === 'cached') el.textContent = extra ? ('Daily Snapshot Instagram • cache ' + extra) : 'Daily Snapshot Instagram • cache';
+  else el.textContent = extra ? ('Daily Snapshot Instagram • ' + extra) : 'Daily Snapshot Instagram';
 }
 
 function setBuildInfo(message, syncMessage){
@@ -27,10 +27,10 @@ function setDataSource(state, detail){
   var cls = 'live src-loading';
   if(state === 'cached'){
     cls = 'live src-cached';
-    message = detail ? ('Menampilkan cache lokal • ' + detail) : 'Menampilkan cache lokal';
+    message = detail ? ('Daily Snapshot Instagram • cache lokal • ' + detail) : 'Daily Snapshot Instagram • cache lokal';
   } else if(state === 'static'){
     cls = 'live src-live';
-    message = detail ? ('Data terbaru dashboard • ' + detail) : 'Data terbaru dashboard';
+    message = detail ? ('Daily Snapshot Instagram • snapshot ' + detail) : 'Daily Snapshot Instagram • snapshot terbaru';
   } else if(state === 'error'){
     cls = 'live src-error';
     message = detail ? ('Gagal memuat data • ' + detail) : 'Gagal memuat data';
@@ -90,12 +90,12 @@ function onData(raw, source){
   document.getElementById('dashboard').style.display = 'block';
   updateDarkBtn(document.documentElement.getAttribute('data-theme') || 'light');
   var data = getDashboardData();
-  document.getElementById('lastUpdate').textContent = 'Update terakhir: ' + prettyLastUpdate(data.lastUpdate || '-');
+  document.getElementById('lastUpdate').textContent = 'Daily Snapshot Instagram: ' + prettyLastUpdate(data.lastUpdate || '-');
   if (source === 'cached') {
     var cacheTs = parseInt(localStorage.getItem(CACHE_TS_KEY) || Date.now(), 10);
     var cacheAge = formatAge(Date.now() - cacheTs);
     setFreshnessBadge('cached', 'Cache ' + cacheAge);
-    setBuildInfo('Cache lokal aktif', 'Disimpan ' + cacheAge);
+    setBuildInfo('Daily Snapshot Instagram (cache)', 'Disimpan ' + cacheAge);
     var refreshBtn = document.querySelector('.hdr-btn[onclick="forceRefreshData()"]');
     if(refreshBtn){
       refreshBtn.style.borderColor = 'var(--ig-pink)';
@@ -105,7 +105,7 @@ function onData(raw, source){
   } else {
     var updated = prettyLastUpdate(data.lastUpdate || '-');
     setFreshnessBadge('fresh', updated);
-    setBuildInfo('Build dashboard aktif', 'Sinkron terakhir ' + updated);
+    setBuildInfo('Daily Snapshot Instagram aktif', 'Sinkron terakhir ' + updated);
     var refreshBtn2 = document.querySelector('.hdr-btn[onclick="forceRefreshData()"]');
     if(refreshBtn2){
       refreshBtn2.style.borderColor = '';
