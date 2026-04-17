@@ -5,6 +5,16 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function safeReadJson(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function loadSocialBladeStats(repoRoot, username) {
+  const statsPath = path.join(repoRoot, 'data', 'raw', 'stats', `${username}-stats.json`);
+  return safeReadJson(statsPath);
+}
+
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
 }
@@ -119,14 +129,14 @@ function buildMetrics(username, followers, rawPosts) {
   };
 }
 
-function buildMerged(username, followers, metrics) {
+function buildMerged(username, socialBladeStats, metrics) {
   return {
     date: new Date().toISOString().slice(0, 10),
     username,
     profile: {
-      followers,
-      following: null,
-      posts_count: null
+      followers: socialBladeStats?.followers ?? metrics.followers ?? null,
+      following: socialBladeStats?.following ?? null,
+      posts_count: socialBladeStats?.posts_count ?? null
     },
     metrics: {
       analyzed_posts: metrics.posts_analyzed,
@@ -137,7 +147,7 @@ function buildMerged(username, followers, metrics) {
       engagement_rate: metrics.engagement_rate
     },
     sources: {
-      profile_stats: 'config-fallback',
+      profile_stats: socialBladeStats ? 'socialblade-raw-stats' : 'missing-socialblade-stats',
       post_metrics: 'apify'
     }
   };
@@ -146,14 +156,27 @@ function buildMerged(username, followers, metrics) {
 function main() {
   const username = process.argv[2];
   const inputPath = process.argv[3];
-  const followers = Number(process.argv[4]);
-  if (!username || !inputPath || !followers) {
-    console.error('Usage: node scripts/apify/transform-apify-posts.js <username> <inputJsonPath> <followers>');
+  const fallbackFollowers = Number(process.argv[4]);
+  if (!username || !inputPath) {
+    console.error('Usage: node scripts/apify/transform-apify-posts.js <username> <inputJsonPath> [fallbackFollowers]');
     process.exit(1);
   }
 
   const repoRoot = path.resolve(__dirname, '..', '..');
   const items = readJson(inputPath);
+  const socialBladeStats = loadSocialBladeStats(repoRoot, username);
+  const followers = Number(socialBladeStats?.followers ?? fallbackFollowers);
+
+  if (!Number.isFinite(followers) || followers <= 0) {
+    console.error(`Fresh follower count missing for ${username}. Expected SocialBlade raw stats or valid fallback.`);
+    process.exit(2);
+  }
+
+  if (!socialBladeStats || socialBladeStats.ok === false) {
+    console.error(`SocialBlade raw stats missing or invalid for ${username}. Refusing stale config fallback.`);
+    process.exit(2);
+  }
+
   if (!Array.isArray(items)) {
     console.error('Input JSON must be an array of Apify dataset items');
     process.exit(1);
@@ -168,7 +191,7 @@ function main() {
 
   const rawPosts = buildRawPosts(username, items);
   const metrics = buildMetrics(username, followers, rawPosts);
-  const merged = buildMerged(username, followers, metrics);
+  const merged = buildMerged(username, socialBladeStats, metrics);
 
   fs.writeFileSync(path.join(rawDir, `${username}-latest12-full.json`), JSON.stringify(rawPosts, null, 2));
   fs.writeFileSync(path.join(metricsDir, `${username}-metrics.json`), JSON.stringify(metrics, null, 2));
@@ -180,7 +203,9 @@ function main() {
     posts_analyzed: metrics.posts_analyzed,
     avg_likes: metrics.avg_likes,
     avg_comments: metrics.avg_comments,
-    engagement_rate: metrics.engagement_rate
+    engagement_rate: metrics.engagement_rate,
+    follower_source: merged.sources.profile_stats,
+    followers
   }, null, 2));
 }
 

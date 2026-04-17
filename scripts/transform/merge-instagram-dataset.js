@@ -14,28 +14,34 @@ function todayUtc() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function pickProfileStats(profileData, fallbackFollowers = null) {
+function pickProfileStats(profileData, socialBladeStats = null) {
+  const socialFollowers = socialBladeStats?.followers ?? null;
+  const socialFollowing = socialBladeStats?.following ?? null;
+  const socialPosts = socialBladeStats?.posts_count ?? null;
+
   if (!profileData || typeof profileData !== "object") {
     return {
-      followers: fallbackFollowers,
-      following: null,
-      posts_count: null
+      followers: socialFollowers,
+      following: socialFollowing,
+      posts_count: socialPosts
     };
   }
 
   return {
     followers:
+      socialFollowers ??
       profileData.followers ??
       profileData.followers_count ??
       profileData.edge_followed_by?.count ??
-      fallbackFollowers ??
       null,
     following:
+      socialFollowing ??
       profileData.following ??
       profileData.following_count ??
       profileData.edge_follow?.count ??
       null,
     posts_count:
+      socialPosts ??
       profileData.posts_count ??
       profileData.posts ??
       profileData.edge_owner_to_timeline_media?.count ??
@@ -88,22 +94,28 @@ function main() {
   ensureDir(mergedDir);
 
   const accounts = safeReadJson(accountsPath) || [];
-  const accountConfig = accounts.find((a) => a.username === username) || null;
-  const fallbackFollowers = accountConfig?.followers ?? null;
+  accounts.find((a) => a.username === username) || null;
 
   const profilePath = path.join(rawProfilesDir, `${username}.json`);
   const metricsPath = path.join(processedMetricsDir, `${username}-metrics.json`);
+  const socialBladeStatsPath = path.join(repoRoot, "data", "raw", "stats", `${username}-stats.json`);
 
   const profileData = safeReadJson(profilePath);
   const metricsData = safeReadJson(metricsPath);
+  const socialBladeStats = safeReadJson(socialBladeStatsPath);
+
+  if (!socialBladeStats || socialBladeStats.ok === false) {
+    console.error(`SocialBlade raw stats missing or invalid for ${username}`);
+    process.exit(2);
+  }
 
   const merged = {
     date: todayUtc(),
     username,
-    profile: pickProfileStats(profileData, fallbackFollowers),
+    profile: pickProfileStats(profileData, socialBladeStats),
     metrics: pickMetrics(metricsData),
     sources: {
-      profile_stats: profileData ? "scrapling" : "fallback-config",
+      profile_stats: profileData ? "scrapling+socialblade" : "socialblade-raw-stats",
       post_metrics: metricsData ? "json" : "missing"
     }
   };
