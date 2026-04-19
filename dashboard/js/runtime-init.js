@@ -189,6 +189,13 @@ function initAuthUI(){
       if(e.target === this) closeUserModal();
     });
   }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      if(loginModal && loginModal.classList.contains('show')) hideLoginModal();
+      if(settingsModal && settingsModal.classList.contains('show')) closeSettingsModal();
+      if(userModal && userModal.classList.contains('show')) closeUserModal();
+    }
+  });
   document.addEventListener('click', function(e){
     var dropdown = document.getElementById('userDropdown');
     var menu = document.getElementById('userMenu');
@@ -505,8 +512,24 @@ function changePassword(){
     return;
   }
   if(typeof AuthModule === 'undefined') return;
+  // Verify current password before allowing change
   var session = AuthModule.getSession();
   if(!session) return;
+  var users = AuthModule.getUsers();
+  var currentUser = null;
+  for(var i = 0; i < users.length; i++){
+    if(String(users[i].id) === String(session.userId)){ currentUser = users[i]; break; }
+  }
+  if(!currentUser){
+    showToast('User tidak ditemukan', 'error');
+    return;
+  }
+  // Use login() to verify current password since hashPasswordSync is not exposed
+  var verifyResult = AuthModule.login(session.username, current.value);
+  if(!verifyResult || !verifyResult.success){
+    showToast('Password saat ini salah', 'error');
+    return;
+  }
   var result = AuthModule.updateUser(session.userId, { password: newPass.value });
   if(result.success){
     showToast('Password berhasil diubah', 'success');
@@ -528,7 +551,8 @@ function showToast(message, type){
   };
   var toast = document.createElement('div');
   toast.className = 'toast ' + type;
-  toast.innerHTML = (icons[type] || icons.info) + '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
+  var safeMessage = String(message).replace(/[<>"'&]/g, function(c){ return {'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c]; });
+  toast.innerHTML = (icons[type] || icons.info) + '<span>' + safeMessage + '</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
   container.appendChild(toast);
   setTimeout(function(){ toast.classList.add('show'); }, 10);
   setTimeout(function(){

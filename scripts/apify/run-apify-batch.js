@@ -52,7 +52,8 @@ function loadAccounts(repoRoot) {
 function getRun(runId) {
   const out = runCmd('curl', [
     '-sS',
-    `https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_TOKEN}`
+    '-H', `Authorization: Bearer ${APIFY_TOKEN}`,
+    `https://api.apify.com/v2/actor-runs/${runId}`
   ]);
 
   const parsed = JSON.parse(out);
@@ -149,7 +150,8 @@ async function callApifyRun(username, resultsLimit) {
 function fetchDatasetItems(datasetId) {
   const out = runCmd('curl', [
     '-sS',
-    `https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_TOKEN}&clean=true`
+    '-H', `Authorization: Bearer ${APIFY_TOKEN}`,
+    `https://api.apify.com/v2/datasets/${datasetId}/items?clean=true`
   ]);
   const items = JSON.parse(out || '[]');
   if (!Array.isArray(items)) throw new Error('Apify dataset items response is not an array');

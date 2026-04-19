@@ -70,7 +70,7 @@
   --ig-gradient-medium:linear-gradient(135deg, rgba(225,48,108,0.15), rgba(131,58,180,0.12), rgba(64,93,230,0.1));
   --t1:#262626;
   --t2:#555555;
-  --t3:#8e8e8e;
+  --t3:#6b6b6b;
   --t4:#c7c7c7;
   --link:#00376B;
   --success:#2ecc71;
@@ -91,7 +91,7 @@
   --ig-gradient-medium:linear-gradient(135deg, rgba(225,48,108,0.25), rgba(131,58,180,0.2), rgba(64,93,230,0.18));
   --t1:#E8E8E8;
   --t2:#B0B0B0;
-  --t3:#777777;
+  --t3:#9a9a9a;
   --t4:#444444;
   --link:#8BB4E0;
   --success:#27ae60;
@@ -129,7 +129,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .settings-panel.active{display:block;animation:slideUpFade 0.25s ease-out forwards}
 
 /* Shared Card Style */
-.neo{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);transition:all .3s ease}
+.neo{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);transition:background .3s ease,border-color .3s ease,box-shadow .3s ease}
 .neo:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
 
 /* Loading */
@@ -291,7 +291,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .rtbl tbody tr.brow td:first-child{border-left:3px solid var(--ig-pink)}
 .rn{font-weight:800;font-size:16px}
 .r1{color:#F77737}.r2{color:var(--t3)}.r3{color:#CD7F32}
-.tu{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--t1)}
+.tu{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--t1);min-width:0;max-width:220px}
 .gp{color:var(--success)}.gn{color:var(--danger)}.gz{color:var(--t3)}
 .er-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:var(--radius-pill);font-size:12px;font-weight:700;border:none}
 .er-high{background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.06));color:#1B9E4B}
@@ -360,7 +360,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 
 /* Settings */
 .settings-sec{margin-bottom:40px}
-.settings-toggle{cursor:pointer;font-size:13px;color:var(--ig-purple);font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.notification-settings-toggle{cursor:pointer;font-size:13px;color:var(--ig-purple);font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:12px}
 .settings-panel{display:none;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 .settings-panel.open{display:block}
 .settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
@@ -701,6 +701,8 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   .hdr-btn svg{width:18px;height:18px}
   .hdr-btn{padding:8px}
 }
+.fbtn:focus-visible,.hdr-btn:focus-visible,.nav-item:focus-visible,.h2h-chip:focus-visible,.settings-tab:focus-visible,.auth-btn:focus-visible,.settings-save:focus-visible,.add-user-btn:focus-visible,.user-action-btn:focus-visible,.back-to-top:focus-visible,.toast-close:focus-visible,.auth-modal-close:focus-visible,.settings-close:focus-visible{outline:2px solid var(--ig-purple);outline-offset:2px;border-radius:var(--radius-sm)}
+@media(prefers-color-scheme:dark){html:not([data-theme]){--bg:#121212;--card:#1E1E1E;--border:#333;--t1:#F5F5F5;--t2:#D0D0D0;--t3:#9a9a9a;--t4:#555;--shadow:0 2px 12px rgba(0,0,0,0.4)}}
 
 </style>
 </head>
@@ -731,6 +733,7 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 
 <!-- EXPORT OVERLAY -->
 <div id="exportOverlay" class="export-overlay">
+  <button type="button" onclick="this.parentElement.style.display='none'" style="position:absolute;top:16px;right:16px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">Tutup</button>
   <div class="export-box">
     <div class="spinner"></div>
     <p id="exportMsg" style="margin-top:16px;color:var(--t2);font-weight:600">Menyiapkan export...</p>
@@ -948,7 +951,7 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 
 <!-- NOTIFICATION THRESHOLD SETTINGS (DISABLED) -->
 <section class="settings-sec" style="display:none">
-  <div class="settings-toggle" onclick="toggleSettings()">
+  <div class="notification-settings-toggle" onclick="toggleSettings()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     <span id="settingsLabel">Pengaturan Notifikasi</span>
   </div>
@@ -1132,17 +1135,17 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
         <div class="settings-section">
           <div class="settings-section-title">Change Password</div>
           <div class="auth-field auth-field-password">
-            <label>Current Password</label>
+            <label for="currentPassword">Current Password</label>
             <input type="password" id="currentPassword" class="settings-input" placeholder="Current password">
             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('currentPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
           </div>
           <div class="auth-field auth-field-password">
-            <label>New Password</label>
+            <label for="newPassword">New Password</label>
             <input type="password" id="newPassword" class="settings-input" placeholder="New password">
             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('newPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
           </div>
           <div class="auth-field auth-field-password">
-            <label>Confirm New Password</label>
+            <label for="confirmPassword">Confirm New Password</label>
             <input type="password" id="confirmPassword" class="settings-input" placeholder="Confirm new password">
             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
           </div>
@@ -1159,13 +1162,13 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
     <h3 id="userModalTitle">Add User</h3>
     <div id="userModalError" class="auth-error"><span></span></div>
     <input type="hidden" id="editUserId">
-    <div class="auth-field"><label>Username</label><input type="text" id="userUsername" placeholder="Username"></div>
+    <div class="auth-field"><label for="userUsername">Username</label><input type="text" id="userUsername" placeholder="Username"></div>
     <div class="auth-field auth-field-password">
-      <label>Password</label>
+      <label for="userPassword">Password</label>
       <input type="password" id="userPassword" placeholder="Password">
       <button type="button" class="password-toggle" onclick="togglePasswordVisibility('userPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
     </div>
-    <div class="auth-field"><label>Role</label><select id="userRole" class="settings-select" style="width:100%"><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>
+    <div class="auth-field"><label for="userRole">Role</label><select id="userRole" class="settings-select" style="width:100%"><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>
     <div class="settings-btn-group">
       <button class="settings-btn settings-btn-secondary" onclick="closeUserModal()">Cancel</button>
       <button class="settings-btn settings-btn-primary" onclick="saveUser()">Save</button>
@@ -1173,18 +1176,18 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   </div>
 </div>
 
-<script src="./js/auth.js?v=20260419_040250"></script>
-<script src="./js/settings.js?v=20260419_040250"></script>
-<script src="./js/data-core.js?v=20260419_040250"></script>
-<script src="./js/ui-utils.js?v=20260419_040250"></script>
-<script src="./js/render-overview.js?v=20260419_040250"></script>
-<script src="./js/render-charts.js?v=20260419_040250"></script>
-<script src="./js/render-comparison.js?v=20260419_040250"></script>
-<script src="./js/render-content.js?v=20260419_040250"></script>
-<script src="./js/render-metrics.js?v=20260419_040250"></script>
-<script src="./js/runtime-core.js?v=20260419_040250"></script>
-<script src="./js/runtime-data-loader.js?v=20260419_040250"></script>
-<script src="./js/runtime-init.js?v=20260419_040250"></script>
+<script defer src="./js/auth.js?v=20260419_040250"></script>
+<script defer src="./js/settings.js?v=20260419_040250"></script>
+<script defer src="./js/data-core.js?v=20260419_040250"></script>
+<script defer src="./js/ui-utils.js?v=20260419_040250"></script>
+<script defer src="./js/render-overview.js?v=20260419_040250"></script>
+<script defer src="./js/render-charts.js?v=20260419_040250"></script>
+<script defer src="./js/render-comparison.js?v=20260419_040250"></script>
+<script defer src="./js/render-content.js?v=20260419_040250"></script>
+<script defer src="./js/render-metrics.js?v=20260419_040250"></script>
+<script defer src="./js/runtime-core.js?v=20260419_040250"></script>
+<script defer src="./js/runtime-data-loader.js?v=20260419_040250"></script>
+<script defer src="./js/runtime-init.js?v=20260419_040250"></script>
 </body>
 </html>
 

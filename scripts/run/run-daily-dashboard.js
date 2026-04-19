@@ -125,9 +125,19 @@ function ensureGitIdentity(repoRoot) {
 function githubPushEnv() {
   const token = process.env.GITHUB_PAT || process.env.GITHUB_TOKEN;
   if (!token) return {};
-  const askpass = '/tmp/git-askpass-dashboard.sh';
   const fs = require('fs');
+  const os = require('os');
+  const askpass = path.join(os.tmpdir(), `git-askpass-dashboard-${process.pid}.sh`);
   fs.writeFileSync(askpass, `#!/bin/sh\ncase "$1" in\n  *Username*) echo "x-access-token" ;;\n  *Password*) echo "${token}" ;;\n  *) echo "" ;;\nesac\n`, { mode: 0o700 });
+
+  // Register cleanup to remove the askpass file when the process exits
+  function cleanupAskpass() {
+    try { fs.unlinkSync(askpass); } catch (_) { /* ignore if already removed */ }
+  }
+  process.on('exit', cleanupAskpass);
+  process.on('SIGINT', () => { cleanupAskpass(); process.exit(130); });
+  process.on('SIGTERM', () => { cleanupAskpass(); process.exit(143); });
+
   return {
     GIT_ASKPASS: askpass,
     GIT_TERMINAL_PROMPT: '0'

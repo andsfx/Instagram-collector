@@ -1,93 +1,114 @@
 import type { DashboardApi } from './schema'
-import type { DashboardRecord, MetricEntry } from './types'
+import type {
+  ContentBreakdownAccountShape,
+  ContentBreakdownByAccount,
+  DashboardRecord,
+  MetricEntry,
+  PostInsightsByAccount,
+  PostInsightsAccountShape,
+  PostInsightPost,
+} from './types'
 
-type AccountKey = string
+function assertLatestMetricEntry(input: DashboardApi, account: string): MetricEntry {
+  const latestEntry = input.latest?.[account]
+
+  if (!latestEntry) {
+    throw new Error(`Dashboard payload tidak valid: latest.${account} tidak tersedia`)
+  }
+
+  return latestEntry as MetricEntry
+}
+
+/** Safely extract a number or return undefined */
+function num(value: unknown): number | undefined {
+  return typeof value === 'number' ? value : undefined
+}
+
+/** Safely extract a string or return undefined */
+function str(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined
+}
+
+function adaptContentBreakdown(input: DashboardApi): ContentBreakdownByAccount {
+  const raw = input.content_breakdown
+  if (!raw) return {}
+
+  return Object.fromEntries(
+    input.accounts.map((acc) => {
+      const cb = raw[acc] as Record<string, unknown> | undefined
+      if (!cb) return [acc, undefined]
+
+      const shaped: ContentBreakdownAccountShape = {
+        posts: num(cb.posts) ?? num(cb.total_posts_analyzed),
+        reels: num(cb.reels),
+        carousels: num(cb.carousels) ?? num(cb.carousel),
+        images: num(cb.images) ?? num(cb.image),
+        videos: num(cb.videos) ?? num(cb.video),
+        followers: num(cb.followers) ?? num(cb.follower_count),
+        bestPost: {
+          url: str(cb.best_post_url) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.url),
+          type: str(cb.best_post_type) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.type),
+          interactions: num(cb.best_post_likes) ?? num((cb.bestPost as Record<string, unknown> | undefined)?.interactions),
+          comments: num(cb.best_post_comments) ?? num((cb.bestPost as Record<string, unknown> | undefined)?.comments),
+          timestamp: str(cb.best_post_timestamp) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.timestamp),
+          id: str(cb.best_post_id) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.id),
+          caption: str(cb.best_post_caption) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.caption),
+        },
+      }
+
+      return [acc, shaped]
+    }),
+  )
+}
+
+function adaptPostInsights(input: DashboardApi): PostInsightsByAccount {
+  const raw = input.post_insights
+  if (!raw) return {}
+
+  return Object.fromEntries(
+    input.accounts.map((acc) => {
+      const pi = raw[acc] as Record<string, unknown> | undefined
+      if (!pi) return [acc, undefined]
+
+      const shaped: PostInsightsAccountShape = {
+        followers: num(pi.followers),
+        posts: Array.isArray(pi.posts) ? (pi.posts as PostInsightPost[]) : undefined,
+        top_interactions: Array.isArray(pi.top_interactions) ? (pi.top_interactions as PostInsightPost[]) : undefined,
+        average_likes: num(pi.average_likes),
+        average_comments: num(pi.average_comments),
+        average_post_er: num(pi.average_post_er),
+        dominant_type: str(pi.dominant_type),
+        top_hashtags: Array.isArray(pi.top_hashtags) ? (pi.top_hashtags as string[]) : undefined,
+        campaign_terms: Array.isArray(pi.campaign_terms) ? (pi.campaign_terms as string[]) : undefined,
+        viral_posts: num(pi.viral_posts),
+        underperform_posts: num(pi.underperform_posts),
+      }
+
+      return [acc, shaped]
+    }),
+  )
+}
 
 export function adaptDashboardData(input: DashboardApi): DashboardRecord {
-  // Build latest entries with robust fallbacks to support real-world payloads
-  const latestEntries: Record<AccountKey, MetricEntry> = Object.fromEntries(
+  const latestEntries: Record<string, MetricEntry> = Object.fromEntries(
     input.accounts.map((account) => {
-      // Try primary source
-      const primary = (input.latest?.[account] ?? null) as MetricEntry | null
-      if (primary) return [account, primary]
-      // Fallbacks from alternative, possibly snake_case fields
-      const cb = (input as any).content_breakdown?.[account] as any
-      if (cb) return [account, cb as MetricEntry]
-      const pi = (input as any).post_insights?.[account] as any
-      if (pi) return [account, pi as MetricEntry]
-      // Default empty metric to keep shape stable
-      const empty: any = {
-        followers: null,
-        following: null,
-        posts: null,
-        avg_likes: null,
-        avg_comments: null,
-        engagement_rate: null,
-      }
-      return [account, empty as MetricEntry]
+      return [account, assertLatestMetricEntry(input, account)]
     }),
   )
 
   const history = input.history.map((row) => ({
     date: row.date,
     values: Object.fromEntries(
-      input.accounts.map((account) => [account, (row as any)[account] as MetricEntry]),
+      input.accounts.map((account) => {
+        const entry = (row as Record<string, unknown>)[account]
+        // Safely coerce history row entries to MetricEntry shape
+        if (entry && typeof entry === 'object') {
+          return [account, entry as MetricEntry]
+        }
+        return [account, { followers: null, following: null, posts: null, avg_likes: null, avg_comments: null, engagement_rate: null } satisfies MetricEntry]
+      }),
     ),
   }))
-
-  // Build audited content_breakdown and post_insights shapes if present
-  const content_breakdown: any = Object.fromEntries(
-    input.accounts.map((acc) => {
-      const cb = (input as any).content_breakdown?.[acc]
-      if (cb) {
-        // Normalize to our ContentBreakdownByAccount shape as a minimal object
-        const shaped: any = {
-          posts: cb?.posts ?? cb?.total_posts_analyzed ?? undefined,
-          reels: cb?.reels ?? undefined,
-          carousels: cb?.carousels ?? cb?.carousel ?? undefined,
-          images: cb?.images ?? cb?.image ?? undefined,
-          videos: cb?.videos ?? cb?.video ?? undefined,
-          followers: cb?.followers ?? cb?.follower_count ?? undefined,
-        }
-        // Normalize best post information from both modern and legacy field names
-        shaped.bestPost = {
-          url: cb?.best_post_url ?? cb?.bestPost?.url ?? undefined,
-          type: cb?.best_post_type ?? cb?.bestPost?.type ?? undefined,
-          interactions: cb?.best_post_likes ?? cb?.bestPost?.interactions ?? undefined,
-          comments: cb?.best_post_comments ?? cb?.bestPost?.comments ?? undefined,
-          timestamp: cb?.best_post_timestamp ?? cb?.bestPost?.timestamp ?? undefined,
-          id: cb?.best_post_id ?? cb?.bestPost?.id ?? undefined,
-          caption: cb?.best_post_caption ?? cb?.bestPost?.caption ?? undefined,
-        }
-        // If there is no meaningful data, still return an object to preserve shape
-        return [acc, shaped]
-      }
-      return [acc, undefined]
-    }),
-  )
-
-  const post_insights: any = Object.fromEntries(
-    input.accounts.map((acc) => {
-      const pi = (input as any).post_insights?.[acc]
-      if (pi) {
-        const shaped: any = {
-          followers: pi?.followers ?? undefined,
-          posts: Array.isArray(pi?.posts) ? pi.posts : undefined,
-          top_interactions: Array.isArray(pi?.top_interactions) ? pi.top_interactions : undefined,
-          average_likes: pi?.average_likes ?? undefined,
-          average_comments: pi?.average_comments ?? undefined,
-          average_post_er: pi?.average_post_er ?? undefined,
-          dominant_type: pi?.dominant_type ?? undefined,
-          top_hashtags: Array.isArray(pi?.top_hashtags) ? pi.top_hashtags : undefined,
-          campaign_terms: Array.isArray(pi?.campaign_terms) ? pi.campaign_terms : undefined,
-          viral_posts: pi?.viral_posts ?? undefined,
-          underperform_posts: pi?.underperform_posts ?? undefined,
-        }
-        return [acc, shaped]
-      }
-      return [acc, undefined]
-    }),
-  )
 
   return {
     generatedAt: input.generated_at,
@@ -103,8 +124,12 @@ export function adaptDashboardData(input: DashboardApi): DashboardRecord {
       executiveKpis: input.presentation_report.executiveSummary.kpis,
       executiveBullets: input.presentation_report.executiveSummary.bullets,
     },
+    meta: {
+      brandAccount: input.meta?.brand_account ?? input.accounts[0] ?? null,
+      historyDays: input.meta?.history_days,
+    },
     history,
-    content_breakdown: content_breakdown as any,
-    post_insights: post_insights as any,
+    content_breakdown: adaptContentBreakdown(input),
+    post_insights: adaptPostInsights(input),
   }
 }

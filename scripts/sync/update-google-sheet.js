@@ -57,7 +57,12 @@ function runGog(args, options = {}) {
   const env = { ...process.env };
   const platformBin = process.platform === "win32" ? "gog" : "/root/.local/bin/gog";
   const gogBin = process.env.GOG_BIN || platformBin;
-  if (!env.GOG_ACCOUNT) env.GOG_ACCOUNT = "andysafii9@gmail.com";
+  if (!env.GOG_ACCOUNT) {
+    if (!process.env.GOG_ACCOUNT) {
+      throw new Error("GOG_ACCOUNT environment variable is required. Set it in .env or pass it directly.");
+    }
+    env.GOG_ACCOUNT = process.env.GOG_ACCOUNT;
+  }
   return execFileSync(gogBin, args, {
     cwd: options.cwd,
     env,
@@ -171,9 +176,14 @@ function buildContentBreakdownRow(merged, metrics) {
   ].map((v) => (v == null ? "" : String(v)));
 }
 
-function upsertByDateUsername(spreadsheetId, tabName, width, row) {
+/**
+ * Upsert a row by date+username.
+ * Accepts an optional pre-fetched `existingRows` array to avoid re-fetching
+ * all rows for every account (N+1 problem).
+ */
+function upsertByDateUsername(spreadsheetId, tabName, width, row, existingRows) {
   const endCol = String.fromCharCode(64 + width);
-  const rows = getExistingRows(spreadsheetId, `${tabName}!A2:${endCol}`);
+  const rows = existingRows ?? getExistingRows(spreadsheetId, `${tabName}!A2:${endCol}`);
   const keyDate = row[0] ?? "";
   const keyUsername = row[1] ?? "";
   let matchedIndex = -1;
@@ -192,7 +202,11 @@ function upsertByDateUsername(spreadsheetId, tabName, width, row) {
   return { action: "update", row: matchedIndex };
 }
 
-function processOne(repoRoot, sheets, username) {
+/**
+ * Process a single account. Accepts optional pre-fetched sheet rows to avoid
+ * redundant full-sheet reads when processing multiple accounts.
+ */
+function processOne(repoRoot, sheets, username, cachedRows) {
   const mergedPath = path.join(repoRoot, "data", "processed", "merged", `${username}.json`);
   const metricsPath = path.join(repoRoot, "data", "processed", "metrics", `${username}-metrics.json`);
   const merged = safeReadJson(mergedPath);
@@ -215,14 +229,16 @@ function processOne(repoRoot, sheets, username) {
     sheets.spreadsheetId,
     engagementTab,
     ENGAGEMENT_HEADERS.length,
-    buildEngagementRow(merged, metrics)
+    buildEngagementRow(merged, metrics),
+    cachedRows?.engagement
   );
 
   const contentResult = upsertByDateUsername(
     sheets.spreadsheetId,
     contentTab,
     CONTENT_BREAKDOWN_HEADERS.length,
-    buildContentBreakdownRow(merged, metrics)
+    buildContentBreakdownRow(merged, metrics),
+    cachedRows?.content
   );
 
   return {
@@ -246,13 +262,24 @@ function main() {
 
   if (arg === "--all") {
     const enabled = accounts.filter((a) => a.enabled).map((a) => a.username);
-    const results = enabled.map((username) => processOne(repoRoot, sheets, username));
+
+    // Pre-fetch all rows once to avoid N+1 reads
+    const engagementTab = sheets.tabs.engagement || "Engagement";
+    const contentTab = sheets.tabs.contentBreakdown || "Content Breakdown";
+    const engEndCol = String.fromCharCode(64 + ENGAGEMENT_HEADERS.length);
+    const cbEndCol = String.fromCharCode(64 + CONTENT_BREAKDOWN_HEADERS.length);
+    const cachedRows = {
+      engagement: getExistingRows(sheets.spreadsheetId, `${engagementTab}!A2:${engEndCol}`),
+      content: getExistingRows(sheets.spreadsheetId, `${contentTab}!A2:${cbEndCol}`),
+    };
+
+    const results = enabled.map((username) => processOne(repoRoot, sheets, username, cachedRows));
     console.log(JSON.stringify(results, null, 2));
     const hasFailure = results.some((r) => !r.ok && !r.skipped);
     process.exit(hasFailure ? 2 : 0);
   }
 
-  const result = processOne(repoRoot, sheets, arg);
+  const result = processOne(repoRoot, sheets, arg, null);
   console.log(JSON.stringify(result, null, 2));
   process.exit(result.ok ? 0 : 2);
 }

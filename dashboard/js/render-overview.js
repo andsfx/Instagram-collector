@@ -8,7 +8,7 @@ function dashData(){
 
 function escapeHtml(text){
   if(!text) return '';
-  return String(text).replace(/[&<>]/g,(char)=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[char]));
+  return String(text).replace(/[&<>"']/g,function(char){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]; });
 }
 
 function formatPostDate(iso){
@@ -91,7 +91,7 @@ function renderExecutiveSummary(){
   ];
 
   el.innerHTML = cards.map(function(card){
-    return `<article class="summary-card highlight" data-tone="${card.tone || 'brand'}" title="${escapeHtml(card.s)}"><div class="k">${card.k}</div><div class="v">${card.v}</div><div class="s">${card.s}</div></article>`;
+    return `<article class="summary-card highlight" data-tone="${card.tone || 'brand'}" title="${escapeHtml(card.s)}"><div class="k">${card.k}</div><div class="v">${escapeHtml(card.v)}</div><div class="s">${escapeHtml(card.s)}</div></article>`;
   }).join('');
 }
 
@@ -111,10 +111,10 @@ function renderTodaySummary(){
   const brandGrowth = brand.growthAbs || 0;
   const tone = brandGrowth > 0 ? 'positif' : brandGrowth < 0 ? 'melemah' : 'stabil';
   const items = [
-    `Hari ini performa brand @${brand.u} cenderung <strong>${tone}</strong> dengan perubahan followers <strong>${brandGrowth >= 0 ? '+' : ''}${fmtFull(brandGrowth)}</strong>.`,
-    topGrowth ? `Pergerakan followers tercepat saat ini datang dari <strong>@${topGrowth.u}</strong> (${topGrowth.growthAbs >= 0 ? '+' : ''}${fmtFull(topGrowth.growthAbs)} hari ini).` : '',
-    topER ? `Akun dengan engagement rate tertinggi adalah <strong>@${topER.u}</strong> di level <strong>${pct(topER.er || 0)}</strong>.` : '',
-    topFollowers ? `Pemimpin total followers tetap <strong>@${topFollowers.u}</strong> dengan <strong>${fmtFull(topFollowers.f || 0)}</strong> followers.` : ''
+    `Hari ini performa brand @${escapeHtml(brand.u)} cenderung <strong>${tone}</strong> dengan perubahan followers <strong>${brandGrowth >= 0 ? '+' : ''}${fmtFull(brandGrowth)}</strong>.`,
+    topGrowth ? `Pergerakan followers tercepat saat ini datang dari <strong>@${escapeHtml(topGrowth.u)}</strong> (${topGrowth.growthAbs >= 0 ? '+' : ''}${fmtFull(topGrowth.growthAbs)} hari ini).` : '',
+    topER ? `Akun dengan engagement rate tertinggi adalah <strong>@${escapeHtml(topER.u)}</strong> di level <strong>${pct(topER.er || 0)}</strong>.` : '',
+    topFollowers ? `Pemimpin total followers tetap <strong>@${escapeHtml(topFollowers.u)}</strong> dengan <strong>${fmtFull(topFollowers.f || 0)}</strong> followers.` : ''
   ].filter(Boolean);
 
   el.innerHTML = `
@@ -135,10 +135,11 @@ function renderSummaryStrip(){
   var el = document.getElementById('summaryStrip');
   if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
   var leaders = computeOverviewLeaders();
+  if(!leaders || !leaders.topFollowers || !leaders.topER || !leaders.topGrowth) return;
   var cards = [
-    { k:'Pemimpin Followers', v:'@' + leaders.topFollowers.u, s: fmtFull(leaders.topFollowers.f) + ' followers', cls:'highlight' },
-    { k:'ER Tertinggi', v:'@' + leaders.topER.u, s: ((leaders.topER.er || 0) * 100).toFixed(2) + '% tingkat interaksi' },
-    { k:'Pertumbuhan Tercepat', v:'@' + leaders.topGrowth.u, s: (leaders.topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(leaders.topGrowth.growthAbs || 0) + ' hari ini' },
+    { k:'Pemimpin Followers', v:'@' + escapeHtml(leaders.topFollowers.u), s: fmtFull(leaders.topFollowers.f) + ' followers', cls:'highlight' },
+    { k:'ER Tertinggi', v:'@' + escapeHtml(leaders.topER.u), s: ((leaders.topER.er || 0) * 100).toFixed(2) + '% tingkat interaksi' },
+    { k:'Pertumbuhan Tercepat', v:'@' + escapeHtml(leaders.topGrowth.u), s: (leaders.topGrowth.growthAbs >= 0 ? '+' : '') + fmtFull(leaders.topGrowth.growthAbs || 0) + ' hari ini' },
     { k:'Format Dominan', v: (leaders.topFormat[0] || 'reels').charAt(0).toUpperCase() + (leaders.topFormat[0] || 'reels').slice(1), s: fmtFull(leaders.topFormat[1] || 0) + ' post pada dataset terbaru' },
     { k:'Pembaruan Terakhir', v: prettyLastUpdate(dashData().lastUpdate || '-'), s: 'Data followers harian dan engagement terbaru' }
   ];
@@ -150,6 +151,7 @@ function renderSummaryStrip(){
 // ===== OVERVIEW CARDS =====
 function renderCards(){
   const el = document.getElementById('cards');
+  if(!el || !dashData() || !dashData().accounts) return;
   const accs = [...dashData().accounts].sort((a,b) => b.f - a.f);
   const cardClasses = ['cc','cg','ca','cr'];
   replaceWithFragment(el, accs.map((a, i) => {
@@ -161,8 +163,8 @@ function renderCards(){
     const erValue = a.er != null ? (a.er * 100).toFixed(2)+'%' : '-';
     const erBadgeClass = a.er >= 0.03 ? 'er-strong' : a.er >= 0.01 ? 'er-watch' : 'er-weak';
     const erBadgeLabel = a.er >= 0.03 ? 'Kuat' : a.er >= 0.01 ? 'Perlu dipantau' : 'Perlu perhatian';
-    return `<article class="${cls}" aria-label="Ringkasan akun @${a.u}" title="Akun @${a.u}">
-      <div class="ch"><span class="cun"><span class="account-label">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}<span class="account-handle" title="@${a.u}">@${a.u}</span></span></span>${tag}</div>
+    return `<article class="${cls}" aria-label="Ringkasan akun @${escapeHtml(a.u)}" title="Akun @${escapeHtml(a.u)}">
+      <div class="ch"><span class="cun"><span class="account-label">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}<span class="account-handle" title="@${escapeHtml(a.u)}">@${escapeHtml(a.u)}</span></span></span>${tag}</div>
       <div class="cfol"><div class="lb">Followers</div><div class="vl">${fmtFull(a.f)}</div><div class="gr ${gCls}" aria-label="Perubahan harian ${deltaText}">${gIcon} <span class="delta-label">${deltaText}</span> ${a.growthAbs >= 0 ? '+' : ''}${fmtFull(a.growthAbs)} (${pct(a.growthPct)})</div></div>
       <div class="csts">
         <div class="cst"><div class="sv">${fmtFull(a.fo)}</div><div class="sl">Following</div></div>
@@ -206,7 +208,7 @@ function renderGrowthVelocity(){
     const maxBar = Math.max(Math.abs(dailyPct), Math.abs(weeklyPct), 0.01);
 
     return `<div class="gv-card">
-      <div class="gv-name"><span style="color:${COLORS[idx % COLORS.length]}">&#9679;</span> @${a.u}</div>
+      <div class="gv-name"><span style="color:${COLORS[idx % COLORS.length]}">&#9679;</span> @${escapeHtml(a.u)}</div>
       <div class="gv-row">
         <span class="gv-label">Daily</span>
         <span class="gv-val ${dailyCls}">${daily >= 0 ? '+' : ''}${fmtFull(daily)} (${dailyPct >= 0 ? '+' : ''}${dailyPct.toFixed(3)}%)</span>
@@ -287,8 +289,8 @@ function renderPostSnapshot(){
       { k:'Total post teranalisis', v: fmtFull(totalPosts) },
       { k:'Viral / perlu optimasi', v: `${fmtFull(totalViral)} / ${fmtFull(totalUnder)}` },
       { k:'Tema campaign teratas', v: escapeHtml(topCampaign) },
-      { k:'Akun paling viral', v: topViral ? `@${topViral.username}` : '-' },
-      { k:'Akun dengan ER tertinggi', v: topER ? `@${topER.username}` : '-' },
+      { k:'Akun paling viral', v: topViral ? `@${escapeHtml(topViral.username)}` : '-' },
+      { k:'Akun dengan ER tertinggi', v: topER ? `@${escapeHtml(topER.username)}` : '-' },
     ];
     summaryEl.innerHTML = items.map((item)=>`<div class="ps-summary-card"><div class="ps-summary-k">${item.k}</div><div class="ps-summary-v">${item.v}</div></div>`).join('');
   }
@@ -300,7 +302,7 @@ function renderPostSnapshot(){
 
   const html = cards.map(({ username, insight }) => {
     if(!insight){
-      return `<div class="ps-card"><div class="ps-card-title">@${username}</div><div class="ps-empty">Data postingan belum tersedia.</div></div>`;
+      return `<div class="ps-card"><div class="ps-card-title">@${escapeHtml(username)}</div><div class="ps-empty">Data postingan belum tersedia.</div></div>`;
     }
     const posts = insight.posts || [];
     const visiblePosts = selectedPostFilter === 'all' ? posts : posts.filter((post) => post.performance_label === selectedPostFilter);
@@ -313,9 +315,9 @@ function renderPostSnapshot(){
     const campaigns = (insight.campaign_terms || []).slice(0, 2).map((term) => escapeHtml(term)).join(', ');
     const campaignHtml = campaigns ? `<div class="ps-campaign">Tema campaign: ${campaigns}</div>` : '<div class="ps-campaign">Tema campaign: -</div>';
 
-    let insightText = `Format ${titleCase(insight.dominant_type || 'unknown')} masih jadi kekuatan utama @${username}.`;
-    if ((insight.viral_posts || 0) > (insight.underperform_posts || 0)) insightText = `${fmtFull(insight.viral_posts || 0)} postingan terakhir @${username} masuk kategori viral atau stabil kuat.`;
-    else if ((insight.underperform_posts || 0) >= 3) insightText = `Beberapa postingan @${username} masih perlu optimasi agar performanya lebih konsisten.`;
+    let insightText = `Format ${titleCase(insight.dominant_type || 'unknown')} masih jadi kekuatan utama @${escapeHtml(username)}.`;
+    if ((insight.viral_posts || 0) > (insight.underperform_posts || 0)) insightText = `${fmtFull(insight.viral_posts || 0)} postingan terakhir @${escapeHtml(username)} masuk kategori viral atau stabil kuat.`;
+    else if ((insight.underperform_posts || 0) >= 3) insightText = `Beberapa postingan @${escapeHtml(username)} masih perlu optimasi agar performanya lebih konsisten.`;
 
     let previewHtml = '<div class="ps-post ps-empty">Tidak ada postingan sesuai filter.</div>';
     if (bestPost) {
@@ -337,7 +339,7 @@ function renderPostSnapshot(){
     return `<div class="ps-card">
       <div class="ps-card-header">
         <div>
-          <div class="ps-card-title">@${username}</div>
+          <div class="ps-card-title">@${escapeHtml(username)}</div>
           <div class="ps-card-meta">Ringkasan 12 postingan terakhir</div>
         </div>
         <div class="ps-card-format">${titleCase(insight.dominant_type || 'unknown')}</div>
@@ -396,10 +398,10 @@ function renderTable(){
     const rCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : '';
     const gap = a.f - brand.f;
     const gapCls = a.b ? 'gz' : gap > 0 ? 'gp' : gap < 0 ? 'gn' : 'gz';
-    const erCls = a.er >= 0.2 ? 'er-high' : a.er >= 0.1 ? 'er-mid' : 'er-low';
+    const erCls = a.er >= 0.03 ? 'er-high' : a.er >= 0.01 ? 'er-mid' : 'er-low';
     return `<tr class="${a.b ? 'brow' : ''}">
       <td><span class="rn ${rCls}">#${rank}</span></td>
-      <td title="@${a.u}"><span class="tu">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}<span class="account-handle">@${a.u}</span></span></td>
+      <td title="@${escapeHtml(a.u)}"><span class="tu">${a.v ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#405DE6" stroke="#405DE6" stroke-width="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4" stroke="#FFF" stroke-width="2.5" fill="none"/></svg>' : ''}<span class="account-handle">@${escapeHtml(a.u)}</span></span></td>
       <td>${fmtFull(a.f)}</td>
       <td>${fmtFull(a.fo)}</td>
       <td>${fmtFull(a.p)}</td>
@@ -422,20 +424,21 @@ document.querySelectorAll('.rtbl thead th').forEach(th => {
 });
 
 function renderAlerts(){
-  const sec = document.getElementById('alertSection');
-  const list = document.getElementById('alertList');
-  if(!dashData().alerts || dashData().alerts.length === 0){
-    sec.style.display = 'none';
-    return;
-  }
+    const sec = document.getElementById('alertSection');
+    const list = document.getElementById('alertList');
+    if(!sec || !list) return;
+    if(!dashData() || !dashData().alerts || dashData().alerts.length === 0){
+        sec.style.display = 'none';
+        return;
+    }
   sec.style.display = 'block';
   list.innerHTML = '<div class="al-list">' + dashData().alerts.map(a => {
     const isDanger = a.jenis && a.jenis.toLowerCase().includes('drop');
     const pctCls = a.persen >= 0 ? 'up' : 'dn';
     return `<div class="al-item${isDanger ? ' danger' : ''}">
       <span class="al-date">${a.tanggal || '-'}</span>
-      <span class="al-akun">@${a.akun}</span>
-      <span class="al-info">${a.jenis || ''} ${a.catatan ? '- ' + a.catatan : ''}</span>
+      <span class="al-akun">@${escapeHtml(a.akun)}</span>
+      <span class="al-info">${escapeHtml(a.jenis || '')} ${a.catatan ? '- ' + escapeHtml(a.catatan) : ''}</span>
       <span class="al-pct ${pctCls}">${a.persen != null ? (a.persen >= 0 ? '+' : '') + a.persen.toFixed(2) + '%' : ''}</span>
     </div>`;
   }).join('') + '</div>';

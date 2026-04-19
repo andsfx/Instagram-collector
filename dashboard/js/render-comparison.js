@@ -83,8 +83,11 @@ function renderH2HSelectors(){
 }
 
 function renderH2H(){
-  var uA = document.getElementById('h2hA').value;
-  var uB = document.getElementById('h2hB').value;
+  var selA = document.getElementById('h2hA');
+  var selB = document.getElementById('h2hB');
+  if(!selA || !selB) return;
+  var uA = selA.value;
+  var uB = selB.value;
   var grid = document.getElementById('h2hGrid');
   var header = document.getElementById('h2hHeader');
   var metricSub = document.getElementById('h2hTrendSub');
@@ -100,7 +103,7 @@ function renderH2H(){
   }
 
   if(header){
-    header.innerHTML = '<div class="h2h-name" title="@' + uA + '">@' + uA + '</div><div class="h2h-badge">VS</div><div class="h2h-name" title="@' + uB + '">@' + uB + '</div>';
+    header.innerHTML = '<div class="h2h-name" title="@' + escapeHtml(uA) + '">@' + escapeHtml(uA) + '</div><div class="h2h-badge">VS</div><div class="h2h-name" title="@' + escapeHtml(uB) + '">@' + escapeHtml(uB) + '</div>';
   }
 
   var metricOptions = getH2HMetricOptions();
@@ -123,12 +126,12 @@ function renderH2H(){
   var totalWins = Math.max(winsA + winsB, 1);
   var verdictHtml = '<div class="h2h-verdict"><div class="ttl">Quick Verdict</div><div class="txt">';
   if (winner) {
-    verdictHtml += '@' + winner.u + ' unggul keseluruhan atas @' + loser.u + ' (' + (winsA > winsB ? winsA : winsB) + ' dari ' + metrics.length + ' metrik).';
+    verdictHtml += '@' + escapeHtml(winner.u) + ' unggul keseluruhan atas @' + escapeHtml(loser.u) + ' (' + (winsA > winsB ? winsA : winsB) + ' dari ' + metrics.length + ' metrik).';
   } else {
-    verdictHtml += '@' + aA.u + ' dan @' + aB.u + ' masih berimbang pada metrik utama.';
+    verdictHtml += '@' + escapeHtml(aA.u) + ' dan @' + escapeHtml(aB.u) + ' masih berimbang pada metrik utama.';
   }
-  verdictHtml += '</div><div class="sub">Pada metrik aktif <strong>' + activeMetric.label + '</strong>, ' + (activeA === activeB ? 'keduanya masih imbang.' : ('@' + (activeA > activeB ? aA.u : aB.u) + ' lebih unggul dengan nilai ' + activeMetric.formatter((activeA > activeB ? activeA : activeB)))) + '</div>' +
-    '<div class="h2h-scorebar" aria-label="Distribusi kemenangan per metrik"><div class="h2h-scorebar-side a" style="width:' + Math.max((winsA / totalWins) * 100, winsA ? 18 : 0) + '%">@' + aA.u + ': ' + winsA + '</div><div class="h2h-scorebar-side b" style="width:' + Math.max((winsB / totalWins) * 100, winsB ? 18 : 0) + '%">' + winsB + ' :@' + aB.u + '</div></div></div>';
+  verdictHtml += '</div><div class="sub">Pada metrik aktif <strong>' + activeMetric.label + '</strong>, ' + (activeA === activeB ? 'keduanya masih imbang.' : ('@' + escapeHtml(activeA > activeB ? aA.u : aB.u) + ' lebih unggul dengan nilai ' + activeMetric.formatter((activeA > activeB ? activeA : activeB)))) + '</div>' +
+    '<div class="h2h-scorebar" aria-label="Distribusi kemenangan per metrik"><div class="h2h-scorebar-side a" style="width:' + Math.max((winsA / totalWins) * 100, winsA ? 18 : 0) + '%">@' + escapeHtml(aA.u) + ': ' + winsA + '</div><div class="h2h-scorebar-side b" style="width:' + Math.max((winsB / totalWins) * 100, winsB ? 18 : 0) + '%">' + winsB + ' :@' + escapeHtml(aB.u) + '</div></div></div>';
   var html = verdictHtml + '<table class="h2h-table"><tbody>';
   metrics.forEach(function(m){
     var winA = m.vA > m.vB;
@@ -157,9 +160,23 @@ function renderH2H(){
   var seriesB = activeMetric.series(uB);
   if (metricSub) metricSub.textContent = activeMetric.sub;
   if(!seriesA || !seriesA.length || !seriesB || !seriesB.length){
-    ctx.canvas.parentElement.querySelector('.chcon').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px">Trend untuk metrik ini belum tersedia</div>';
+    var noDataEl = ctx.canvas.parentElement.querySelector('.h2h-no-data');
+    if(!noDataEl){
+      noDataEl = document.createElement('div');
+      noDataEl.className = 'h2h-no-data';
+      noDataEl.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px;position:absolute;inset:0;background:var(--card)';
+      ctx.canvas.parentElement.style.position = 'relative';
+      ctx.canvas.parentElement.appendChild(noDataEl);
+    }
+    noDataEl.textContent = 'Trend untuk metrik ini belum tersedia';
+    noDataEl.style.display = 'flex';
+    ctx.canvas.style.display = 'none';
     return;
   }
+  // Ensure canvas is visible and no-data overlay is hidden when data exists
+  ctx.canvas.style.display = '';
+  var existingNoData = ctx.canvas.parentElement.querySelector('.h2h-no-data');
+  if(existingNoData) existingNoData.style.display = 'none';
   var idxA = dashData().accounts.indexOf(aA);
   var idxB = dashData().accounts.indexOf(aB);
   dashState().chartInstances.h2h = new Chart(ctx, {

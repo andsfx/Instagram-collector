@@ -34,7 +34,7 @@ function mkFollowersBar(){
         borderSkipped: false
       }]
     },
-    options: { ...chartDefaults(), plugins: { ...chartDefaults().plugins, legend: { display: false } }, indexAxis: 'x' }
+    options: (function(){ var d = chartDefaults(); return { ...d, plugins: { ...d.plugins, legend: { display: false } }, indexAxis: 'x' }; })()
   });
 }
 
@@ -42,6 +42,7 @@ function mkERBar(){
   destroyChart('erbar');
   const ctx = document.getElementById('chER').getContext('2d');
   const accs = [...dashData().accounts].sort((a,b) => b.er - a.er);
+  var defaults = chartDefaults();
   dashState().chartInstances.erbar = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -57,9 +58,9 @@ function mkERBar(){
       }]
     },
     options: { 
-      ...chartDefaults(), 
+      ...defaults, 
       plugins: { 
-        ...chartDefaults().plugins, 
+        ...defaults.plugins, 
         legend: { display: false },
         tooltip: { 
           backgroundColor: 'rgba(0,0,0,0.8)', 
@@ -73,11 +74,11 @@ function mkERBar(){
         }
       },
       scales: {
-        ...chartDefaults().scales,
+        ...defaults.scales,
         y: { 
-          ...chartDefaults().scales.y, 
+          ...defaults.scales.y, 
           ticks: { 
-            ...chartDefaults().scales.y.ticks, 
+            ...defaults.scales.y.ticks, 
             callback: function(v){ return v.toFixed(1) + '%'; } 
           } 
         }
@@ -181,9 +182,23 @@ function mkERTrend(){
   destroyChart('ertrend');
   const ctx = document.getElementById('chERTrend').getContext('2d');
   if(!dashData().engTrend){
-    ctx.canvas.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px">Data engagement trend belum tersedia</div>';
+    var noDataEl = ctx.canvas.parentElement.querySelector('.chart-no-data');
+    if(!noDataEl){
+      noDataEl = document.createElement('div');
+      noDataEl.className = 'chart-no-data';
+      noDataEl.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:13px;position:absolute;inset:0;background:var(--card)';
+      ctx.canvas.parentElement.style.position = 'relative';
+      ctx.canvas.parentElement.appendChild(noDataEl);
+    }
+    noDataEl.textContent = 'Data engagement trend belum tersedia';
+    noDataEl.style.display = 'flex';
+    ctx.canvas.style.display = 'none';
     return;
   }
+  ctx.canvas.style.display = '';
+  var existingNoData = ctx.canvas.parentElement.querySelector('.chart-no-data');
+  if(existingNoData) existingNoData.style.display = 'none';
+  var defaults = chartDefaults();
   dashState().chartInstances.ertrend = new Chart(ctx, {
     type: 'line',
     data: {
@@ -201,21 +216,21 @@ function mkERTrend(){
       }))
     },
     options: {
-      ...chartDefaults(),
+      ...defaults,
       scales: {
-        ...chartDefaults().scales,
+        ...defaults.scales,
         y: {
-          ...chartDefaults().scales.y,
+          ...defaults.scales.y,
           ticks: {
-            ...chartDefaults().scales.y.ticks,
+            ...defaults.scales.y.ticks,
             callback: function(v){ return v.toFixed(1) + '%'; }
           }
         }
       },
       plugins: {
-        ...chartDefaults().plugins,
+        ...defaults.plugins,
         tooltip: {
-          ...chartDefaults().plugins.tooltip,
+          ...defaults.plugins.tooltip,
           callbacks: {
             label: function(ctx){ return ctx.dataset.label + ': ' + (ctx.raw != null ? ctx.raw.toFixed(2) + '%' : 'N/A'); }
           }
@@ -346,11 +361,12 @@ function mkProjection(){
     note.textContent = crossings.length > 0 ? crossings.join(' | ') : 'Tidak ada prediksi crossing dalam 90 hari ke depan.';
   }
 
+  var defaults = chartDefaults();
   dashState().chartInstances.projection = new Chart(ctx, {
     type: 'line',
     data: { labels: allLabels, datasets: datasets },
-    options: Object.assign({}, chartDefaults(), {
-      plugins: Object.assign({}, chartDefaults().plugins, {
+    options: Object.assign({}, defaults, {
+      plugins: Object.assign({}, defaults.plugins, {
         legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 11 }, color: getChartTextColor(),
           filter: function(item){ return item.text.indexOf('proyeksi') === -1; }
         }},

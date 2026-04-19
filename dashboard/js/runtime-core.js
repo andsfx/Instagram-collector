@@ -105,6 +105,7 @@ function updateDarkBtn(theme){
   const btn = document.getElementById('darkToggle');
   const icon = document.getElementById('darkIcon');
   const label = document.getElementById('darkLabel');
+  if(!btn || !icon || !label) return;
   if(theme === 'dark'){
     btn.classList.add('active');
     icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
@@ -172,10 +173,11 @@ function loadSettings(){
 
 function applySettingsToUI(){
   const s = loadSettings();
-  document.getElementById('setGap').value = s.gapFollow;
-  document.getElementById('setErDrop').value = s.erDrop;
-  document.getElementById('setGrowthSpike').value = s.growthSpike;
-  document.getElementById('setFollowChange').value = s.followChange;
+  var el;
+  el = document.getElementById('setGap'); if(el) el.value = s.gapFollow;
+  el = document.getElementById('setErDrop'); if(el) el.value = s.erDrop;
+  el = document.getElementById('setGrowthSpike'); if(el) el.value = s.growthSpike;
+  el = document.getElementById('setFollowChange'); if(el) el.value = s.followChange;
 }
 
 function saveAnalyticsSettings(){
@@ -187,13 +189,15 @@ function saveAnalyticsSettings(){
   };
   localStorage.setItem('ig-dash-settings', JSON.stringify(s));
   const btn = document.querySelector('.settings-save');
-  btn.textContent = 'Tersimpan!';
-  setTimeout(() => btn.textContent = 'Simpan Settings', 1500);
+  if(btn){
+    btn.textContent = 'Tersimpan!';
+    setTimeout(() => btn.textContent = 'Simpan Settings', 1500);
+  }
 }
 
 function toggleSettings(){
   const panel = document.getElementById('settingsPanel');
-  panel.classList.toggle('open');
+  if(panel) panel.classList.toggle('open');
 }
 window.loadSettings = loadSettings;
 window.applySettingsToUI = applySettingsToUI;
@@ -207,6 +211,7 @@ function setF(f){
   document.querySelectorAll('.fbtn').forEach(b => b.classList.toggle('on', b.getAttribute('data-p') === f));
   const fn = document.getElementById('fn');
   const fnt = document.getElementById('fnt');
+  if(!fn || !fnt) return;
   if(f === 'day'){
     fn.classList.remove('show');
   } else {
@@ -394,6 +399,7 @@ window.initChartVisibilityBootstrap = initChartVisibilityBootstrap;
 function _doCanvasExport(callback){
   var overlay = document.getElementById('exportOverlay');
   var msg = document.getElementById('exportMsg');
+  if(!overlay || !msg) return;
   overlay.style.display = 'flex';
   msg.textContent = 'Loading export libraries...';
   loadExportLibs().then(function(){
@@ -493,6 +499,7 @@ function _loadBrandLogoDataURL(){
 function exportPDF(){
   var overlay = document.getElementById('exportOverlay');
   var msg = document.getElementById('exportMsg');
+  if(!overlay || !msg) return;
   overlay.style.display = 'flex';
   msg.textContent = 'Loading export libraries...';
 

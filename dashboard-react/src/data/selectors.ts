@@ -61,6 +61,17 @@ export interface HeroMetaItem {
   label: string
 }
 
+export interface HeroSummary {
+  title: string
+  subtitle: string
+  description: string
+  boardTitle: string
+}
+
+function formatAccountHandle(account: string | null) {
+  return account ? `@${account}` : 'brand utama'
+}
+
 export function getFreshnessSummary(data: DashboardRecord): FreshnessSummary {
   return {
     latestDateLabel: formatDateLabel(data.latestDate),
@@ -86,6 +97,17 @@ export function getHeroMeta(data: DashboardRecord): HeroMetaItem[] {
       label: 'Histori aktif',
     },
   ]
+}
+
+export function getHeroSummary(data: DashboardRecord): HeroSummary {
+  const brandHandle = formatAccountHandle(data.meta.brandAccount)
+
+  return {
+    title: brandHandle,
+    subtitle: 'Performance overview',
+    description: `Growth, engagement, dan gap kompetitor untuk ${brandHandle} dalam satu ringkasan.`,
+    boardTitle: `Buka dengan posisi ${brandHandle}. Turun ke detail bila perlu.`,
+  }
 }
 
 export interface ExecutiveSummaryData {
@@ -180,7 +202,7 @@ const HEATMAP_SLOTS = [
 ] as const
 
 function getBrandAccount(data: DashboardRecord) {
-  return data.accounts[0] ?? null
+  return data.meta.brandAccount ?? data.accounts[0] ?? null
 }
 
 function getMetricValue(data: DashboardRecord, account: string, metric: HeadToHeadMetric) {
@@ -351,8 +373,19 @@ export function getQuickVisualData(data: DashboardRecord): QuickVisualData {
   })
 
   projectionTrend.sort((left, right) => {
-    const leftDate = new Date(`2026 ${left.date}`)
-    const rightDate = new Date(`2026 ${right.date}`)
+    // Use the latest date's year as reference instead of hardcoding a year.
+    // This ensures correct sorting across year boundaries.
+    const referenceYear = new Date(data.latestDate).getFullYear()
+    const leftDate = new Date(`${referenceYear} ${left.date}`)
+    const rightDate = new Date(`${referenceYear} ${right.date}`)
+    // Handle year rollover: if a date parses before the latest date's month,
+    // it may belong to the next year
+    if (leftDate.getTime() < new Date(data.latestDate).getTime() - 180 * 86400000) {
+      leftDate.setFullYear(referenceYear + 1)
+    }
+    if (rightDate.getTime() < new Date(data.latestDate).getTime() - 180 * 86400000) {
+      rightDate.setFullYear(referenceYear + 1)
+    }
     return leftDate.getTime() - rightDate.getTime()
   })
 

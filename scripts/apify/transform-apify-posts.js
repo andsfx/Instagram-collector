@@ -19,11 +19,6 @@ function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
 }
 
-function mean(arr) {
-  if (!arr.length) return null;
-  return Number((arr.reduce((a, b) => a + b, 0) / arr.length / arr.length * arr.length).toFixed(2));
-}
-
 function avg(arr) {
   if (!arr.length) return null;
   return Number((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2));

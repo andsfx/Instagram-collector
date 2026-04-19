@@ -17,28 +17,33 @@ export function SectionNav({
   const [activeId, setActiveId] = useState(items[0]?.id ?? '')
 
   useEffect(() => {
-    const observers = items
-      .map((item) => {
-        const element = document.getElementById(item.id)
-        if (!element) return null
+    // Use a single IntersectionObserver for all sections instead of one per section
+    const elementToId = new Map<Element, string>()
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            const activeEntry = entries.find((entry) => entry.isIntersecting)
-            if (activeEntry) {
-              setActiveId(item.id)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const sectionId = elementToId.get(entry.target)
+            if (sectionId) {
+              setActiveId(sectionId)
             }
-          },
-          { rootMargin: '-28% 0px -58% 0px', threshold: 0.05 },
-        )
+          }
+        }
+      },
+      { rootMargin: '-28% 0px -58% 0px', threshold: 0.05 },
+    )
 
+    for (const item of items) {
+      const element = document.getElementById(item.id)
+      if (element) {
+        elementToId.set(element, item.id)
         observer.observe(element)
-        return observer
-      })
-      .filter(Boolean) as IntersectionObserver[]
+      }
+    }
 
     return () => {
-      observers.forEach((observer) => observer.disconnect())
+      observer.disconnect()
     }
   }, [items])
 

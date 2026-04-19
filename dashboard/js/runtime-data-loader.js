@@ -118,9 +118,12 @@ function onData(raw, source){
 }
 
 function onError(e, raw){
+  var errorMessage = e && e.message ? e.message : 'Terjadi kesalahan. Silakan refresh halaman.';
+  // Sanitize error message to prevent XSS
+  errorMessage = String(errorMessage).replace(/[<>"'&]/g, function(c){ return {'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c]; });
   document.getElementById('loadingState').innerHTML =
     '<div class="error-box"><strong>Gagal memuat data</strong><br><br>'+
-    (e && e.message ? e.message : 'Terjadi kesalahan. Silakan refresh halaman.')+
+    errorMessage+
     '<br><br><button onclick="forceRefreshData()" style="padding:8px 20px;border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:var(--radius-pill);cursor:pointer;font-weight:600;font-family:inherit">Force refresh</button></div>';
   setFreshnessBadge('error', 'perlu refresh');
   setDataSource('loading');
@@ -141,10 +144,13 @@ async function fetchWithTimeout(url, timeoutMs, cacheMode){
   }
 }
 
+var _silentRefreshRunning = false;
 async function silentRefresh(){
+  if(_silentRefreshRunning) return;
+  _silentRefreshRunning = true;
+  try {
   var data = getDashboardData();
   if(!data || !data.generated_at) return;
-  try {
     var res = await fetchWithTimeout(STATIC_JSON_URL, 5000, 'no-cache');
     if(!res.ok) return;
     var raw = await res.json();
@@ -154,7 +160,10 @@ async function silentRefresh(){
     saveToCache(raw);
     setDataSource('static', raw.latest && raw.latest.date ? raw.latest.date : todayWibDate());
     onData(raw, 'static');
-  } catch(_) {}
+  } catch(_) {
+  } finally {
+    _silentRefreshRunning = false;
+  }
 }
 
 async function initDashboard(){
@@ -203,5 +212,4 @@ window.fetchWithTimeout = fetchWithTimeout;
 window.silentRefresh = silentRefresh;
 window.initDashboard = initDashboard;
 window.forceRefreshData = forceRefreshData;
-Dashboard = initDashboard;
-window.forceRefreshData = forceRefreshData;
+window.Dashboard = initDashboard;

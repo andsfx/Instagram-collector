@@ -20,19 +20,8 @@ import {
   YAxis,
 } from 'recharts'
 import type { QuickVisualData } from '../data/selectors'
+import { chartAxisColor, chartGridColor, chartItemStyle, chartLabelStyle, chartLegendStyle, chartTooltipStyle } from './chart-theme'
 import { SectionCard } from './ui'
-
-const chartAxisColor = 'var(--chart-axis)'
-const chartGridColor = 'var(--chart-grid)'
-const chartTooltipStyle = {
-  backgroundColor: 'var(--chart-tooltip-bg)',
-  border: '1px solid var(--chart-tooltip-border)',
-  borderRadius: '12px',
-  color: 'var(--text)',
-}
-const chartLabelStyle = { color: 'var(--text)' }
-const chartItemStyle = { color: 'var(--text)' }
-const chartLegendStyle = { color: 'var(--text-muted)' }
 
 export function QuickVisual({ data }: { data: QuickVisualData }) {
   return (

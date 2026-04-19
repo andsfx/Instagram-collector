@@ -75,4 +75,7 @@ await context.close();
 
 fs.writeFileSync(output, JSON.stringify(result, null, 2), 'utf8');
 console.log(JSON.stringify(result, null, 2));
-})();
+})().catch((err) => {
+  console.error('Fatal error:', err.message || err);
+  process.exit(1);
+});

@@ -1,14 +1,15 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
+import { defineConfig, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
+import type { ServerResponse } from 'node:http'
 
 function dashboardDataPlugin() {
   const rootDir = fileURLToPath(new URL('.', import.meta.url))
   const dataPath = resolve(rootDir, '../dashboard/data.json')
 
-  async function handleRequest(res: any) {
+  async function handleRequest(res: ServerResponse) {
     try {
       const raw = await readFile(dataPath, 'utf8')
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
@@ -22,14 +23,14 @@ function dashboardDataPlugin() {
 
   return {
     name: 'dashboard-data-runtime-endpoint',
-    configureServer(server: any) {
-      server.middlewares.use('/api/dashboard-data', (_req: any, res: any) => {
-        void handleRequest(res)
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use('/api/dashboard-data', (_req, res) => {
+        void handleRequest(res as ServerResponse)
       })
     },
-    configurePreviewServer(server: any) {
-      server.middlewares.use('/api/dashboard-data', (_req: any, res: any) => {
-        void handleRequest(res)
+    configurePreviewServer(server: { middlewares: ViteDevServer['middlewares'] }) {
+      server.middlewares.use('/api/dashboard-data', (_req, res) => {
+        void handleRequest(res as ServerResponse)
       })
     },
   }

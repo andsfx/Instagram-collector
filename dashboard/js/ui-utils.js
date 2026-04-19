@@ -101,11 +101,13 @@
 
   function getBrand(){
     var data = window.getDashboardData();
-    return data.accounts.find(a => a.b) || data.accounts[0];
+    if(!data || !data.accounts) return null;
+    return data.accounts.find(a => a.b) || data.accounts[0] || null;
   }
 
   function getCompetitors(){
     var data = window.getDashboardData();
+    if(!data || !data.accounts) return [];
     return data.accounts.filter(a => !a.b);
   }
 

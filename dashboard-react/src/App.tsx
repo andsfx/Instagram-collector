@@ -1,10 +1,10 @@
-import { Suspense, lazy, useState, type ReactNode } from 'react'
+import { Suspense, lazy, useMemo, useState, type ReactNode } from 'react'
 import { HeaderBar } from './components/HeaderBar'
 import { FreshnessPanel } from './components/FreshnessPanel'
 import { ExecutiveSummary } from './components/ExecutiveSummary'
 import { TodaySummary } from './components/TodaySummary'
 import { useDashboardData } from './hooks/useDashboardData'
-import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeroMeta, getInsightsData, getQuickVisualData, getTodaySummary } from './data/selectors'
+import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeroMeta, getHeroSummary, getInsightsData, getQuickVisualData, getTodaySummary } from './data/selectors'
 import { getSummaryStrip } from './data/selectors'
 import { AccountOverviewGrid } from './components/AccountOverviewGrid'
 import { RankingGrowthPresentation } from './components/RankingGrowthPresentation'
@@ -49,16 +49,25 @@ function ChapterShell({
   kicker: string
   title: string
   description: string
-  tone?: 'neutral' | 'accent'
+  tone?: 'neutral' | 'brand' | 'accent' | 'blend' | 'appendix'
   children: ReactNode
 }) {
+  const toneClasses =
+    tone === 'brand'
+      ? 'border-[color:color-mix(in_srgb,var(--brand)_28%,white)] before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-full before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_36%,white),color-mix(in_srgb,var(--brand-soft-2)_22%,white)_48%,transparent_84%)] dark:border-[color:color-mix(in_srgb,var(--brand)_24%,transparent)] dark:before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_34%,transparent),color-mix(in_srgb,var(--brand-soft-2)_20%,transparent)_48%,transparent_82%)]'
+      : tone === 'accent'
+        ? 'border-[color:color-mix(in_srgb,var(--accent)_26%,white)] before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-full before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--danger-soft)_82%,white),color-mix(in_srgb,var(--warning-soft)_42%,white)_50%,transparent_84%)] dark:border-[color:color-mix(in_srgb,var(--accent)_24%,transparent)] dark:before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--danger-soft)_84%,transparent),color-mix(in_srgb,var(--warning-soft)_38%,transparent)_50%,transparent_82%)]'
+        : tone === 'blend'
+          ? 'border-[color:color-mix(in_srgb,var(--brand)_18%,color-mix(in_srgb,var(--accent)_18%,white))] before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-full before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_28%,white),color-mix(in_srgb,var(--danger-soft)_34%,white)_52%,transparent_86%)] dark:border-[color:color-mix(in_srgb,var(--brand)_18%,color-mix(in_srgb,var(--accent)_18%,transparent))] dark:before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_28%,transparent),color-mix(in_srgb,var(--danger-soft)_30%,transparent)_52%,transparent_84%)]'
+          : tone === 'appendix'
+            ? 'border-[color:color-mix(in_srgb,var(--border-strong)_78%,white)] before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-full before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_100%,white),color-mix(in_srgb,var(--brand-soft)_12%,white)_55%,transparent_86%)] dark:border-[color:color-mix(in_srgb,var(--border-strong)_80%,transparent)] dark:before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_96%,transparent),color-mix(in_srgb,var(--brand-soft)_10%,transparent)_54%,transparent_84%)]'
+            : 'border-slate-200/80 dark:border-white/10'
+
   return (
     <div
       className={[
         'relative grid gap-6 border-t px-0 pt-8 sm:gap-7 sm:pt-10 lg:gap-8 lg:pt-12',
-        tone === 'accent'
-          ? 'border-[color:color-mix(in_srgb,var(--brand)_18%,white)] before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-full before:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_10%,white),transparent_72%)] dark:border-[color:color-mix(in_srgb,var(--brand)_16%,transparent)] dark:before:bg-[linear-gradient(180deg,rgba(51,65,85,0.18),transparent_72%)]'
-          : 'border-slate-200/80 dark:border-white/10',
+        toneClasses,
       ].join(' ')}
     >
       <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_minmax(240px,0.8fr)] lg:items-end lg:gap-6">
@@ -126,14 +135,15 @@ export default function App() {
     )
   }
 
-  const freshness = getFreshnessSummary(data)
-  const executive = getExecutiveSummary(data)
-  const today = getTodaySummary(data)
-  const quickVisual = getQuickVisualData(data)
-  const accountSummaries = getAccountSummaries(data)
-  const insights = getInsightsData(data)
-  const summaryStrip = getSummaryStrip(data)
-  const heroMeta = getHeroMeta(data)
+  const freshness = useMemo(() => getFreshnessSummary(data), [data])
+  const executive = useMemo(() => getExecutiveSummary(data), [data])
+  const today = useMemo(() => getTodaySummary(data), [data])
+  const quickVisual = useMemo(() => getQuickVisualData(data), [data])
+  const accountSummaries = useMemo(() => getAccountSummaries(data), [data])
+  const insights = useMemo(() => getInsightsData(data), [data])
+  const summaryStrip = useMemo(() => getSummaryStrip(data), [data])
+  const heroMeta = useMemo(() => getHeroMeta(data), [data])
+  const heroSummary = useMemo(() => getHeroSummary(data), [data])
   const sections: SectionNavItem[] = [
     { id: 'section-growth', label: 'Growth' },
     { id: 'section-summary', label: 'Summary' },
@@ -149,7 +159,7 @@ export default function App() {
 
   return (
     <main id="main-content" className="relative min-h-screen overflow-x-clip pb-20">
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[40rem] bg-[radial-gradient(circle_at_top_left,rgba(244,114,182,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(99,102,241,0.1),transparent_28%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.16),transparent_30%),radial-gradient(circle_at_top_right,rgba(129,140,248,0.12),transparent_28%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[40rem] bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.1),transparent_32%),radial-gradient(circle_at_top_right,rgba(165,180,252,0.12),transparent_28%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.18),transparent_30%),radial-gradient(circle_at_top_right,rgba(165,180,252,0.14),transparent_28%)]" />
       <a
         className="absolute left-4 top-4 z-50 -translate-y-16 rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white shadow-lg transition focus:translate-y-0 dark:bg-white dark:text-slate-950"
         href="#section-summary"
@@ -158,7 +168,7 @@ export default function App() {
       </a>
 
       <section className="relative">
-        <HeaderBar onRefresh={retry} heroMeta={heroMeta} />
+          <HeaderBar onRefresh={retry} heroMeta={heroMeta} copy={heroSummary} />
       </section>
 
       <section className="sticky top-0 z-30">
@@ -167,7 +177,10 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-growth" className={`${chapterBase} scroll-mt-28`}>
+      <section
+        id="section-growth"
+        className={`${chapterBase} scroll-mt-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_34%,white),color-mix(in_srgb,var(--danger-soft)_24%,white)_72%,transparent)] dark:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_28%,transparent),color-mix(in_srgb,var(--danger-soft)_18%,transparent)_72%,transparent)]`}
+      >
         <div className={`${shell} space-y-5 sm:space-y-6`}>
           <SectionAsyncBoundary
             resetKey={asyncResetKey + 3}
@@ -185,7 +198,10 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-summary" className={`${chapterBase} scroll-mt-28`}>
+      <section
+        id="section-summary"
+        className={`${chapterBase} scroll-mt-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--danger-soft)_72%,white),color-mix(in_srgb,var(--warning-soft)_24%,white)_56%,transparent_88%)] dark:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--danger-soft)_54%,transparent),color-mix(in_srgb,var(--warning-soft)_22%,transparent)_54%,transparent_86%)]`}
+      >
         <div className={shell}>
           <ChapterShell
             kicker="Executive Summary"
@@ -201,12 +217,16 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-content" className={`${chapterBase} scroll-mt-28`}>
+      <section
+        id="section-content"
+        className={`${chapterBase} scroll-mt-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_44%,white),color-mix(in_srgb,var(--brand-soft-2)_18%,white)_52%,transparent_88%)] dark:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_34%,transparent),color-mix(in_srgb,var(--brand-soft-2)_14%,transparent)_52%,transparent_86%)]`}
+      >
         <div className={shell}>
           <ChapterShell
             kicker="Content Performance"
             title="Format, post terbaik, dan bukti performa."
             description="Fokus pada apa yang bekerja, siapa yang memimpin, dan contoh terkuat."
+            tone="brand"
           >
             <ContentBreakdownPresentation data={data} />
             <PostSnapshot data={data} />
@@ -214,12 +234,16 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-comparison" className={`${chapterBase} scroll-mt-28`}>
+      <section
+        id="section-comparison"
+        className={`${chapterBase} scroll-mt-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_20%,white),color-mix(in_srgb,var(--danger-soft)_30%,white)_58%,transparent_90%)] dark:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_18%,transparent),color-mix(in_srgb,var(--danger-soft)_24%,transparent)_58%,transparent_88%)]`}
+      >
         <div className={shell}>
           <ChapterShell
             kicker="Comparison"
             title="Bandingkan akun dan gap utama."
             description="Lihat ranking, posisi akun, dan head-to-head dalam satu alur."
+            tone="blend"
           >
             <RankingGrowthPresentation data={data} mode="table" />
             <AccountOverviewGrid accounts={accountSummaries} />
@@ -239,12 +263,16 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-pattern" className={`${chapterBase} scroll-mt-28`}>
+      <section
+        id="section-pattern"
+        className={`${chapterBase} scroll-mt-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_96%,white),color-mix(in_srgb,var(--brand-soft)_22%,white)_64%,transparent_90%)] dark:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_88%,transparent),color-mix(in_srgb,var(--brand-soft)_16%,transparent)_64%,transparent_88%)]`}
+      >
         <div className={shell}>
           <ChapterShell
             kicker="Pattern & Appendix"
             title="Riwayat harian, waktu posting, dan appendix visual."
             description="Bagian ini untuk detail tambahan. Flow utama tetap ringan."
+            tone="appendix"
           >
             <DailyMetrics data={data} />
             <SectionAsyncBoundary
@@ -300,13 +328,19 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-appendix" className="scroll-mt-28 pb-6 pt-4 sm:pb-10">
+      <section
+        id="section-appendix"
+        className="scroll-mt-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_100%,white),color-mix(in_srgb,var(--brand-soft)_10%,white)_55%,transparent_84%)] pb-6 pt-4 dark:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel-muted)_92%,transparent),color-mix(in_srgb,var(--brand-soft)_8%,transparent)_55%,transparent_82%)] sm:pb-10"
+      >
         <div className={shell}>
           <FreshnessPanel freshness={freshness} />
         </div>
       </section>
 
-      <section id="section-recap" className="scroll-mt-28 pb-10 pt-4 sm:pb-14">
+      <section
+        id="section-recap"
+        className="scroll-mt-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_42%,white),color-mix(in_srgb,var(--danger-soft)_44%,white)_58%,transparent_92%)] pb-10 pt-4 dark:bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_24%,transparent),color-mix(in_srgb,var(--danger-soft)_30%,transparent)_58%,transparent_90%)] sm:pb-14"
+      >
         <div className={shell}>
           <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
         </div>

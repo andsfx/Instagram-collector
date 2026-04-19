@@ -15,22 +15,15 @@ import {
   resolveHeadToHeadPreset,
 } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
+import { chartAxisColor, chartGridColor, chartTooltipStyle } from './chart-theme'
 import { SectionCard } from './ui'
-
-const chartAxisColor = 'var(--chart-axis)'
-const chartGridColor = 'var(--chart-grid)'
-const chartTooltipStyle = {
-  backgroundColor: 'var(--chart-tooltip-bg)',
-  border: '1px solid var(--chart-tooltip-border)',
-  borderRadius: '12px',
-  color: 'var(--text)',
-}
 
 export function HeadToHead({ data }: { data: DashboardRecord }) {
   const defaults = useMemo(() => getHeadToHeadDefaults(data), [data])
   const [accountA, setAccountA] = useState(defaults.accountA)
   const [accountB, setAccountB] = useState(defaults.accountB)
   const [metric, setMetric] = useState<HeadToHeadMetric>(defaults.metric)
+  const [presetValue, setPresetValue] = useState('')
 
   const view = useMemo(() => getHeadToHeadData(data, accountA, accountB, metric), [accountA, accountB, data, metric])
 
@@ -65,12 +58,12 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
           <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Preset</span>
           <select
             className="min-h-[44px] rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
-            defaultValue=""
+            value={presetValue}
             onChange={(event) => {
               const resolved = resolveHeadToHeadPreset(data, event.target.value, accountA, accountB)
               setAccountA(resolved.accountA)
               setAccountB(resolved.accountB)
-              event.target.value = ''
+              setPresetValue('')
             }}
           >
             <option value="" disabled>Pilih preset</option>

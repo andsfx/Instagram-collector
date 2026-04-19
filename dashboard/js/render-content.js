@@ -30,8 +30,8 @@ function renderContentBreakdown(){
   if (highlights) {
     highlights.innerHTML = [
       { k:'Format Terbanyak', v:typeLabels[topFormat[0]] || topFormat[0], s:fmtFull(topFormat[1]) + ' post' },
-      { k:'ER Tertinggi', v:mostEfficient ? ('@' + mostEfficient[0]) : '—', s:mostEfficient ? pct(mostEfficient[1].avgER || 0) : '—' },
-      { k:'Best Post Owner', v:bestOwner ? ('@' + bestOwner.username) : '—', s:bestOwner ? (fmtFull(bestOwner.likes) + ' likes · ' + ((typeLabels[bestOwner.type] || bestOwner.type || 'Post'))) : '—' }
+      { k:'ER Tertinggi', v:mostEfficient ? ('@' + escapeHtml(mostEfficient[0])) : '—', s:mostEfficient ? pct(mostEfficient[1].avgER || 0) : '—' },
+      { k:'Best Post Owner', v:bestOwner ? ('@' + escapeHtml(bestOwner.username)) : '—', s:bestOwner ? (fmtFull(bestOwner.likes) + ' likes · ' + ((typeLabels[bestOwner.type] || bestOwner.type || 'Post'))) : '—' }
     ].map(function(card){ return '<div class="cp-mini"><div class="k">' + card.k + '</div><div class="v">' + card.v + '</div><div class="s">' + card.s + '</div></div>'; }).join('');
   }
   var html = '<div class="cp-grid">';
@@ -55,7 +55,7 @@ function renderContentBreakdown(){
     var erTone = (cb.avgER || 0) >= 0.03 ? 'strong' : (cb.avgER || 0) >= 0.01 ? 'watch' : 'weak';
     var erText = erTone === 'strong' ? 'ER kuat' : erTone === 'watch' ? 'ER moderat' : 'ER perlu perhatian';
     html += '<div class="cp-hdr">' +
-      '<span class="cp-user">@' + a.u + '</span>' +
+      '<span class="cp-user">@' + escapeHtml(a.u) + '</span>' +
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cp-topformat">Top Format: ' + (typeLabels[topType] || topType) + '</span><span class="cp-er-badge ' + erTone + '"><span aria-hidden="true">' + (erTone === 'strong' ? '&#9733;' : erTone === 'watch' ? '&#9673;' : '&#33;') + '</span> ER ' + pct(cb.avgER || 0) + ' · ' + erText + '</span></div>' +
       '</div>';
     // Body: per-type table
@@ -140,15 +140,12 @@ function renderHeatmap(){
   if(dashData().heatmap && dashData().heatmap[user]){
     rawData = dashData().heatmap[user];
   } else {
+    // No heatmap data available — show empty grid instead of fake random data
     rawData = [];
     for(var di = 0; di < 7; di++){
       var row = [];
       for(var hi = 0; hi < 24; hi++){
-        var base = 0;
-        if(hi >= 8 && hi <= 12) base = Math.random() * 3;
-        else if(hi >= 17 && hi <= 21) base = Math.random() * 4;
-        else if(hi >= 6 && hi <= 23) base = Math.random() * 1.5;
-        row.push(Math.round(base));
+        row.push(0);
       }
       rawData.push(row);
     }
@@ -222,7 +219,11 @@ function renderHeatmap(){
 
   // Best time summary
   if(bestEl){
-    bestEl.innerHTML = '<div class="hm-best">Waktu posting terbaik: <strong>' + days[bestDay] + ', ' + slots[bestSlot].label + ' (' + slots[bestSlot].sub + ')</strong> dengan ' + bestVal + ' posts</div>';
+    if(dashData().heatmap && dashData().heatmap[user]){
+      bestEl.innerHTML = '<div class="hm-best">Waktu posting terbaik: <strong>' + days[bestDay] + ', ' + slots[bestSlot].label + ' (' + slots[bestSlot].sub + ')</strong> dengan ' + bestVal + ' posts</div>';
+    } else {
+      bestEl.innerHTML = '<div class="hm-best" style="color:var(--t3)">Data heatmap untuk @' + escapeHtml(user) + ' belum tersedia. Menampilkan grid kosong.</div>';
+    }
   }
 }
 
@@ -238,9 +239,9 @@ function renderInsights(){
   if(brand){
     // Brand growth insight
     if(brand.growthPct > 0){
-      insights.push({ type: 'positive', icon: '↗', text: '@' + brand.u + ' tumbuh ' + pct(brand.growthPct) + ' periode ini. Keep it up!' });
+      insights.push({ type: 'positive', icon: '↗', text: '@' + escapeHtml(brand.u) + ' tumbuh ' + pct(brand.growthPct) + ' periode ini. Keep it up!' });
     } else if(brand.growthPct < 0){
-      insights.push({ type: 'warning', icon: '↘', text: '@' + brand.u + ' turun ' + pct(Math.abs(brand.growthPct)) + '. Perlu evaluasi strategi konten.' });
+      insights.push({ type: 'warning', icon: '↘', text: '@' + escapeHtml(brand.u) + ' turun ' + pct(Math.abs(brand.growthPct)) + '. Perlu evaluasi strategi konten.' });
     }
 
     // Closest competitor
@@ -249,9 +250,9 @@ function renderInsights(){
       var closest = sorted[0];
       var gap = brand.f - closest.f;
       if(gap > 0){
-        insights.push({ type: 'info', icon: '◎', text: 'Kompetitor terdekat: @' + closest.u + ' (gap ' + fmtFull(gap) + ' followers). ' + (gap < (settings.gapAlert || 500) ? 'Gap sangat tipis!' : 'Posisi aman.') });
+        insights.push({ type: 'info', icon: '◎', text: 'Kompetitor terdekat: @' + escapeHtml(closest.u) + ' (gap ' + fmtFull(gap) + ' followers). ' + (gap < (settings.gapAlert || 500) ? 'Gap sangat tipis!' : 'Posisi aman.') });
       } else {
-        insights.push({ type: 'danger', icon: '⚠', text: '@' + closest.u + ' sudah unggul ' + fmtFull(Math.abs(gap)) + ' followers dari brand. Perlu strategi catch-up.' });
+        insights.push({ type: 'danger', icon: '⚠', text: '@' + escapeHtml(closest.u) + ' sudah unggul ' + fmtFull(Math.abs(gap)) + ' followers dari brand. Perlu strategi catch-up.' });
       }
     }
 
@@ -269,7 +270,7 @@ function renderInsights(){
   if(comps.length > 0){
     var fastest = comps.slice().sort(function(a,b){ return (b.growthPct||0) - (a.growthPct||0); })[0];
     if(fastest.growthPct > 0){
-      insights.push({ type: 'info', icon: '↗', text: 'Kompetitor paling cepat tumbuh: @' + fastest.u + ' (+' + pct(fastest.growthPct) + '). Pantau strategi mereka.' });
+      insights.push({ type: 'info', icon: '↗', text: 'Kompetitor paling cepat tumbuh: @' + escapeHtml(fastest.u) + ' (+' + pct(fastest.growthPct) + '). Pantau strategi mereka.' });
     }
   }
 
@@ -277,7 +278,7 @@ function renderInsights(){
   if(comps.length > 0){
     var bestER = comps.slice().sort(function(a,b){ return (b.er||0) - (a.er||0); })[0];
     if(bestER.er > (brand ? brand.er : 0)){
-      insights.push({ type: 'info', icon: '★', text: '@' + bestER.u + ' punya ER tertinggi (' + pct(bestER.er) + '). Analisis konten mereka untuk inspirasi.' });
+      insights.push({ type: 'info', icon: '★', text: '@' + escapeHtml(bestER.u) + ' punya ER tertinggi (' + pct(bestER.er) + '). Analisis konten mereka untuk inspirasi.' });
     }
   }
 
