@@ -390,7 +390,13 @@ function renderTable(){
   });
 
   document.querySelectorAll('.rtbl thead th').forEach(th => {
-    th.classList.toggle('sd', th.getAttribute('data-s') === dashState().sortCol);
+    const isActive = th.getAttribute('data-s') === dashState().sortCol;
+    th.classList.toggle('sd', isActive);
+    // Update sort direction arrow
+    var si = th.querySelector('.si');
+    if(si && isActive){
+      si.innerHTML = dashState().sortAsc ? '&#9650;' : '&#9660;';
+    }
   });
 
   const tbody = document.getElementById('rtb');

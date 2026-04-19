@@ -38,6 +38,7 @@ function mkFollowersBar(){
     },
     options: (function(){ var d = chartDefaults(); return { ...d, plugins: { ...d.plugins, legend: { display: false } }, indexAxis: 'x' }; })()
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 
 function mkERBar(){
@@ -89,6 +90,7 @@ function mkERBar(){
       }
     }
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 
 function mkShare(){
@@ -119,6 +121,7 @@ function mkShare(){
       }
     }
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 
 function mkRadar(){
@@ -161,6 +164,7 @@ function mkRadar(){
       plugins: { legend: { position: 'bottom', labels: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11, weight: '600' }, padding: 12, usePointStyle: true, pointStyle: 'circle' } } }
     }
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 
 function mkTrend(){
@@ -187,6 +191,7 @@ function mkTrend(){
     },
     options: chartDefaults()
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 
 function mkERTrend(){
@@ -249,6 +254,7 @@ function mkERTrend(){
       }
     }
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 
 // ===== PROJECTION CHART (Feature 2) =====
@@ -385,5 +391,6 @@ function mkProjection(){
       })
     })
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 

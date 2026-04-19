@@ -81,14 +81,16 @@ function initRevealAnimations(){
   if(!nav) return;
   const navInner = nav.querySelector('.nav-inner');
   const items = nav.querySelectorAll('.nav-item');
-  const sectionIds = ['sec-overview','sec-engagement','sec-content','sec-history'];
+  const sectionIds = ['sec-overview','sec-growth','sec-ranking','sec-engagement','sec-content','sec-history'];
   let lastScroll = 0;
   let ticking = false;
 
   function updateNavScroll(){
     if(navInner){
-      const isScrolled = navInner.scrollLeft > 10;
-      navInner.classList.toggle('scrolled-right', isScrolled);
+      const hasOverflow = navInner.scrollWidth > navInner.clientWidth;
+      const atEnd = navInner.scrollLeft + navInner.clientWidth >= navInner.scrollWidth - 5;
+      navInner.classList.toggle('has-overflow', hasOverflow);
+      navInner.classList.toggle('at-end', atEnd);
     }
   }
 
@@ -115,11 +117,7 @@ function initRevealAnimations(){
 
     if(scrollY > 200){
       nav.classList.add('scrolled');
-      if(scrollY > lastScroll && scrollY > 400){
-        nav.classList.add('hidden');
-      } else {
-        nav.classList.remove('hidden');
-      }
+      nav.classList.remove('hidden');
     } else {
       nav.classList.remove('scrolled');
       nav.classList.remove('hidden');

@@ -190,5 +190,6 @@ function renderH2H(){
     },
     options: chartDefaults()
   });
+  if(ctx.canvas.closest('.chcon')) ctx.canvas.closest('.chcon').classList.add('loaded');
 }
 

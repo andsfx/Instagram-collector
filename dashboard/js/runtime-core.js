@@ -278,13 +278,11 @@ function updateNavBadges(){
   if(!data || !data.accounts) return;
   const count = data.accounts.length;
   
-  const badgeOverview = document.getElementById('nav-count-overview');
-  const badgeEngagement = document.getElementById('nav-count-engagement');
-  const badgeContent = document.getElementById('nav-count-content');
-  
-  if(badgeOverview) badgeOverview.textContent = count;
-  if(badgeEngagement) badgeEngagement.textContent = count;
-  if(badgeContent) badgeContent.textContent = count;
+  var badgeIds = ['nav-count-overview','nav-count-growth','nav-count-ranking','nav-count-engagement','nav-count-content'];
+  badgeIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.textContent = count;
+  });
 }
 
 // ===== LAZY CHART RENDERING =====
