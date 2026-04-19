@@ -204,6 +204,35 @@
         };
       });
     }
+    // Build heatmap from post_insights timestamps (7 days x 24 hours per account)
+    // Days: 0=Senin, 1=Selasa, ..., 6=Minggu  |  Hours: 0-23 in WIB (UTC+7)
+    const heatmap = {};
+    if (raw.post_insights && typeof raw.post_insights === 'object') {
+      Object.entries(raw.post_insights).forEach(([u, insight]) => {
+        const posts = (insight && Array.isArray(insight.posts)) ? insight.posts : [];
+        if (posts.length === 0) return;
+        // Initialize 7x24 grid
+        const grid = [];
+        for (let d = 0; d < 7; d++) {
+          grid.push(new Array(24).fill(0));
+        }
+        posts.forEach((p) => {
+          const ts = p.published_at || p.timestamp;
+          if (!ts) return;
+          // Convert to WIB (UTC+7)
+          const utc = new Date(ts);
+          if (isNaN(utc.getTime())) return;
+          const wib = new Date(utc.getTime() + 7 * 60 * 60 * 1000);
+          // getUTCDay: 0=Sunday, convert to 0=Monday
+          const jsDay = wib.getUTCDay(); // 0=Sun,1=Mon,...,6=Sat
+          const dayIdx = jsDay === 0 ? 6 : jsDay - 1; // 0=Mon,...,6=Sun
+          const hour = wib.getUTCHours();
+          grid[dayIdx][hour]++;
+        });
+        heatmap[u] = grid;
+      });
+    }
+
     return {
       ...raw,
       lastUpdate: raw.generated_at_wib || raw.generated_at || '-',
@@ -213,7 +242,8 @@
       dates,
       trend,
       engTrend,
-      contentBreakdown
+      contentBreakdown,
+      heatmap
     };
   }
 
