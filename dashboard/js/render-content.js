@@ -90,7 +90,7 @@ function renderContentBreakdown(){
         '<div class="cp-best-info">' +
         '<div class="cp-best-label">Best Post <span class="cp-type-badge ' + (bp.type||'') + '">' + (typeLabels[bp.type]||bp.type||'') + '</span></div>' +
         '<div class="cp-best-stats">' + num(bp.likes) + ' likes &middot; ' + num(bp.comments) + ' comments</div>' +
-        '<a class="cp-best-link" href="' + bp.url + '" target="_blank">Lihat Post &rarr;</a>' +
+        '<a class="cp-best-link" href="' + (bp.url && bp.url.match(/^https?:\/\//) ? escapeHtml(bp.url) : '#') + '" target="_blank" rel="noopener noreferrer">Lihat Post &rarr;</a>' +
         '</div></div>';
     }
 

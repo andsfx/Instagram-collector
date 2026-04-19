@@ -16,7 +16,7 @@
   var MAX_LOGIN_ATTEMPTS = 3;
   var LOCKOUT_DURATION = 5 * 60 * 1000;
 
-  function hashPasswordSync(password){
+  function hashPasswordLegacy(password){
     var hash = 0;
     for(var i = 0; i < password.length; i++){
       var char = password.charCodeAt(i);
@@ -24,6 +24,35 @@
       hash = hash & hash;
     }
     return Math.abs(hash).toString(16).padStart(16, '0');
+  }
+
+  var HASH_SALT = 'ig_dash_2024_salt';
+  var HASH_ITERATIONS = 1000;
+  var HASH_PREFIX = 'v2:';
+
+  function hashPasswordSync(password){
+    var input = HASH_SALT + ':' + password;
+    var h1 = 0x811c9dc5 >>> 0;
+    var h2 = 0x01000193 >>> 0;
+    for(var iter = 0; iter < HASH_ITERATIONS; iter++){
+      for(var i = 0; i < input.length; i++){
+        var c = input.charCodeAt(i);
+        h1 = h1 ^ c;
+        h1 = Math.imul(h1, 0x01000193) >>> 0;
+        h2 = h2 ^ (c + iter);
+        h2 = Math.imul(h2, 0x5bd1e995) >>> 0;
+      }
+      input = h1.toString(16) + h2.toString(16) + HASH_SALT;
+    }
+    return HASH_PREFIX + h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
+  }
+
+  function verifyPassword(password, storedHash){
+    if(storedHash && storedHash.indexOf(HASH_PREFIX) === 0){
+      return hashPasswordSync(password) === storedHash;
+    }
+    // Legacy hash fallback
+    return hashPasswordLegacy(password) === storedHash;
   }
 
   function generateId(){
@@ -129,8 +158,7 @@
       return { success: false, message: 'Username atau password salah' };
     }
 
-    var inputHash = hashPasswordSync(password);
-    if(inputHash !== user.passwordHash){
+    if(!verifyPassword(password, user.passwordHash)){
       var lockData = getLockout(username) || { attempts: 0 };
       lockData.attempts++;
       if(lockData.attempts >= MAX_LOGIN_ATTEMPTS){
@@ -144,6 +172,18 @@
     }
 
     clearLockout(username);
+
+    // Auto-migrate legacy hash to v2
+    if(user.passwordHash && user.passwordHash.indexOf(HASH_PREFIX) !== 0){
+      var users = getUsers();
+      for(var mi = 0; mi < users.length; mi++){
+        if(idsEqual(users[mi].id, user.id)){
+          users[mi].passwordHash = hashPasswordSync(password);
+          break;
+        }
+      }
+      saveUsers(users);
+    }
 
     var session = {
       isLoggedIn: true,
@@ -176,9 +216,20 @@
     return null;
   }
 
+  var SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+
   function isLoggedIn(){
     var session = getSession();
-    return session && session.isLoggedIn === true;
+    if(!session || session.isLoggedIn !== true) return false;
+    // Check session expiry
+    if(session.loginAt){
+      var loginTime = new Date(session.loginAt).getTime();
+      if(Date.now() - loginTime > SESSION_MAX_AGE){
+        logout();
+        return false;
+      }
+    }
+    return true;
   }
 
   function isAdmin(){
@@ -231,7 +282,7 @@
     var found = false;
 
     for(var i = 0; i < users.length; i++){
-      if(users[i].id === userId){
+      if(idsEqual(users[i].id, userId)){
         if(updates.username && updates.username !== users[i].username){
           if(findUser(updates.username)){
             return { success: false, message: 'Username sudah digunakan' };
@@ -326,6 +377,7 @@
     updateUser: updateUser,
     deleteUser: deleteUser,
     getUserCount: getUserCount,
+    verifyPassword: verifyPassword,
     requireAuth: requireAuth,
     initAuth: initAuth,
     MAX_USERS: MAX_USERS

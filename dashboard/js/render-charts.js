@@ -18,7 +18,9 @@ function chartDefaults(){
 
 function mkFollowersBar(){
   destroyChart('bar');
-  const ctx = document.getElementById('chBar').getContext('2d');
+  var el = document.getElementById('chBar');
+  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
+  const ctx = el.getContext('2d');
   const accs = [...dashData().accounts].sort((a,b) => b.f - a.f);
   dashState().chartInstances.bar = new Chart(ctx, {
     type: 'bar',
@@ -40,7 +42,9 @@ function mkFollowersBar(){
 
 function mkERBar(){
   destroyChart('erbar');
-  const ctx = document.getElementById('chER').getContext('2d');
+  var el = document.getElementById('chER');
+  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
+  const ctx = el.getContext('2d');
   const accs = [...dashData().accounts].sort((a,b) => b.er - a.er);
   var defaults = chartDefaults();
   dashState().chartInstances.erbar = new Chart(ctx, {
@@ -89,7 +93,9 @@ function mkERBar(){
 
 function mkShare(){
   destroyChart('share');
-  const ctx = document.getElementById('chShare').getContext('2d');
+  var el = document.getElementById('chShare');
+  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
+  const ctx = el.getContext('2d');
   const total = dashData().accounts.reduce((s,a) => s + a.f, 0);
   dashState().chartInstances.share = new Chart(ctx, {
     type: 'doughnut',
@@ -108,7 +114,7 @@ function mkShare(){
         legend: { position: 'bottom', labels: { color: getChartTextColor(), font: { family: DASHBOARD_CHART_FONT, size: 11, weight: '600' }, padding: 12, usePointStyle: true, pointStyle: 'circle' } },
         tooltip: {
           backgroundColor: 'rgba(0,0,0,0.8)', cornerRadius: 8, padding: 12,
-          callbacks: { label: function(ctx){ return ctx.label + ': ' + fmtFull(ctx.raw) + ' (' + (ctx.raw/total*100).toFixed(1) + '%)'; } }
+          callbacks: { label: function(ctx){ return ctx.label + ': ' + fmtFull(ctx.raw) + ' (' + (total > 0 ? (ctx.raw/total*100).toFixed(1) : '0.0') + '%)'; } }
         }
       }
     }
@@ -117,13 +123,16 @@ function mkShare(){
 
 function mkRadar(){
   destroyChart('radar');
-  const ctx = document.getElementById('chRadar').getContext('2d');
+  var el = document.getElementById('chRadar');
+  if(!el || !dashData() || !dashData().accounts || !dashData().accounts.length) return;
+  const ctx = el.getContext('2d');
   const maxF = Math.max(...dashData().accounts.map(a=>a.f));
   const maxFo = Math.max(...dashData().accounts.map(a=>a.fo));
   const maxP = Math.max(...dashData().accounts.map(a=>a.p));
   const maxAL = Math.max(...dashData().accounts.map(a=>a.al));
   const maxER = Math.max(...dashData().accounts.map(a=>a.er));
   const maxAC = Math.max(...dashData().accounts.map(a=>a.ac));
+  if(maxF <= 0 && maxFo <= 0 && maxP <= 0) return; // No meaningful data to display
 
   dashState().chartInstances.radar = new Chart(ctx, {
     type: 'radar',
@@ -156,7 +165,9 @@ function mkRadar(){
 
 function mkTrend(){
   destroyChart('trend');
-  const ctx = document.getElementById('chTrend').getContext('2d');
+  var el = document.getElementById('chTrend');
+  if(!el || !dashData() || !dashData().accounts) return;
+  const ctx = el.getContext('2d');
   dashState().chartInstances.trend = new Chart(ctx, {
     type: 'line',
     data: {

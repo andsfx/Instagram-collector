@@ -74,7 +74,13 @@ function syncRuntimeState(parsed){
 }
 
 function onData(raw, source){
-  var parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  var parsed;
+  try {
+    parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  } catch(parseErr) {
+    onError(new Error('Data JSON tidak valid: ' + parseErr.message), null);
+    return;
+  }
   var validation = validateDashboardRaw(parsed);
   if (!validation.ok) {
     onError(new Error('Schema dashboard tidak valid: ' + validation.issues.join('; ')), parsed);
@@ -159,6 +165,7 @@ async function silentRefresh(){
     if(!shouldUseFreshPayload(data, raw)) return;
     saveToCache(raw);
     setDataSource('static', raw.latest && raw.latest.date ? raw.latest.date : todayWibDate());
+    chartVisibilityBootstrapStarted = false;
     onData(raw, 'static');
   } catch(_) {
   } finally {

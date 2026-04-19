@@ -225,7 +225,7 @@ function renderDailyMetrics() {
 
   container.innerHTML = html;
 
-  window.__DM_ROWS_DATA = window.__DM_ROWS_DATA || {};
+  window.__DM_ROWS_DATA = {};
   accounts.forEach(acc => {
       const accRows = [];
       let chron = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));

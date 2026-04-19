@@ -403,11 +403,11 @@ function renderUserTable(){
     var roleClass = user.role === 'admin' ? 'admin' : 'viewer';
     var canEdit = isAdmin && (user.id !== 1 || user.id === currentUserId);
     var canDelete = isAdmin && user.id !== 1 && user.id !== currentUserId;
-    html += '<tr><td>' + user.username + '</td>';
-    html += '<td><span class="user-badge ' + roleClass + '">' + user.role + '</span></td>';
+    html += '<tr><td>' + escapeHtml(user.username) + '</td>';
+    html += '<td><span class="user-badge ' + escapeHtml(roleClass) + '">' + escapeHtml(user.role) + '</span></td>';
     html += '<td class="user-actions">';
-    if(canEdit) html += '<button class="user-action-btn edit" onclick="editUser(\'' + user.id + '\')">Edit</button>';
-    if(canDelete) html += '<button class="user-action-btn delete" onclick="deleteUser(\'' + user.id + '\')">Delete</button>';
+    if(canEdit) html += '<button class="user-action-btn edit" onclick="editUser(\'' + escapeHtml(String(user.id)) + '\')">Edit</button>';
+    if(canDelete) html += '<button class="user-action-btn delete" onclick="deleteUser(\'' + escapeHtml(String(user.id)) + '\')">Delete</button>';
     html += '</td></tr>';
   });
   tbody.innerHTML = html;
@@ -424,7 +424,8 @@ function showAddUserModal(){
   if(username){ username.value = ''; username.disabled = false; }
   if(password){ password.value = ''; password.placeholder = 'Password'; }
   if(role) role.value = 'viewer';
-  document.getElementById('userModal').classList.add('show');
+  var modal = document.getElementById('userModal');
+  if(modal) modal.classList.add('show');
 }
 
 function editUser(userId){
@@ -443,22 +444,29 @@ function editUser(userId){
   if(username){ username.value = user.username; username.disabled = true; }
   if(password){ password.value = ''; password.placeholder = 'Leave blank to keep current'; }
   if(role) role.value = user.role;
-  document.getElementById('userModal').classList.add('show');
+  var modal = document.getElementById('userModal');
+  if(modal) modal.classList.add('show');
 }
 
 function closeUserModal(){
-  document.getElementById('userModal').classList.remove('show');
+  var el = document.getElementById('userModal');
+  if(el) el.classList.remove('show');
 }
 
 function saveUser(){
-  var editId = document.getElementById('editUserId').value;
-  var username = document.getElementById('userUsername').value.trim();
-  var password = document.getElementById('userPassword').value;
-  var role = document.getElementById('userRole').value;
+  var editIdEl = document.getElementById('editUserId');
+  var usernameEl = document.getElementById('userUsername');
+  var passwordEl = document.getElementById('userPassword');
+  var roleEl = document.getElementById('userRole');
+  if(!editIdEl || !usernameEl || !passwordEl || !roleEl) return;
+  var editId = editIdEl.value;
+  var username = usernameEl.value.trim();
+  var password = passwordEl.value;
+  var role = roleEl.value;
   var errorEl = document.getElementById('userModalError');
   
   if(!username){
-    if(errorEl){ errorEl.textContent = 'Username harus diisi'; errorEl.classList.add('show'); }
+    if(errorEl){ var errSpan = errorEl.querySelector('span'); if(errSpan) errSpan.textContent = 'Username harus diisi'; else errorEl.textContent = 'Username harus diisi'; errorEl.classList.add('show'); }
     return;
   }
   
@@ -470,7 +478,7 @@ function saveUser(){
     result = AuthModule.updateUser(editId, updates);
   } else {
     if(!password){
-      if(errorEl){ errorEl.textContent = 'Password harus diisi'; errorEl.classList.add('show'); }
+      if(errorEl){ var errSpan = errorEl.querySelector('span'); if(errSpan) errSpan.textContent = 'Password harus diisi'; else errorEl.textContent = 'Password harus diisi'; errorEl.classList.add('show'); }
       return;
     }
     result = AuthModule.addUser(username, password, role);
@@ -481,7 +489,7 @@ function saveUser(){
     renderUserTable();
     showToast(editId ? 'User berhasil diupdate' : 'User berhasil ditambahkan', 'success');
   } else {
-    if(errorEl){ errorEl.textContent = result.message; errorEl.classList.add('show'); }
+    if(errorEl){ var errSpan = errorEl.querySelector('span'); if(errSpan) errSpan.textContent = result.message; else errorEl.textContent = result.message; errorEl.classList.add('show'); }
   }
 }
 
@@ -500,14 +508,14 @@ function deleteUser(userId){
 function changePassword(){
   var current = document.getElementById('currentPassword');
   var newPass = document.getElementById('newPassword');
-  var confirm = document.getElementById('confirmPassword');
+  var confirmEl = document.getElementById('confirmPassword');
   
-  if(!current || !newPass || !confirm) return;
-  if(!current.value || !newPass.value || !confirm.value){
+  if(!current || !newPass || !confirmEl) return;
+  if(!current.value || !newPass.value || !confirmEl.value){
     showToast('Semua field harus diisi', 'error');
     return;
   }
-  if(newPass.value !== confirm.value){
+  if(newPass.value !== confirmEl.value){
     showToast('Password baru tidak cocok', 'error');
     return;
   }
@@ -524,16 +532,17 @@ function changePassword(){
     showToast('User tidak ditemukan', 'error');
     return;
   }
-  // Use login() to verify current password since hashPasswordSync is not exposed
-  var verifyResult = AuthModule.login(session.username, current.value);
-  if(!verifyResult || !verifyResult.success){
-    showToast('Password saat ini salah', 'error');
-    return;
+  // Use verifyPassword to check current password without login side effects
+  if(typeof AuthModule.verifyPassword === 'function'){
+    if(!AuthModule.verifyPassword(current.value, currentUser.passwordHash)){
+      showToast('Password saat ini salah', 'error');
+      return;
+    }
   }
   var result = AuthModule.updateUser(session.userId, { password: newPass.value });
   if(result.success){
     showToast('Password berhasil diubah', 'success');
-    current.value = ''; newPass.value = ''; confirm.value = '';
+    current.value = ''; newPass.value = ''; confirmEl.value = '';
   } else {
     showToast(result.message, 'error');
   }

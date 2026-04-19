@@ -703,6 +703,12 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 }
 .fbtn:focus-visible,.hdr-btn:focus-visible,.nav-item:focus-visible,.h2h-chip:focus-visible,.settings-tab:focus-visible,.auth-btn:focus-visible,.settings-save:focus-visible,.add-user-btn:focus-visible,.user-action-btn:focus-visible,.back-to-top:focus-visible,.toast-close:focus-visible,.auth-modal-close:focus-visible,.settings-close:focus-visible{outline:2px solid var(--ig-purple);outline-offset:2px;border-radius:var(--radius-sm)}
 @media(prefers-color-scheme:dark){html:not([data-theme]){--bg:#121212;--card:#1E1E1E;--border:#333;--t1:#F5F5F5;--t2:#D0D0D0;--t3:#9a9a9a;--t4:#555;--shadow:0 2px 12px rgba(0,0,0,0.4)}}
+[data-theme="dark"] .error-box{background:linear-gradient(135deg,#2A1A1A,#1E1E1E);border-color:#5C2020;color:#fca5a5}
+[data-theme="dark"] .rtbl tbody td{border-bottom-color:#333}
+[data-theme="dark"] .ps-kpi{background:rgba(255,255,255,.06)}
+[data-theme="dark"] .ps-card-format,[data-theme="dark"] .ps-chip{background:rgba(255,255,255,.08)}
+[data-theme="dark"] .ps-summary-card{background:rgba(255,255,255,.04)}
+@media print{.nav-bar,.back-to-top,.hdr-btn,.fbar,.export-overlay,.toast-container,.auth-modal,.settings-modal,.user-modal,#debugPanel,.settings-toggle-wrap{display:none!important}.neo{box-shadow:none;border:1px solid #ddd}main{padding:0}body{background:#fff;color:#000}.chcon{break-inside:avoid;page-break-inside:avoid}}
 
 </style>
 </head>
@@ -846,10 +852,10 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 <div class="sec-group" id="sec-overview">
 <div class="sec-group-header reveal rv-left"><div class="sec-num">1</div><div class="sec-label">Ringkasan</div><div class="sec-desc">Ringkasan performa akun, momentum pertumbuhan, dan peringkat</div></div>
 <section class="exec-summary reveal rv-up">
-  <div class="exec-summary-grid" id="executiveSummary"></div>
-  <div id="todaySummary"></div>
+  <div class="exec-summary-grid" id="executiveSummary" aria-live="polite"></div>
+  <div id="todaySummary" aria-live="polite"></div>
 </section>
-<section class="summary-strip reveal rv-up" id="summaryStrip"></section>
+<section class="summary-strip reveal rv-up" id="summaryStrip" aria-live="polite"></section>
 
 <!-- OVERVIEW CARDS -->
 <section class="cards-s reveal rv-up">

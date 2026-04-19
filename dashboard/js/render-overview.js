@@ -183,6 +183,7 @@ function renderCards(){
 // ===== FEATURE 1: GROWTH VELOCITY =====
 function renderGrowthVelocity(){
   const el = document.getElementById('gvCards');
+  if(!el || !dashData() || !dashData().accounts) return;
   const accs = dashData().accounts;
   const trend = dashData().trend || {};
 
@@ -330,7 +331,7 @@ function renderPostSnapshot(){
       previewHtml = `<div class="ps-post ps-post-featured">
         <div class="ps-post-label">Postingan teratas</div>
         <div class="ps-post-head"><span class="ps-post-tag ${label}">${labelText}</span><span class="ps-post-meta">${date} · ${contentType}</span></div>
-        <a class="ps-post-link" href="${bestPost.url || '#'}" target="_blank" rel="noreferrer">${escapeHtml(caption.slice(0, 42) || 'Lihat postingan')}</a>
+        <a class="ps-post-link" href="${bestPost.url && bestPost.url.match(/^https?:\/\//) ? escapeHtml(bestPost.url) : '#'}" target="_blank" rel="noopener noreferrer">${escapeHtml(caption.slice(0, 42) || 'Lihat postingan')}</a>
         <div class="ps-post-caption">${escapeHtml(caption)}</div>
         <div class="ps-post-meta">${fmtFull(bestPost.likes)} likes · ${fmtFull(bestPost.comments)} komentar · ER ${postEr} · dibanding rata-rata akun ${averagePostEr}</div>
       </div>`;
@@ -369,6 +370,7 @@ window.renderPostSnapshot = renderPostSnapshot;
 // ===== RANKING TABLE =====
 function renderTable(){
   const brand = getBrand();
+  if(!brand || !dashData() || !dashData().accounts) return;
   const sorted = [...dashData().accounts].sort((a,b) => {
     let va, vb;
     switch(dashState().sortCol){
