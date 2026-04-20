@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const { execFileSync } = require('child_process');
 
 const SHEET_ID = '1MdTlen1rcq1ZplbTwfHzj-kHFBoQufgahzRAxZPqt7U';
@@ -227,13 +228,54 @@ function main() {
     }
 
     if ((summary.git.changed || summary.git.committed) && !skipPush) {
-      try {
-        run('git', ['push', 'origin', 'HEAD:main'], { cwd: repoRoot, env: githubPushEnv() });
-        summary.git.pushed = true;
-      } catch (error) {
-        error.stage = 'git';
-        error.code = error.code || 'GIT_PUSH_FAILED';
-        throw error;
+      const pushEnv = githubPushEnv();
+      const maxPushAttempts = 3;
+      for (let attempt = 1; attempt <= maxPushAttempts; attempt++) {
+        try {
+          if (attempt > 1) {
+            console.log(`\n>>> push attempt ${attempt}/${maxPushAttempts}`);
+          }
+          run('git', ['push', 'origin', 'HEAD:main'], { cwd: repoRoot, env: pushEnv });
+          summary.git.pushed = true;
+          break;
+        } catch (pushError) {
+          if (attempt >= maxPushAttempts) {
+            pushError.stage = 'git';
+            pushError.code = pushError.code || 'GIT_PUSH_FAILED';
+            throw pushError;
+          }
+          // Pull rebase and retry
+          console.log('\n>>> push rejected, pulling with rebase...');
+          try {
+            run('git', ['pull', '--rebase', 'origin', 'main'], { cwd: repoRoot, env: pushEnv });
+          } catch (pullError) {
+            // Check if rebase conflict on index.html (asset version)
+            const conflictFiles = execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], {
+              cwd: repoRoot, encoding: 'utf8'
+            }).trim();
+            if (conflictFiles === 'dashboard/index.html' || conflictFiles.includes('dashboard/index.html')) {
+              console.log('\n>>> auto-resolving index.html conflict (accept theirs + version bump)');
+              execFileSync('git', ['checkout', '--theirs', 'dashboard/index.html'], { cwd: repoRoot });
+              // Re-apply current asset version from data.json build
+              const dataJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'dashboard', 'data.json'), 'utf8'));
+              const assetVersion = dataJson.generated_at
+                ? dataJson.generated_at.replace(/[-:T]/g, '').slice(0, 15).replace(/(\d{8})(\d{6})/, '$1_$2')
+                : new Date().toISOString().replace(/[-:T]/g, '').slice(0, 15).replace(/(\d{8})(\d{6})/, '$1_$2');
+              const indexPath = path.join(repoRoot, 'dashboard', 'index.html');
+              let indexHtml = fs.readFileSync(indexPath, 'utf8');
+              indexHtml = indexHtml.replace(/\?v=\d{8}_\d{6}/g, `?v=${assetVersion}`);
+              fs.writeFileSync(indexPath, indexHtml);
+              execFileSync('git', ['add', 'dashboard/index.html'], { cwd: repoRoot });
+              execFileSync('git', ['-c', 'core.editor=true', 'rebase', '--continue'], { cwd: repoRoot });
+            } else {
+              // Can't auto-resolve, abort rebase and fail
+              try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}
+              pullError.stage = 'git';
+              pullError.code = 'GIT_PULL_REBASE_CONFLICT';
+              throw pullError;
+            }
+          }
+        }
       }
     } else if (skipPush) {
       console.log('\n>>> skip push (--skip-push)');
