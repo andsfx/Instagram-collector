@@ -70,7 +70,7 @@
   --ig-gradient-medium:linear-gradient(135deg, rgba(225,48,108,0.15), rgba(131,58,180,0.12), rgba(64,93,230,0.1));
   --t1:#262626;
   --t2:#555555;
-  --t3:#6b6b6b;
+  --t3:#8e8e8e;
   --t4:#c7c7c7;
   --link:#00376B;
   --success:#2ecc71;
@@ -91,11 +91,11 @@
   --ig-gradient-medium:linear-gradient(135deg, rgba(225,48,108,0.25), rgba(131,58,180,0.2), rgba(64,93,230,0.18));
   --t1:#E8E8E8;
   --t2:#B0B0B0;
-  --t3:#9a9a9a;
+  --t3:#777777;
   --t4:#444444;
   --link:#8BB4E0;
-  --success:#34d399;
-  --danger:#f87171;
+  --success:#27ae60;
+  --danger:#c0392b;
   --input-bg:#2A2A2A;
   --input-border:#444444;
 }
@@ -129,7 +129,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .settings-panel.active{display:block;animation:slideUpFade 0.25s ease-out forwards}
 
 /* Shared Card Style */
-.neo{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);transition:background .3s ease,border-color .3s ease,box-shadow .3s ease}
+.neo{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);transition:all .3s ease}
 .neo:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
 
 /* Loading */
@@ -181,7 +181,6 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .debug-item .v{font-size:13px;color:var(--t1);font-weight:700;word-break:break-word}
 .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
 @media (min-width: 1024px) { .summary-strip{grid-template-columns:repeat(5,1fr);} }
-.summary-strip .summary-card{min-height:auto;padding:12px 16px;border-left:none}.summary-strip .summary-card::before{display:none}.summary-strip .summary-card .v{font-size:15px;font-weight:700}.summary-strip .summary-card .k{font-size:10px;margin-bottom:4px}.summary-strip .summary-card .s{font-size:11px;margin-top:4px}
 .exec-summary{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:18px}.exec-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.summary-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;min-height:132px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}.summary-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--ig-gradient);opacity:.75}.summary-card .k{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700}.summary-card .v{font-size:clamp(20px,2.2vw,26px);color:var(--t1);font-weight:800;line-height:1.15;letter-spacing:-.03em;word-break:break-word}.summary-card .s{font-size:12px;color:var(--t2);margin-top:8px;line-height:1.55}.summary-card.highlight{background:linear-gradient(135deg,rgba(225,48,108,.06),rgba(131,58,180,.05))}.summary-card .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(225,48,108,.08);color:var(--ig-pink);font-size:11px;font-weight:700;margin-top:8px}.summary-card[data-tone="brand"]{background:linear-gradient(135deg,rgba(225,48,108,.08),rgba(131,58,180,.06))}.summary-card[data-tone="positive"]{background:linear-gradient(135deg,rgba(46,204,113,.09),rgba(46,204,113,.03))}.summary-card[data-tone="positive"]::before{background:linear-gradient(180deg,#2ecc71,#16a34a)}.summary-card[data-tone="positive"] .v{color:var(--success)}.summary-card[data-tone="warning"]{background:linear-gradient(135deg,rgba(252,175,69,.13),rgba(247,119,55,.05))}.summary-card[data-tone="warning"]::before{background:linear-gradient(180deg,#FCAF45,#F77737)}.summary-card[data-tone="warning"] .v{color:#d97706}
 .today-summary-card{padding:18px 20px;background:linear-gradient(135deg,rgba(64,93,230,.05),rgba(225,48,108,.06));border:1px solid rgba(131,58,180,.16);border-radius:var(--radius);box-shadow:var(--shadow);height:100%}.today-summary-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}.today-summary-k{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:700}.today-summary-v{font-size:20px;color:var(--t1);font-weight:800;line-height:1.2;margin-top:4px;letter-spacing:-.03em}.today-summary-chip{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.7);border:1px solid var(--border);font-size:11px;font-weight:700;color:var(--t2)}.today-summary-list{margin-left:18px;color:var(--t2);display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.6}.today-summary-list strong{color:var(--t1)}.today-summary-list li{padding-left:2px}
 .back-to-top{position:fixed;bottom:30px;right:30px;background:var(--ig-gradient);color:#FFF;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(225,48,108,0.4);opacity:0;visibility:hidden;transition:all 0.3s ease;z-index:999;}
@@ -199,7 +198,6 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .fbtn:hover{color:var(--t1);background:var(--bg)}
 .fbtn.on{color:#FFF;background:var(--ig-gradient);font-weight:700;box-shadow:0 2px 12px rgba(225,48,108,0.35);transform:scale(1.02)}
 .fbtn.on:hover{transform:scale(1.04)}
-.fbtn:disabled,.fbtn.unavailable{opacity:.4;cursor:not-allowed;pointer-events:none}
 .fnotice{display:none;text-align:center;margin:-16px 0 28px}
 .fnotice.show{display:block}
 .fnotice .nb{display:inline-flex;align-items:center;gap:8px;background:#FFF8E1;border:1px solid #FFE082;border-radius:var(--radius-sm);padding:10px 20px;font-size:13px;color:#F57F17;font-weight:500;box-shadow:var(--shadow)}
@@ -229,15 +227,15 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .ctag.bt{background:var(--ig-gradient);color:#FFF}
 .ctag.ct{background:var(--bg);color:var(--t3);border:1px solid var(--border)}
 .cfol{margin-bottom:16px}
-.cfol .lb{font-size:11px;color:var(--t3);letter-spacing:.3px;margin-bottom:2px;font-weight:600}
+.cfol .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600}
 .cfol .vl{font-size:32px;font-weight:800;letter-spacing:-1px;color:var(--t1)}
 .cfol .gr{font-size:12px;margin-top:2px;font-weight:600}
 .gr.up{color:var(--success)}.gr.down{color:var(--danger)}.gr.flat{color:var(--t3)}.delta-label{font-size:11px;text-transform:uppercase;letter-spacing:.45px;margin-right:2px}
 .csts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .csts4{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .cst{text-align:center;padding:10px 4px;background:var(--bg);border-radius:var(--radius-sm);border:none}
-.cst .sv{font-size:17px;font-weight:700;color:var(--t1)}
-.cst .sl{font-size:11px;color:var(--t3);letter-spacing:.2px;font-weight:600}
+.cst .sv{font-size:15px;font-weight:700;color:var(--t1)}
+.cst .sl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
 .cst.er-highlight{background:var(--ig-gradient-soft);border:none}
 .cst.er-highlight .sv{background:var(--ig-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.er-context{margin-top:6px;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.35px;color:var(--t2)}.er-context-icon{font-size:11px;line-height:1}.cst.er-strong .er-context{color:#1B9E4B}.cst.er-watch .er-context{color:#E67E22}.cst.er-weak .er-context{color:var(--danger)}
 
@@ -265,7 +263,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .gv-name{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .gv-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
 .gv-row:last-child{border-bottom:none}
-.gv-label{font-size:12px;color:var(--t3);font-weight:600;letter-spacing:.3px}
+.gv-label{font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
 .gv-val{font-size:16px;font-weight:800}
 .gv-val.up{color:var(--success)}.gv-val.down{color:var(--danger)}.gv-val.flat{color:var(--t3)}
 .gv-bar{height:4px;border-radius:2px;background:var(--bg);margin-top:4px;overflow:hidden}
@@ -293,14 +291,12 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .rtbl tbody tr.brow td:first-child{border-left:3px solid var(--ig-pink)}
 .rn{font-weight:800;font-size:16px}
 .r1{color:#F77737}.r2{color:var(--t3)}.r3{color:#CD7F32}
-.tu{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--t1);min-width:0;max-width:220px}
+.tu{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--t1)}
 .gp{color:var(--success)}.gn{color:var(--danger)}.gz{color:var(--t3)}
 .er-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:var(--radius-pill);font-size:12px;font-weight:700;border:none}
 .er-high{background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.06));color:#1B9E4B}
 .er-mid{background:linear-gradient(135deg,rgba(247,119,55,0.12),rgba(252,175,69,0.06));color:#E67E22}
 .er-low{background:linear-gradient(135deg,rgba(231,76,60,0.12),rgba(231,76,60,0.06));color:var(--danger)}
-[data-theme="dark"] .er-high{background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(52,211,153,0.08));color:#34d399}
-[data-theme="dark"] .er-low{background:linear-gradient(135deg,rgba(248,113,113,0.15),rgba(248,113,113,0.08));color:#f87171}
 
 /* Charts */
 .chsec{margin-bottom:40px}
@@ -310,7 +306,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .chcard.fw{grid-column:1/-1}
 .chtit{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--t1)}
 .chsub{font-size:12px;color:var(--t3);margin-bottom:16px;font-weight:400}
-.chcon{flex:1;position:relative;min-height:280px}.chcon::before{content:'Memuat grafik\2026';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:13px;font-weight:600;background:var(--card);z-index:1;border-radius:var(--radius-sm);opacity:1;transition:opacity .3s}.chcon.loaded::before{opacity:0;pointer-events:none}
+.chcon{flex:1;position:relative;min-height:280px}
 .chnote{text-align:center;font-size:12px;color:var(--t3);font-weight:500;margin-top:12px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm);border:none}
 
 /* Alerts */
@@ -343,8 +339,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 
 /* Perbandingan Head-to-Head */
 .h2h-sec{margin-bottom:40px}
-.h2h-controls{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}.h2h-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}.h2h-presets,.h2h-metrics{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}.h2h-chip{padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--t2);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s ease;box-shadow:var(--shadow)}.h2h-chip:hover{transform:translateY(-1px);color:var(--t1)}.h2h-chip.active{background:var(--ig-gradient);color:#fff;border-color:transparent}
-@media(max-width:768px){.h2h-chip{padding:10px 14px;min-height:44px}}.h2h-selectors{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+.h2h-controls{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}.h2h-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}.h2h-presets,.h2h-metrics{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}.h2h-chip{padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--t2);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s ease;box-shadow:var(--shadow)}.h2h-chip:hover{transform:translateY(-1px);color:var(--t1)}.h2h-chip.active{background:var(--ig-gradient);color:#fff;border-color:transparent}.h2h-selectors{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
 .h2h-selectors select{padding:10px 16px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--t1);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;font-weight:700;min-width:180px}
 .h2h-vs{font-size:20px;font-weight:800;color:var(--ig-pink);text-transform:uppercase}
 .h2h-header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-bottom:16px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -365,7 +360,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 
 /* Settings */
 .settings-sec{margin-bottom:40px}
-.notification-settings-toggle{cursor:pointer;font-size:13px;color:var(--ig-purple);font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.settings-toggle{cursor:pointer;font-size:13px;color:var(--ig-purple);font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:12px}
 .settings-panel{display:none;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 .settings-panel.open{display:block}
 .settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
@@ -442,12 +437,11 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 @keyframes fdIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fuIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:900px){.chgrid{grid-template-columns:1fr}.chcard.fw{grid-column:1}.h2h-header{grid-template-columns:1fr auto 1fr;padding:10px 12px}.h2h-item td{padding:8px 10px;font-size:13px}.h2h-row{flex-direction:column;align-items:stretch}.h2h-selectors{flex-direction:column}.h2h-selectors select{width:100%}.h2h-presets,.h2h-metrics{justify-content:flex-start;overflow:auto;padding-bottom:4px}.hdr-actions{gap:8px}.hdr-btn{width:100%;justify-content:center}.summary-strip,.cp-strip,.exec-summary,.exec-summary-grid{grid-template-columns:1fr}.foot{font-size:11px;padding:16px}}
-@media(max-width:768px){.rtbl{min-width:0}.rtbl thead th:nth-child(4),.rtbl thead th:nth-child(5),.rtbl thead th:nth-child(9),.rtbl tbody td:nth-child(4),.rtbl tbody td:nth-child(5),.rtbl tbody td:nth-child(9){display:none}.rtbl thead th,.rtbl tbody td{padding:8px 10px;font-size:12px}.rn{font-size:14px}}
 @media(max-width:640px){.wrap{padding:16px 12px 48px}.acard{padding:16px}.cscroll{grid-template-columns:1fr}.cfol .vl{font-size:26px}.igrid{grid-template-columns:1fr}.fbtn{padding:7px 16px;font-size:12px}.gv-grid{grid-template-columns:1fr}}
 .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .hdr-meta-line{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}.hdr .subtle-sep{color:var(--t4)}
 .account-label{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:100%}.account-handle{display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
-html[data-dashboard-density="compact"] .wrap,[data-dashboard-density="compact"] .wrap{max-width:1280px;padding-top:18px}.compact-mode .summary-card,.compact-mode .acard,.compact-mode .gv-card,.compact-mode .cp-card,.compact-mode .icard,.compact-mode .dm-card{box-shadow:none}.compact-mode .exec-summary,.compact-mode .summary-strip,.compact-mode .cscroll,.compact-mode .gv-grid,.compact-mode .cp-strip{gap:12px}.compact-mode .stitle{font-size:16px;margin-bottom:14px}.compact-mode .chcard{min-height:320px}.digest-mode #sec-growth,.digest-mode #sec-ranking,.digest-mode #sec-engagement,.digest-mode #sec-content,.digest-mode #sec-history,.digest-mode #sec-daily-metrics,.digest-mode #sec-post-snapshot,.digest-mode .nav-bar,.digest-mode .fnotice{display:none!important}.digest-mode .exec-summary{grid-template-columns:1fr}.digest-mode .summary-strip{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.digest-mode .cards-s,.digest-mode .gv-sec{margin-bottom:24px}
+html[data-dashboard-density="compact"] .wrap,[data-dashboard-density="compact"] .wrap{max-width:1280px;padding-top:18px}.compact-mode .summary-card,.compact-mode .acard,.compact-mode .gv-card,.compact-mode .cp-card,.compact-mode .icard,.compact-mode .dm-card{box-shadow:none}.compact-mode .exec-summary,.compact-mode .summary-strip,.compact-mode .cscroll,.compact-mode .gv-grid,.compact-mode .cp-strip{gap:12px}.compact-mode .stitle{font-size:16px;margin-bottom:14px}.compact-mode .chcard{min-height:320px}.digest-mode #sec-engagement,.digest-mode #sec-content,.digest-mode #sec-history,.digest-mode #sec-daily-metrics,.digest-mode #sec-post-snapshot,.digest-mode .nav-bar,.digest-mode .fnotice{display:none!important}.digest-mode .exec-summary{grid-template-columns:1fr}.digest-mode .summary-strip{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.digest-mode .cards-s,.digest-mode .gv-sec{margin-bottom:24px}
 /* ===== STICKY NAV BAR ===== */
 .nav-bar{position:sticky;top:0;z-index:100;background:rgba(250,250,250,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 0;margin:0 -20px 32px;padding-left:20px;padding-right:20px;transition:transform .3s ease,box-shadow .3s ease}
 .nav-bar.scrolled{box-shadow:0 2px 16px rgba(0,0,0,0.08)}
@@ -456,9 +450,8 @@ html[data-dashboard-density="compact"] .wrap,[data-dashboard-density="compact"] 
 [data-theme="dark"] .nav-bar.scrolled{box-shadow:0 2px 16px rgba(0,0,0,0.3)}
 .nav-inner{display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;max-width:1400px;margin:0 auto;position:relative}
 .nav-inner::-webkit-scrollbar{display:none}
-.nav-inner::after{content:'';position:absolute;right:0;top:0;bottom:0;width:48px;background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;opacity:0;transition:opacity .3s}
-.nav-inner.has-overflow::after{opacity:1}
-.nav-inner.at-end::after{opacity:0}
+.nav-inner::after{content:'';position:absolute;right:0;top:0;bottom:0;width:48px;background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;opacity:1;transition:opacity .3s}
+.nav-inner.scrolled-right::after{opacity:1}
 .nav-item{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius-pill);font-size:13px;font-weight:600;color:var(--t3);background:transparent;border:1px solid transparent;cursor:pointer;transition:all .25s ease;white-space:nowrap;text-decoration:none;font-family:inherit}
 .nav-item:hover{color:var(--t1);background:var(--ig-gradient-soft)}
 .nav-item.active{color:#FFF;background:var(--ig-gradient);border-color:transparent;box-shadow:0 2px 10px rgba(225,48,108,0.25);font-weight:700}
@@ -471,7 +464,7 @@ html[data-dashboard-density="compact"] .wrap,[data-dashboard-density="compact"] 
 .sec-group-header .sec-num{width:28px;height:28px;border-radius:8px;background:var(--ig-gradient);color:#FFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .sec-group-header .sec-label{font-size:16px;font-weight:700;color:var(--t1)}
 .sec-group-header .sec-desc{font-size:12px;color:var(--t3);font-weight:400;margin-left:auto}
-@media(max-width:640px){.nav-item{padding:10px 14px;font-size:12px;min-height:44px}.nav-bar{margin:0 -12px 24px;padding-left:12px;padding-right:12px}}
+@media(max-width:640px){.nav-item{padding:7px 14px;font-size:12px}.nav-bar{margin:0 -12px 24px;padding-left:12px;padding-right:12px}}
 
 /* ===== SCROLL REVEAL ANIMATIONS ===== */
 @keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
@@ -708,14 +701,6 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   .hdr-btn svg{width:18px;height:18px}
   .hdr-btn{padding:8px}
 }
-.fbtn:focus-visible,.hdr-btn:focus-visible,.nav-item:focus-visible,.h2h-chip:focus-visible,.settings-tab:focus-visible,.auth-btn:focus-visible,.settings-save:focus-visible,.add-user-btn:focus-visible,.user-action-btn:focus-visible,.back-to-top:focus-visible,.toast-close:focus-visible,.auth-modal-close:focus-visible,.settings-close:focus-visible{outline:2px solid var(--ig-purple);outline-offset:2px;border-radius:var(--radius-sm)}
-@media(prefers-color-scheme:dark){html:not([data-theme]){--bg:#121212;--card:#1E1E1E;--border:#333;--t1:#F5F5F5;--t2:#D0D0D0;--t3:#9a9a9a;--t4:#555;--shadow:0 2px 12px rgba(0,0,0,0.4)}}
-[data-theme="dark"] .error-box{background:linear-gradient(135deg,#2A1A1A,#1E1E1E);border-color:#5C2020;color:#fca5a5}
-[data-theme="dark"] .rtbl tbody td{border-bottom-color:#333}
-[data-theme="dark"] .ps-kpi{background:rgba(255,255,255,.06)}
-[data-theme="dark"] .ps-card-format,[data-theme="dark"] .ps-chip{background:rgba(255,255,255,.08)}
-[data-theme="dark"] .ps-summary-card{background:rgba(255,255,255,.04)}
-@media print{.nav-bar,.back-to-top,.hdr-btn,.fbar,.export-overlay,.toast-container,.auth-modal,.settings-modal,.user-modal,#debugPanel,.settings-toggle-wrap{display:none!important}.neo{box-shadow:none;border:1px solid #ddd}main{padding:0}body{background:#fff;color:#000}.chcon{break-inside:avoid;page-break-inside:avoid}}
 
 </style>
 </head>
@@ -746,7 +731,6 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 
 <!-- EXPORT OVERLAY -->
 <div id="exportOverlay" class="export-overlay">
-  <button type="button" onclick="this.parentElement.style.display='none'" style="position:absolute;top:16px;right:16px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">Tutup</button>
   <div class="export-box">
     <div class="spinner"></div>
     <p id="exportMsg" style="margin-top:16px;color:var(--t2);font-weight:600">Menyiapkan export...</p>
@@ -840,14 +824,6 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Ringkasan <span class="nav-count" id="nav-count-overview"></span>
     </a>
-    <a class="nav-item" href="#sec-growth" data-sec="sec-growth">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      Pertumbuhan <span class="nav-count" id="nav-count-growth"></span>
-    </a>
-    <a class="nav-item" href="#sec-ranking" data-sec="sec-ranking">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      Peringkat <span class="nav-count" id="nav-count-ranking"></span>
-    </a>
     <a class="nav-item" href="#sec-engagement" data-sec="sec-engagement">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Interaksi <span class="nav-count" id="nav-count-engagement"></span>
@@ -865,23 +841,18 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 
 <!-- ===== SECTION 1: OVERVIEW ===== -->
 <div class="sec-group" id="sec-overview">
-<div class="sec-group-header reveal rv-left"><div class="sec-num">1</div><div class="sec-label">Ringkasan</div><div class="sec-desc">Ringkasan performa dan posisi brand vs kompetitor</div></div>
+<div class="sec-group-header reveal rv-left"><div class="sec-num">1</div><div class="sec-label">Ringkasan</div><div class="sec-desc">Ringkasan performa akun, momentum pertumbuhan, dan peringkat</div></div>
 <section class="exec-summary reveal rv-up">
-  <div class="exec-summary-grid" id="executiveSummary" aria-live="polite"></div>
-  <div id="todaySummary" aria-live="polite"></div>
+  <div class="exec-summary-grid" id="executiveSummary"></div>
+  <div id="todaySummary"></div>
 </section>
-<section class="summary-strip reveal rv-up" id="summaryStrip" aria-live="polite"></section>
+<section class="summary-strip reveal rv-up" id="summaryStrip"></section>
 
 <!-- OVERVIEW CARDS -->
 <section class="cards-s reveal rv-up">
   <div class="stitle"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#833AB4" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>Ringkasan Akun</div>
   <div class="cscroll" id="cards"></div>
 </section>
-</div><!-- end sec-overview -->
-
-<!-- ===== SECTION 2: GROWTH & POST ANALYSIS ===== -->
-<div class="sec-group" id="sec-growth">
-<div class="sec-group-header reveal rv-left"><div class="sec-num">2</div><div class="sec-label">Pertumbuhan</div><div class="sec-desc">Momentum pertumbuhan dan analisis postingan terbaru</div></div>
 
 <!-- GROWTH VELOCITY -->
 <section class="gv-sec reveal rv-up" id="gv-sec">
@@ -920,11 +891,6 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   <div class="ps-summary" id="postCampaignSummary"></div>
   <div class="ps-grid" id="postSnapshotGrid"></div>
 </section>
-</div><!-- end sec-growth -->
-
-<!-- ===== SECTION 3: RANKING & DAILY METRICS ===== -->
-<div class="sec-group" id="sec-ranking">
-<div class="sec-group-header reveal rv-left"><div class="sec-num">3</div><div class="sec-label">Peringkat</div><div class="sec-desc">Peringkat kompetitor dan metrik harian</div></div>
 
 <!-- RANKING TABLE -->
 <section class="tsec reveal rv-up" id="ranking-section">
@@ -968,11 +934,11 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
     </div>
   </details>
 </section>
-</div><!-- end sec-ranking -->
+</div><!-- end sec-overview -->
 
-<!-- ===== SECTION 4: ENGAGEMENT ===== -->
+<!-- ===== SECTION 2: ENGAGEMENT ===== -->
 <div class="sec-group" id="sec-engagement">
-<div class="sec-group-header reveal rv-left"><div class="sec-num">4</div><div class="sec-label">Interaksi</div><div class="sec-desc">Grafik interaksi dan perbandingan antar akun</div></div>
+<div class="sec-group-header reveal rv-left"><div class="sec-num">2</div><div class="sec-label">Interaksi</div><div class="sec-desc">Grafik interaksi dan perbandingan antar akun</div></div>
 
 <!-- ALERTS + SETTINGS (DISABLED) -->
 <section class="alsec" id="alertSection" style="display:none!important">
@@ -982,7 +948,7 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 
 <!-- NOTIFICATION THRESHOLD SETTINGS (DISABLED) -->
 <section class="settings-sec" style="display:none">
-  <div class="notification-settings-toggle" onclick="toggleSettings()">
+  <div class="settings-toggle" onclick="toggleSettings()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     <span id="settingsLabel">Pengaturan Notifikasi</span>
   </div>
@@ -1045,9 +1011,9 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 </section>
 </div><!-- end sec-engagement -->
 
-<!-- ===== SECTION 5: CONTENT PERFORMANCE ===== -->
+<!-- ===== SECTION 3: CONTENT PERFORMANCE ===== -->
 <div class="sec-group" id="sec-content">
-<div class="sec-group-header reveal rv-left"><div class="sec-num">5</div><div class="sec-label">Performa Konten</div><div class="sec-desc">Rangkuman performa per tipe konten dan heatmap posting</div></div>
+<div class="sec-group-header reveal rv-left"><div class="sec-num">3</div><div class="sec-label">Performa Konten</div><div class="sec-desc">Rangkuman performa per tipe konten dan heatmap posting</div></div>
 
 <!-- CONTENT PERFORMANCE BREAKDOWN -->
 <section class="cb-sec reveal rv-up">
@@ -1073,9 +1039,9 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
 </section>
 </div><!-- end sec-content -->
 
-<!-- ===== SECTION 6: HISTORY & INSIGHTS ===== -->
+<!-- ===== SECTION 4: HISTORY & INSIGHTS ===== -->
 <div class="sec-group" id="sec-history">
-<div class="sec-group-header reveal rv-left"><div class="sec-num">6</div><div class="sec-label">Riwayat & Insight</div><div class="sec-desc">Insight utama dan analisis tren</div></div>
+<div class="sec-group-header reveal rv-left"><div class="sec-num">4</div><div class="sec-label">Riwayat & Insight</div><div class="sec-desc">Insight utama dan analisis tren</div></div>
 
 <!-- INSIGHTS -->
 <section class="isec reveal rv-up">
@@ -1166,17 +1132,17 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
         <div class="settings-section">
           <div class="settings-section-title">Change Password</div>
           <div class="auth-field auth-field-password">
-            <label for="currentPassword">Current Password</label>
+            <label>Current Password</label>
             <input type="password" id="currentPassword" class="settings-input" placeholder="Current password">
             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('currentPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
           </div>
           <div class="auth-field auth-field-password">
-            <label for="newPassword">New Password</label>
+            <label>New Password</label>
             <input type="password" id="newPassword" class="settings-input" placeholder="New password">
             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('newPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
           </div>
           <div class="auth-field auth-field-password">
-            <label for="confirmPassword">Confirm New Password</label>
+            <label>Confirm New Password</label>
             <input type="password" id="confirmPassword" class="settings-input" placeholder="Confirm new password">
             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
           </div>
@@ -1193,13 +1159,13 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
     <h3 id="userModalTitle">Add User</h3>
     <div id="userModalError" class="auth-error"><span></span></div>
     <input type="hidden" id="editUserId">
-    <div class="auth-field"><label for="userUsername">Username</label><input type="text" id="userUsername" placeholder="Username"></div>
+    <div class="auth-field"><label>Username</label><input type="text" id="userUsername" placeholder="Username"></div>
     <div class="auth-field auth-field-password">
-      <label for="userPassword">Password</label>
+      <label>Password</label>
       <input type="password" id="userPassword" placeholder="Password">
       <button type="button" class="password-toggle" onclick="togglePasswordVisibility('userPassword', this)"><svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-closed" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
     </div>
-    <div class="auth-field"><label for="userRole">Role</label><select id="userRole" class="settings-select" style="width:100%"><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>
+    <div class="auth-field"><label>Role</label><select id="userRole" class="settings-select" style="width:100%"><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>
     <div class="settings-btn-group">
       <button class="settings-btn settings-btn-secondary" onclick="closeUserModal()">Cancel</button>
       <button class="settings-btn settings-btn-primary" onclick="saveUser()">Save</button>
@@ -1207,18 +1173,18 @@ body:not(.reveal-ready) .reveal{animation:revealFallback 0s 3s forwards}
   </div>
 </div>
 
-<script defer src="./js/auth.js?v=20260419_040250"></script>
-<script defer src="./js/settings.js?v=20260419_040250"></script>
-<script defer src="./js/data-core.js?v=20260419_040250"></script>
-<script defer src="./js/ui-utils.js?v=20260419_040250"></script>
-<script defer src="./js/render-overview.js?v=20260419_040250"></script>
-<script defer src="./js/render-charts.js?v=20260419_040250"></script>
-<script defer src="./js/render-comparison.js?v=20260419_040250"></script>
-<script defer src="./js/render-content.js?v=20260419_040250"></script>
-<script defer src="./js/render-metrics.js?v=20260419_040250"></script>
-<script defer src="./js/runtime-core.js?v=20260419_040250"></script>
-<script defer src="./js/runtime-data-loader.js?v=20260419_040250"></script>
-<script defer src="./js/runtime-init.js?v=20260419_040250"></script>
+<script src="./js/auth.js?v=20260420_045100"></script>
+<script src="./js/settings.js?v=20260420_045100"></script>
+<script src="./js/data-core.js?v=20260420_045100"></script>
+<script src="./js/ui-utils.js?v=20260420_045100"></script>
+<script src="./js/render-overview.js?v=20260420_045100"></script>
+<script src="./js/render-charts.js?v=20260420_045100"></script>
+<script src="./js/render-comparison.js?v=20260420_045100"></script>
+<script src="./js/render-content.js?v=20260420_045100"></script>
+<script src="./js/render-metrics.js?v=20260420_045100"></script>
+<script src="./js/runtime-core.js?v=20260420_045100"></script>
+<script src="./js/runtime-data-loader.js?v=20260420_045100"></script>
+<script src="./js/runtime-init.js?v=20260420_045100"></script>
 </body>
 </html>
 
