@@ -37,7 +37,7 @@ function main() {
   // 1) SocialBlade stats per account
   for (const account of accounts) {
     try {
-      const out = run('python3', [path.join(repoRoot, 'scripts', 'socialblade', 'collect-socialblade-stats.py'), account.username], { cwd: repoRoot });
+      const out = run('/usr/bin/python3', [path.join(repoRoot, 'scripts', 'socialblade', 'collect-socialblade-stats.py'), account.username], { cwd: repoRoot });
       summary.socialblade.processed += 1;
       summary.socialblade.accounts.push({ username: account.username, status: 'processed', output: JSON.parse(out) });
     } catch (error) {

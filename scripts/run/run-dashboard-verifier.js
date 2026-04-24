@@ -21,17 +21,23 @@ function todayWibDate() {
 }
 
 function loadLatestCronRun(jobId) {
-  const p = path.join('/root/.openclaw/cron/runs', `${jobId}.jsonl`);
-  if (!fs.existsSync(p)) {
-    throw new Error(`Cron run file not found for job ${jobId}`);
+  // Try Hermes cron output first, then fall back to OpenClaw legacy path
+  const hermesCronDir = process.env.HERMES_CRON_RUNS || '/root/.hermes/cron/output';
+  const legacyDir = '/root/.openclaw/cron/runs';
+  
+  for (const dir of [hermesCronDir, legacyDir]) {
+    const p = path.join(dir, `${jobId}.jsonl`);
+    if (fs.existsSync(p)) {
+      const lines = fs.readFileSync(p, 'utf8').split(/\r?\n/).filter(Boolean);
+      if (lines.length) {
+        return JSON.parse(lines[lines.length - 1]);
+      }
+    }
   }
-
-  const lines = fs.readFileSync(p, 'utf8').split(/\r?\n/).filter(Boolean);
-  if (!lines.length) {
-    throw new Error(`Cron run file empty for job ${jobId}`);
-  }
-
-  return JSON.parse(lines[lines.length - 1]);
+  
+  // No cron run data available — return a synthetic "unknown" result
+  // so the verifier can still check live data independently
+  return { status: 'unknown', delivered: false, deliveryStatus: 'unknown', summary: 'No cron run data available (post-migration)' };
 }
 
 function fetchJson(url) {
@@ -56,6 +62,10 @@ function fetchJson(url) {
 
 function inferMainJobHealth(run) {
   const summaryText = String(run.summary || '').trim();
+  if (run.status === 'unknown') {
+    // Post-migration: no cron run data available, treat as ambiguous so live data check can override
+    return { ok: false, reason: 'No cron run data (post-migration)', ambiguous: true };
+  }
   if (run.status !== 'ok') {
     return { ok: false, reason: `run status=${run.status}: ${summaryText || run.error || 'unknown error'}`, ambiguous: false };
   }

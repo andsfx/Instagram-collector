@@ -1,6 +1,6 @@
-import type { HeroMetaItem } from '../data/selectors'
+import type { HeroMetaItem, HeroSummary } from '../data/selectors'
 
-export function HeaderBar({ onRefresh, heroMeta }: { onRefresh: () => void; heroMeta: HeroMetaItem[] }) {
+export function HeaderBar({ onRefresh, heroMeta, copy }: { onRefresh: () => void; heroMeta: HeroMetaItem[]; copy?: HeroSummary }) {
   const heroLead = heroMeta[0]
   const supportingMeta = heroMeta.slice(1)
 
@@ -12,9 +12,9 @@ export function HeaderBar({ onRefresh, heroMeta }: { onRefresh: () => void; hero
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="grid gap-2">
               <div className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
-                Metropolitan Mall Bekasi
+                {copy?.title ?? 'Metropolitan Mall Bekasi'}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-300">Performance overview</div>
+              <div className="text-sm text-slate-600 dark:text-slate-300">{copy?.subtitle ?? 'Performance overview'}</div>
             </div>
             <button
               type="button"
@@ -27,11 +27,11 @@ export function HeaderBar({ onRefresh, heroMeta }: { onRefresh: () => void; hero
 
           <div className="grid gap-5">
             <h1 className="max-w-[11ch] font-display text-[clamp(2.8rem,6vw,6.2rem)] font-semibold leading-[0.92] tracking-[-0.065em] text-slate-950 dark:text-white sm:max-w-[12ch]">
-              Metropolitan Mall Bekasi.
+              {copy?.title ? `${copy.title}.` : 'Metropolitan Mall Bekasi.'}
             </h1>
             <div className="grid max-w-[42rem] gap-3">
               <p className="text-[clamp(1.02rem,0.94rem+0.3vw,1.26rem)] font-medium leading-[1.35] text-slate-800 dark:text-slate-100">
-                Growth, engagement, dan gap kompetitor dalam satu ringkasan.
+                {copy?.description ?? 'Growth, engagement, dan gap kompetitor dalam satu ringkasan.'}
               </p>
               <p className="max-w-[34rem] text-[0.92rem] leading-6 text-slate-600 dark:text-slate-300">
                 Disusun untuk tim internal dan direksi. Mulai dari growth, lanjut ke summary, lalu detail saat diperlukan.
@@ -61,7 +61,7 @@ export function HeaderBar({ onRefresh, heroMeta }: { onRefresh: () => void; hero
               Board readout
             </div>
             <p className="max-w-[22rem] font-display text-[clamp(1.28rem,1.08rem+0.52vw,1.8rem)] font-semibold leading-[1.06] tracking-[-0.035em] text-slate-950 dark:text-white">
-              Buka dengan posisi brand. Turun ke detail bila perlu.
+              {copy?.boardTitle ?? 'Buka dengan posisi brand. Turun ke detail bila perlu.'}
             </p>
           </div>
 

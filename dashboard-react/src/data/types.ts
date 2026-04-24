@@ -38,6 +38,10 @@ export interface DashboardRecord {
     executiveBullets: string[]
   }
   history: Array<{ date: string; values: Record<AccountKey, MetricEntry> }>
+  meta: {
+    brandAccount: string | null
+    historyDays?: number
+  }
   // Optional audited breakdowns from schema
   content_breakdown?: ContentBreakdownByAccount
   post_insights?: PostInsightsByAccount
