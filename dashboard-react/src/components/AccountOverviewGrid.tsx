@@ -2,66 +2,67 @@ import type { UiAccountSummary } from '../data/types'
 import { formatCompact } from '../data/selectors'
 import { SectionCard } from './ui'
 
+const CARD_ACCENTS = [
+  'before:bg-[image:var(--account-brand)]',
+  'before:bg-[image:var(--account-comp-1)]',
+  'before:bg-[image:var(--account-comp-2)]',
+  'before:bg-[image:var(--account-comp-3)]',
+  'before:bg-[image:var(--account-comp-4)]',
+]
+
 export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[] }) {
   return (
-    <SectionCard
-      eyebrow="Overview Akun"
-      title="Perbandingan cepat tiap akun"
-      description="Lapisan ini diubah menjadi roster comparison, jadi pembaca melihat akun sebagai baris-baris terstruktur, bukan kartu-kartu independen."
-    >
-      <div className="grid gap-5">
-        {accounts.map((acc, index) => (
-          <article
-            key={acc.key}
-            className={[
-              'grid gap-4 border-b border-slate-200/70 pb-5 last:border-b-0 last:pb-0 dark:border-white/10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-8',
-              index === 0 ? 'border-[color:color-mix(in_srgb,var(--brand)_18%,white)]' : '',
-            ].join(' ')}
-          >
-            <div className="grid gap-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="grid gap-1">
-                  <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">Akun</div>
-                  <div className="font-display text-[clamp(1.35rem,1.15rem+0.5vw,1.85rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 dark:text-white">
-                    {acc.name}
-                  </div>
+    <SectionCard eyebrow="Overview Akun" title="Perbandingan cepat tiap akun">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {accounts.map((acc, index) => {
+          const accentClass = CARD_ACCENTS[index % CARD_ACCENTS.length]
+          const isBrand = index === 0
+          return (
+            <article
+              key={acc.key}
+              className={`relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-lg)] hover:-translate-y-0.5 before:absolute before:inset-x-0 before:top-0 before:h-1 before:rounded-t-[var(--radius-lg)] ${accentClass} ${isBrand ? 'bg-gradient-to-b from-[rgba(225,48,108,0.03)] to-[var(--panel)]' : ''}`}
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <span className="font-display text-sm font-bold text-[var(--text)]">{acc.name}</span>
+                {isBrand ? (
+                  <span className="rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">Brand</span>
+                ) : (
+                  <span className="rounded-[var(--radius-pill)] bg-[var(--panel-muted)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--text-soft)]">Competitor</span>
+                )}
+              </div>
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-soft)]">Followers</div>
+              <div className="font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
+                {formatCompact.format(acc.followers)}
+              </div>
+              <div className="mt-2 flex gap-1.5">
+                <span className={`inline-flex items-center rounded-[var(--radius-pill)] px-2 py-0.5 text-[10px] font-bold ${acc.change1d > 0 ? 'bg-[var(--success-soft)] text-[var(--success)]' : acc.change1d < 0 ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--panel-muted)] text-[var(--text-soft)]'}`}>
+                  {acc.change1d >= 0 ? '+' : ''}{formatCompact.format(acc.change1d)}
+                </span>
+                <span className={`inline-flex items-center rounded-[var(--radius-pill)] px-2 py-0.5 text-[10px] font-bold ${acc.change7dPct > 0 ? 'bg-[var(--success-soft)] text-[var(--success)]' : acc.change7dPct < 0 ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--panel-muted)] text-[var(--text-soft)]'}`}>
+                  7d {acc.change7dPct >= 0 ? '+' : ''}{acc.change7dPct.toFixed(2)}%
+                </span>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
+                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact.format(acc.following)}</div>
+                  <div className="text-[10px] text-[var(--text-soft)]">Following</div>
                 </div>
-                <div className="flex flex-wrap justify-end gap-2">
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[0.76rem] font-bold ${acc.change1d > 0 ? 'bg-success-soft text-success' : acc.change1d < 0 ? 'bg-danger-soft text-danger' : 'bg-warning-soft text-warning'}`}>
-                    1d {acc.change1d >= 0 ? '+' : ''}{formatCompact.format(acc.change1d)}
-                  </span>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[0.76rem] font-bold ${acc.change7dPct > 0 ? 'bg-success-soft text-success' : acc.change7dPct < 0 ? 'bg-danger-soft text-danger' : 'bg-warning-soft text-warning'}`}>
-                    7d {acc.change7dPct >= 0 ? '+' : ''}{acc.change7dPct.toFixed(2)}%
-                  </span>
+                <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
+                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact.format(acc.posts)}</div>
+                  <div className="text-[10px] text-[var(--text-soft)]">Posts</div>
+                </div>
+                <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
+                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact.format(acc.avgLikes)}</div>
+                  <div className="text-[10px] text-[var(--text-soft)]">Avg Likes</div>
+                </div>
+                <div className="rounded-[var(--radius-sm)] bg-[var(--ig-gradient-soft)] p-2 text-center">
+                  <div className="bg-[image:var(--ig-gradient)] bg-clip-text text-sm font-extrabold text-transparent">{acc.engagementRate.toFixed(2)}%</div>
+                  <div className="text-[10px] text-[var(--text-soft)]">ER</div>
                 </div>
               </div>
-
-              <div className="grid gap-1">
-                <div className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Followers</div>
-                <div className="font-display text-[clamp(1.9rem,1.55rem+0.72vw,2.45rem)] font-semibold leading-none tracking-[-0.05em] text-slate-950 dark:text-white">
-                  {formatCompact.format(acc.followers)}
-                </div>
-                <div className="text-[0.9rem] leading-6 text-slate-600 dark:text-slate-300">
-                  Growth 7 hari {acc.change7dPct >= 0 ? 'menguat' : 'melemah'} {acc.change7dPct >= 0 ? '+' : ''}{acc.change7dPct.toFixed(2)}%.
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-3 border-t border-slate-200/70 pt-4 dark:border-white/10 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-              <div className="grid gap-2 text-[0.92rem]">
-                <div className="flex items-center justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Following</span><span className="font-semibold text-slate-950 dark:text-white">{formatCompact.format(acc.following)}</span></div>
-                <div className="flex items-center justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Posts</span><span className="font-semibold text-slate-950 dark:text-white">{formatCompact.format(acc.posts)}</span></div>
-                <div className="flex items-center justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Engagement</span><span className="font-semibold text-slate-950 dark:text-white">{acc.engagementRate.toFixed(2)}%</span></div>
-                <div className="flex items-center justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Avg Likes</span><span className="font-semibold text-slate-950 dark:text-white">{formatCompact.format(acc.avgLikes)}</span></div>
-                <div className="flex items-center justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Avg Comments</span><span className="font-semibold text-slate-950 dark:text-white">{formatCompact.format(acc.avgComments)}</span></div>
-              </div>
-
-              <div className="text-[0.88rem] leading-[1.55] text-slate-600 dark:text-slate-300">
-                Engagement {acc.engagementRate.toFixed(2)}% memberi konteks terhadap perubahan followers jangka pendek akun ini.
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          )
+        })}
       </div>
     </SectionCard>
   )
