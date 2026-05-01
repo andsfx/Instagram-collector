@@ -44,6 +44,17 @@ export default function App() {
   const [isVisualAppendixOpen, setIsVisualAppendixOpen] = useState(false)
   const [period, setPeriod] = useState<Period>('day')
 
+  // ALL hooks MUST be called before any early return (Rules of Hooks)
+  const freshness = useMemo(() => data ? getFreshnessSummary(data) : null, [data])
+  const executive = useMemo(() => data ? getExecutiveSummary(data) : null, [data])
+  const today = useMemo(() => data ? getTodaySummary(data) : null, [data])
+  const quickVisual = useMemo(() => data ? getQuickVisualData(data) : null, [data])
+  const accountSummaries = useMemo(() => data ? getAccountSummaries(data) : [], [data])
+  const insights = useMemo(() => data ? getInsightsData(data) : null, [data])
+  const summaryStrip = useMemo(() => data ? getSummaryStrip(data) : [], [data])
+  const heroMeta = useMemo(() => data ? getHeroMeta(data) : [], [data])
+  const heroSummary = useMemo(() => data ? getHeroSummary(data) : undefined, [data])
+
   function retryAsyncSection() {
     setAsyncResetKey((current) => current + 1)
   }
@@ -58,7 +69,7 @@ export default function App() {
     )
   }
 
-  if (error || !data) {
+  if (error || !data || !freshness || !executive || !today || !quickVisual || !insights) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6 py-16">
         <div className="grid gap-4 text-center">
@@ -70,18 +81,6 @@ export default function App() {
       </main>
     )
   }
-
-  /* eslint-disable react-hooks/rules-of-hooks */
-  const freshness = useMemo(() => getFreshnessSummary(data), [data])
-  const executive = useMemo(() => getExecutiveSummary(data), [data])
-  const today = useMemo(() => getTodaySummary(data), [data])
-  const quickVisual = useMemo(() => getQuickVisualData(data), [data])
-  const accountSummaries = useMemo(() => getAccountSummaries(data), [data])
-  const insights = useMemo(() => getInsightsData(data), [data])
-  const summaryStrip = useMemo(() => getSummaryStrip(data), [data])
-  const heroMeta = useMemo(() => getHeroMeta(data), [data])
-  const heroSummary = useMemo(() => getHeroSummary(data), [data])
-  /* eslint-enable react-hooks/rules-of-hooks */
 
   const sections: SectionNavItem[] = [
     { id: 'section-growth', label: 'Growth' },
@@ -117,7 +116,7 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-summary" className="scroll-mt-20 py-8" style={{ background: 'var(--panel-muted)', opacity: 0.5 }}>
+      <section id="section-summary" className="scroll-mt-20 bg-[var(--panel-muted)] py-8">
         <div className={`${shell} space-y-6`}>
           <ExecutiveSummary summary={executive} />
           <TodaySummary today={today} />
@@ -133,7 +132,7 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-comparison" className="scroll-mt-20 py-8" style={{ background: 'var(--panel-muted)', opacity: 0.5 }}>
+      <section id="section-comparison" className="scroll-mt-20 bg-[var(--panel-muted)] py-8">
         <div className={`${shell} space-y-6`}>
           <RankingGrowthPresentation data={data} mode="table" />
           <AccountOverviewGrid accounts={accountSummaries} />
@@ -176,7 +175,7 @@ export default function App() {
         </div>
       </section>
 
-      <section id="section-recap" className="scroll-mt-20 py-8" style={{ background: 'var(--panel-muted)', opacity: 0.5 }}>
+      <section id="section-recap" className="scroll-mt-20 bg-[var(--panel-muted)] py-8">
         <div className={`${shell} space-y-6`}>
           <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
           <FreshnessPanel freshness={freshness} />
