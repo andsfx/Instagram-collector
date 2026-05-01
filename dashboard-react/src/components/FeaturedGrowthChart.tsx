@@ -1,15 +1,4 @@
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
 import type { QuickVisualData } from '../data/selectors'
-import { chartAxisColor, chartGridColor, chartItemStyle, chartLabelStyle, chartLegendStyle, chartTooltipStyle } from './chart-theme'
 
 export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
   const firstPoint = data.followerTrend[0]
@@ -18,71 +7,87 @@ export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
     .map((series) => {
       const start = Number(firstPoint?.[series.key] ?? 0)
       const end = Number(lastPoint?.[series.key] ?? 0)
-      return { account: series.key, delta: end - start, start, end }
+      const delta = end - start
+      const pct = start > 0 ? (delta / start) * 100 : 0
+      return { account: series.key, delta, pct, end, color: series.color }
     })
-    .sort((left, right) => right.delta - left.delta)
+    .sort((left, right) => right.end - left.end)
 
-  const leadMover = movers[0]
+  const totalFollowers = movers.reduce((sum, m) => sum + m.end, 0)
   const totalDelta = movers.reduce((sum, m) => sum + m.delta, 0)
-
-  // Normalize data to % change from first day for better scale comparison
-  const normalizedTrend = data.followerTrend.map((point) => {
-    const normalized: Record<string, unknown> = { date: point.date }
-    for (const series of data.series) {
-      const baseValue = Number(firstPoint?.[series.key] ?? 1)
-      const currentValue = Number(point[series.key] ?? 0)
-      normalized[series.key] = baseValue > 0 ? ((currentValue - baseValue) / baseValue) * 100 : 0
-    }
-    return normalized
-  })
+  const maxFollowers = movers[0]?.end ?? 1
+  const leadMover = [...movers].sort((a, b) => b.delta - a.delta)[0]
 
   return (
-    <article className="grid gap-4">
-      {/* KPI Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] cursor-pointer">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Leading Mover</div>
-          <div className="mt-1 font-display text-lg font-extrabold text-[var(--text)]">{leadMover ? `@${leadMover.account}` : '-'}</div>
-          <div className="text-xs font-bold text-[var(--success)]">{leadMover ? `+${leadMover.delta.toLocaleString('id-ID')}` : '-'}</div>
-        </div>
-        <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] cursor-pointer">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Total Growth</div>
-          <div className="mt-1 font-display text-lg font-extrabold text-[var(--text)]">{totalDelta >= 0 ? '+' : ''}{totalDelta.toLocaleString('id-ID')}</div>
-          <div className="text-xs text-[var(--text-muted)]">{data.followerTrend.length} data points</div>
-        </div>
-        <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] cursor-pointer">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Tracked</div>
-          <div className="mt-1 font-display text-lg font-extrabold text-[var(--text)]">{data.series.length} akun</div>
-          <div className="text-xs text-[var(--text-muted)]">Follower comparison</div>
-        </div>
-        <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] cursor-pointer">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Period</div>
-          <div className="mt-1 font-display text-lg font-extrabold text-[var(--text)]">{data.followerTrend.length}d</div>
-          <div className="text-xs text-[var(--text-muted)]">Window aktif</div>
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Hero Card - Total Followers (spans 2 cols) */}
+      <div className="relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] sm:col-span-2">
+        <div className="absolute inset-0 bg-[image:var(--ig-gradient-soft)] opacity-50" />
+        <div className="relative">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Total Followers (All Tracked)</div>
+          <div className="mt-1 font-display text-[clamp(2rem,3vw,3rem)] font-extrabold tracking-tight text-[var(--text)]">
+            {totalFollowers.toLocaleString('id-ID')}
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <span className={`text-sm font-bold ${totalDelta >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
+              {totalDelta >= 0 ? '+' : ''}{totalDelta.toLocaleString('id-ID')}
+            </span>
+            <span className="text-xs text-[var(--text-soft)]">dalam {data.followerTrend.length} hari</span>
+          </div>
         </div>
       </div>
 
-      {/* Chart - Full Width, Normalized to % Growth */}
-      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-4 shadow-[var(--shadow-sm)]">
-        <div className="mb-2 flex items-center justify-between">
-          <div className="text-xs font-bold text-[var(--text-muted)]">Growth % (normalized from day 1)</div>
-          <div className="text-[10px] text-[var(--text-soft)]">Semua akun dimulai dari 0% untuk perbandingan yang adil</div>
+      {/* Leading Mover Card */}
+      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)]">
+        <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Leading Mover</div>
+        <div className="mt-1 font-display text-xl font-extrabold text-[var(--text)]">
+          {leadMover ? `@${leadMover.account}` : '-'}
         </div>
-        <div className="h-[300px] w-full sm:h-[360px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={normalizedTrend} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
-              <XAxis dataKey="date" stroke={chartAxisColor} fontSize={12} />
-              <YAxis stroke={chartAxisColor} fontSize={12} tickFormatter={(v: number) => `${v.toFixed(1)}%`} />
-              <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} formatter={(value: number) => [`${value.toFixed(3)}%`, '']} />
-              <Legend wrapperStyle={chartLegendStyle} />
-              {data.series.map((series) => (
-                <Line key={series.key} type="monotone" dataKey={series.key} name={`@${series.key}`} stroke={series.color} strokeWidth={2.4} dot={false} activeDot={{ r: 4 }} />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="mt-1 flex items-center gap-2">
+          <span className="text-sm font-bold text-[var(--success)]">
+            {leadMover ? `+${leadMover.delta.toLocaleString('id-ID')}` : '-'}
+          </span>
+          <span className="text-xs text-[var(--text-soft)]">
+            {leadMover ? `${leadMover.pct.toFixed(2)}%` : ''}
+          </span>
         </div>
       </div>
-    </article>
+
+      {/* Tracked Accounts Card */}
+      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)]">
+        <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Tracked</div>
+        <div className="mt-1 font-display text-xl font-extrabold text-[var(--text)]">{data.series.length} akun</div>
+        <div className="mt-1 text-xs text-[var(--text-soft)]">{data.followerTrend.length} hari data</div>
+      </div>
+
+      {/* Horizontal Bar Chart - Follower Ranking (spans full width) */}
+      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-4 shadow-[var(--shadow-sm)] sm:col-span-2 lg:col-span-4">
+        <div className="mb-3 text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Follower Ranking</div>
+        <div className="grid gap-2">
+          {movers.map((m, i) => (
+            <div key={m.account} className="grid grid-cols-[140px_1fr_auto] items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style={{ backgroundColor: `${m.color}20`, color: m.color }}>
+                  {i + 1}
+                </span>
+                <span className="truncate text-xs font-bold text-[var(--text)]">@{m.account}</span>
+              </div>
+              <div className="h-5 overflow-hidden rounded-full bg-[var(--panel-muted)]">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${(m.end / maxFollowers) * 100}%`, backgroundColor: m.color }}
+                />
+              </div>
+              <div className="flex items-center gap-2 text-right">
+                <span className="text-xs font-bold text-[var(--text)]">{m.end.toLocaleString('id-ID')}</span>
+                <span className={`text-[10px] font-bold ${m.delta > 0 ? 'text-[var(--success)]' : m.delta < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-soft)]'}`}>
+                  {m.delta > 0 ? '+' : ''}{m.delta.toLocaleString('id-ID')}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
