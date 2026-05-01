@@ -36,8 +36,8 @@ export default {
         'ig-red': 'var(--ig-red)',
       },
       fontFamily: {
-        display: ['var(--font-display)'],
-        body: ['var(--font-body)'],
+        display: ['"Plus Jakarta Sans"', 'var(--font-display)'],
+        body: ['"Plus Jakarta Sans"', 'var(--font-body)'],
       },
       borderRadius: {
         'card': 'var(--radius-lg)',
