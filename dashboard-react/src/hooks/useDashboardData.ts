@@ -19,10 +19,19 @@ let dashboardCache: DashboardRecord | null = null
 let inflightRequest: Promise<DashboardRecord> | null = null
 let inflightController: AbortController | null = null
 let inflightSubscribers = 0
+let inflightRequestId = 0
 
-async function requestDashboardData(forceRefresh = false): Promise<DashboardRecord> {
+function abortInflightRequest() {
+  if (!inflightController) return
+  inflightController.abort()
+  inflightController = null
+  inflightRequest = null
+}
+
+export async function requestDashboardData(forceRefresh = false): Promise<DashboardRecord> {
   if (forceRefresh) {
     dashboardCache = null
+    abortInflightRequest()
   }
 
   if (!forceRefresh && dashboardCache) {
@@ -34,12 +43,15 @@ async function requestDashboardData(forceRefresh = false): Promise<DashboardReco
   }
 
   inflightController = new AbortController()
+  const requestId = inflightRequestId + 1
+  inflightRequestId = requestId
+  const controller = inflightController
 
   inflightRequest = fetch(DASHBOARD_DATA_ENDPOINT, {
     headers: {
       Accept: 'application/json',
     },
-    signal: inflightController.signal,
+    signal: controller.signal,
   })
     .then(async (response) => {
       if (!response.ok) {
@@ -53,8 +65,10 @@ async function requestDashboardData(forceRefresh = false): Promise<DashboardReco
       return adapted
     })
     .finally(() => {
-      inflightRequest = null
-      inflightController = null
+      if (inflightRequestId === requestId) {
+        inflightRequest = null
+        inflightController = null
+      }
     })
 
   return inflightRequest
@@ -68,10 +82,15 @@ function releaseInflightRequest() {
   inflightSubscribers = Math.max(0, inflightSubscribers - 1)
 
   if (inflightSubscribers === 0 && inflightController) {
-    inflightController.abort()
-    inflightController = null
-    inflightRequest = null
+    abortInflightRequest()
   }
+}
+
+export function resetDashboardDataRuntime() {
+  dashboardCache = null
+  inflightSubscribers = 0
+  inflightRequestId = 0
+  abortInflightRequest()
 }
 
 export function useDashboardData(): UseDashboardDataResult {
