@@ -77,18 +77,18 @@ export function RankingGrowthPresentation({
       ? {
           eyebrow: 'Ranking & Growth',
           title: 'Posisi audiens dan momentum pertumbuhan',
-          description: 'Chapter growth berhenti di leaderboard ringkas agar executive summary tetap muncul lebih awal dalam alur presentasi.',
+          description: undefined,
         }
       : mode === 'table'
         ? {
             eyebrow: 'Detailed Comparison',
             title: 'Tabel kompetitor penuh',
-            description: 'Gunakan tabel ini untuk membaca gap brand, status verified, dan metrik akun secara teknis setelah chapter summary dan content selesai dibahas.',
+            description: undefined,
           }
         : {
             eyebrow: 'Ranking & Growth',
             title: 'Posisi audiens dan momentum pertumbuhan',
-            description: 'Chapter comparison dibuka dengan leaderboard yang lebih cepat dipindai, lalu dilanjutkan ke tabel teknis untuk pembacaan detail.',
+            description: undefined,
           }
 
   if (mode === 'summary') {
@@ -98,7 +98,7 @@ export function RankingGrowthPresentation({
           <div className="grid gap-2">
             <div className="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Leaderboard snapshot</div>
             <h3 className="font-display text-[clamp(1.3rem,1.12rem+0.48vw,1.85rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 dark:text-white">
-              Dua ranking paling cepat untuk membaca struktur persaingan.
+              Leaderboard
             </h3>
           </div>
 

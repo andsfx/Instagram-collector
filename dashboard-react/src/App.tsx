@@ -111,7 +111,7 @@ export default function App() {
         </a>
 
         {/* Compact Top Bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-5 py-3 sm:px-6">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-5 py-3 shadow-[var(--shadow-sm)] sm:px-6">
           <div className="flex items-center gap-3">
             <h1 className="text-base font-bold text-[var(--text)]">{heroSummary?.title ?? 'Dashboard Performa Instagram'}</h1>
             <span className="hidden text-sm text-[var(--text-soft)] sm:inline">{heroSummary?.subtitle ?? ''}</span>

@@ -31,7 +31,6 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
     <SectionCard
       eyebrow="Head-to-Head"
       title="Bandingkan dua akun pada metrik yang paling penting"
-      description="Bagian ini dipadatkan menjadi briefing comparison: pilih dua akun, baca verdict, lalu lihat trend tanpa harus menyeberang ke banyak panel."
     >
       <div className="grid gap-3 md:grid-cols-3">
         <label className="grid gap-1.5">
