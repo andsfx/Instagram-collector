@@ -71,9 +71,9 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-[var(--bg)]">
+      <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
         <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="loading" />
-        <main className="lg:ml-[220px] flex-1 overflow-x-clip pt-[60px] lg:pt-0">
+        <main className="lg:ml-[220px] flex-1 overflow-x-hidden pt-[60px] lg:pt-0 max-w-full">
           <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
             <div className="h-4 w-48 skeleton rounded" />
           </header>
@@ -87,9 +87,9 @@ export default function App() {
 
   if (error || !data || !freshness || !executive || !today || !quickVisual || !insights) {
     return (
-      <div className="flex min-h-screen bg-[var(--bg)]">
+      <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
         <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="cached" />
-        <main className="lg:ml-[220px] flex min-h-screen flex-1 items-center justify-center px-6 py-16 pt-[60px] lg:pt-16">
+        <main className="lg:ml-[220px] flex min-h-screen flex-1 items-center justify-center overflow-x-hidden px-6 py-16 pt-[60px] lg:pt-16 max-w-full">
           <div className="grid gap-4 text-center">
             <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Gagal memuat data.'} />
             <button type="button" className="mx-auto inline-flex items-center rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(225,48,108,0.24)]" onClick={retry}>
@@ -104,10 +104,10 @@ export default function App() {
   const shell = 'mx-auto w-full max-w-[1080px] px-6 lg:px-8'
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg)]">
+    <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
       <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus={refreshStatus} onRefresh={retry} />
 
-      <main id="main-content" className="lg:ml-[220px] flex-1 overflow-x-clip pb-20 pt-[60px] lg:pt-0">
+      <main id="main-content" className="lg:ml-[220px] flex-1 overflow-x-hidden pb-20 pt-[60px] lg:pt-0 max-w-full">
         <a className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-[68px] focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-[var(--ig-purple)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg lg:focus:left-[240px] lg:focus:top-4" href="#section-summary">
           Lewati navigasi
         </a>

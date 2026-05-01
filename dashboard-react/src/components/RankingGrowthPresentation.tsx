@@ -227,7 +227,7 @@ export function RankingGrowthPresentation({
               <div className="text-xs font-extrabold uppercase tracking-[0.12em] text-text-soft">Detailed table</div>
               <h3 className="font-display text-[clamp(1.14rem,1rem+0.42vw,1.5rem)] font-semibold leading-[1.08] text-text">Tabel kompetitor penuh</h3>
               <p className="max-w-[62ch] text-[0.95rem] text-text-muted">
-                Urutkan kolom untuk membaca gap brand, status verified, dan metrik akun secara lebih teknis setelah membaca leaderboard di atas.
+                Klik header kolom untuk mengurutkan.
               </p>
             </div>
             <div className="inline-flex w-fit rounded-full border border-[color:color-mix(in_srgb,var(--brand)_14%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_82%,transparent)] px-3 py-1.5 text-xs font-bold text-brand">
@@ -236,7 +236,7 @@ export function RankingGrowthPresentation({
           </div>
 
           <div className="w-full overflow-x-auto rounded-[22px] border border-[color:color-mix(in_srgb,var(--border)_86%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_90%,transparent)]">
-            <table className="w-full min-w-[980px] border-collapse">
+            <table className="w-full min-w-[640px] border-collapse">
               <thead>
                 <tr>
                   {SORT_LABELS.map((column) => (
