@@ -1,7 +1,7 @@
 export type RefreshStatus = 'live' | 'static' | 'cached' | 'loading'
 
 const STATUS_CONFIG: Record<RefreshStatus, { dotClass: string; label: string }> = {
-  live: { dotClass: 'bg-[var(--success)] shadow-[0_0_6px_rgba(46,204,113,0.5)] animate-pulse', label: 'Live data' },
+  live: { dotClass: 'bg-[var(--success)] shadow-[0_0_6px_rgba(46,204,113,0.5)] animate-live-pulse', label: 'Live data' },
   static: { dotClass: 'bg-[var(--ig-blue)] shadow-[0_0_6px_rgba(64,93,230,0.5)]', label: 'Snapshot terbaru' },
   cached: { dotClass: 'bg-[var(--ig-orange)] shadow-[0_0_6px_rgba(247,119,55,0.5)]', label: 'Cache lokal' },
   loading: { dotClass: 'bg-[var(--text-soft)]', label: 'Memuat...' },

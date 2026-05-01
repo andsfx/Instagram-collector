@@ -118,7 +118,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2">
             {heroMeta.slice(0, 3).map((item) => (
-              <div key={item.label} className="hidden items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel-muted)] px-2.5 py-1 text-[10px] font-bold text-[var(--text-muted)] lg:inline-flex">
+              <div key={item.label} className="hidden items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel-muted)] px-2.5 py-1 text-[10px] font-bold text-[var(--text-muted)] lg:inline-flex cursor-default select-none">
                 <span className="uppercase tracking-wide text-[var(--text-soft)]">{item.label}</span>
                 <span className="text-[var(--text)]">{item.value}</span>
               </div>
