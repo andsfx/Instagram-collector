@@ -5,22 +5,24 @@ const LABELS: Record<Period, string> = { day: 'Hari', week: 'Minggu', month: 'Bu
 export function PeriodFilter({ value, onChange }: { value: Period; onChange: (p: Period) => void }) {
   const periods: Period[] = ['day', 'week', 'month']
   return (
-    <div className="inline-flex items-center gap-1 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel)] p-0.5 shadow-[var(--shadow-sm)]">
-      <span className="px-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-soft)]">Periode</span>
-      {periods.map((p) => (
-        <button
-          key={p}
-          type="button"
-          onClick={() => onChange(p)}
-          className={`rounded-[var(--radius-pill)] px-4 py-1.5 text-xs font-semibold transition-all ${
-            value === p
-              ? 'bg-[image:var(--ig-gradient)] text-white shadow-[0_2px_10px_rgba(225,48,108,0.35)]'
-              : 'text-[var(--text-soft)] hover:text-[var(--text)] hover:bg-[var(--panel-muted)]'
-          }`}
-        >
-          {LABELS[p]}
-        </button>
-      ))}
+    <div className="grid gap-1">
+      <div className="px-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--text-soft)]">Periode</div>
+      <div className="flex gap-1 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel-muted)] p-0.5">
+        {periods.map((p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => onChange(p)}
+            className={`flex-1 rounded-[calc(var(--radius-sm)-2px)] px-2 py-1 text-[11px] font-semibold transition-all ${
+              value === p
+                ? 'bg-[var(--panel)] text-[var(--brand)] shadow-sm'
+                : 'text-[var(--text-soft)] hover:text-[var(--text)]'
+            }`}
+          >
+            {LABELS[p]}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
