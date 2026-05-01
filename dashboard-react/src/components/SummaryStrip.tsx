@@ -11,7 +11,7 @@ export function SummaryStrip({ items }: { items: SummaryStripItem[] }) {
           }`}
         >
           <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">{item.label}</div>
-          <div className={`mt-1 font-display text-base font-extrabold tracking-tight ${item.emphasis ? 'text-[var(--brand)]' : 'text-[var(--text)]'}`}>
+          <div className={`mt-1 font-display text-lg font-extrabold tracking-tight ${item.emphasis ? 'text-[var(--brand)]' : 'text-[var(--text)]'}`}>
             {item.value}
           </div>
           <div className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-muted)]">{item.detail}</div>

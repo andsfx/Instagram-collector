@@ -20,7 +20,7 @@ export function ExecutiveSummary({ summary }: { summary: ExecutiveSummaryData })
               className={`relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] p-4 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-[var(--radius-lg)] ${style.card} ${style.border}`}
             >
               <div className="text-[10px] font-bold uppercase tracking-[0.5px] text-[var(--text-soft)]">{kpi.label}</div>
-              <div className="mt-1 font-display text-[clamp(1.3rem,1.1rem+0.5vw,1.7rem)] font-extrabold leading-tight tracking-tight text-[var(--text)]">{kpi.value}</div>
+              <div className="mt-1 font-display text-[clamp(1.5rem,1.2rem+0.6vw,2rem)] font-extrabold leading-tight tracking-tight text-[var(--text)]">{kpi.value}</div>
               <div className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
                 {kpi.account ? `@${kpi.account}` : 'Lintas akun'}
               </div>

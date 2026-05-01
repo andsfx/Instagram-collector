@@ -89,11 +89,10 @@ export default function App() {
     { id: 'section-recap', label: 'Recap' },
   ]
 
-  const shell = 'w-full max-w-[1280px] px-5 sm:px-6'
+  const shell = 'mx-auto w-full max-w-[1080px] px-6 lg:px-8'
 
   return (
     <div className="flex min-h-screen bg-[var(--bg)]">
-      {/* Left Sidebar */}
       <SectionNav
         items={sections}
         theme={theme}
@@ -104,14 +103,12 @@ export default function App() {
         onRefresh={retry}
       />
 
-      {/* Main Content */}
       <main id="main-content" className="ml-[220px] flex-1 overflow-x-clip pb-20">
         <a className="absolute left-[240px] top-4 z-50 -translate-y-16 rounded-[var(--radius-pill)] bg-[var(--ig-purple)] px-4 py-2 text-sm font-medium text-white shadow-lg transition focus:translate-y-0" href="#section-summary">
           Lewati navigasi
         </a>
 
-        {/* Compact Top Bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-5 py-3 shadow-[var(--shadow-sm)] sm:px-6">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
           <div className="flex items-center gap-3">
             <h1 className="text-base font-bold text-[var(--text)]">{heroSummary?.title ?? 'Dashboard Performa Instagram'}</h1>
             <span className="hidden text-sm text-[var(--text-soft)] sm:inline">{heroSummary?.subtitle ?? ''}</span>
@@ -126,19 +123,19 @@ export default function App() {
           </div>
         </header>
 
-        {/* Sections */}
-        <section id="section-growth" className="scroll-mt-16 py-6">
+        {/* Growth - Bento KPI only, NO leaderboard summary (redundant with bar chart) */}
+        <section id="section-growth" className="scroll-mt-16 py-8">
           <div className={`${shell} space-y-6`}>
-            <SectionAsyncBoundary resetKey={asyncResetKey + 3} onReset={retryAsyncSection} loadingTitle="Memuat growth chart" loadingDescription="Chart sedang disiapkan." errorTitle="Gagal memuat chart" errorDescription="Chunk chart gagal dimuat.">
-              <Suspense fallback={<SectionLoadingFallback title="Memuat growth chart" description="Chart sedang disiapkan." />}>
+            <SectionAsyncBoundary resetKey={asyncResetKey + 3} onReset={retryAsyncSection} loadingTitle="Memuat growth" loadingDescription="Data sedang disiapkan." errorTitle="Gagal memuat" errorDescription="Chunk gagal dimuat.">
+              <Suspense fallback={<SectionLoadingFallback title="Memuat growth" description="Data sedang disiapkan." />}>
                 <FeaturedGrowthChart data={quickVisual} />
               </Suspense>
             </SectionAsyncBoundary>
-            <RankingGrowthPresentation data={data} mode="summary" />
           </div>
         </section>
 
-        <section id="section-summary" className="scroll-mt-16 bg-[var(--panel-muted)] py-6">
+        {/* Summary - Executive KPIs + Today + Insights */}
+        <section id="section-summary" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
           <div className={`${shell} space-y-6`}>
             <ExecutiveSummary summary={executive} />
             <TodaySummary today={today} />
@@ -147,14 +144,16 @@ export default function App() {
           </div>
         </section>
 
-        <section id="section-content" className="scroll-mt-16 py-6">
+        {/* Content - Breakdown + Post Snapshot */}
+        <section id="section-content" className="scroll-mt-16 py-8">
           <div className={`${shell} space-y-6`}>
             <ContentBreakdownPresentation data={data} />
             <PostSnapshot data={data} />
           </div>
         </section>
 
-        <section id="section-comparison" className="scroll-mt-16 bg-[var(--panel-muted)] py-6">
+        {/* Comparison - Full table + Account cards + H2H */}
+        <section id="section-comparison" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
           <div className={`${shell} space-y-6`}>
             <RankingGrowthPresentation data={data} mode="table" />
             <AccountOverviewGrid accounts={accountSummaries} />
@@ -166,7 +165,8 @@ export default function App() {
           </div>
         </section>
 
-        <section id="section-pattern" className="scroll-mt-16 py-6">
+        {/* Pattern - Daily Metrics + Heatmap + Visual Appendix */}
+        <section id="section-pattern" className="scroll-mt-16 py-8">
           <div className={`${shell} space-y-6`}>
             <DailyMetrics data={data} />
             <SectionAsyncBoundary resetKey={asyncResetKey + 1} onReset={retryAsyncSection} loadingTitle="Memuat heatmap" loadingDescription="Agregasi waktu posting." errorTitle="Gagal memuat heatmap" errorDescription="Chunk heatmap gagal.">
@@ -197,7 +197,8 @@ export default function App() {
           </div>
         </section>
 
-        <section id="section-recap" className="scroll-mt-16 bg-[var(--panel-muted)] py-6">
+        {/* Recap */}
+        <section id="section-recap" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
           <div className={`${shell} space-y-6`}>
             <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
             <FreshnessPanel freshness={freshness} />
