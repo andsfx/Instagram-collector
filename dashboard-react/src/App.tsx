@@ -73,7 +73,7 @@ export default function App() {
     return (
       <div className="flex min-h-screen bg-[var(--bg)]">
         <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="loading" />
-        <main className="ml-[220px] flex-1 overflow-x-clip">
+        <main className="lg:ml-[220px] flex-1 overflow-x-clip pt-[60px] lg:pt-0">
           <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
             <div className="h-4 w-48 skeleton rounded" />
           </header>
@@ -89,7 +89,7 @@ export default function App() {
     return (
       <div className="flex min-h-screen bg-[var(--bg)]">
         <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="cached" />
-        <main className="ml-[220px] flex min-h-screen flex-1 items-center justify-center px-6 py-16">
+        <main className="lg:ml-[220px] flex min-h-screen flex-1 items-center justify-center px-6 py-16 pt-[60px] lg:pt-16">
           <div className="grid gap-4 text-center">
             <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Gagal memuat data.'} />
             <button type="button" className="mx-auto inline-flex items-center rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(225,48,108,0.24)]" onClick={retry}>
@@ -107,8 +107,8 @@ export default function App() {
     <div className="flex min-h-screen bg-[var(--bg)]">
       <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus={refreshStatus} onRefresh={retry} />
 
-      <main id="main-content" className="ml-[220px] flex-1 overflow-x-clip pb-20">
-        <a className="absolute left-[240px] top-4 z-50 -translate-y-16 rounded-[var(--radius-pill)] bg-[var(--ig-purple)] px-4 py-2 text-sm font-medium text-white shadow-lg transition focus:translate-y-0" href="#section-summary">
+      <main id="main-content" className="lg:ml-[220px] flex-1 overflow-x-clip pb-20 pt-[60px] lg:pt-0">
+        <a className="absolute left-4 top-[68px] lg:left-[240px] lg:top-4 z-50 -translate-y-16 rounded-[var(--radius-pill)] bg-[var(--ig-purple)] px-4 py-2 text-sm font-medium text-white shadow-lg transition focus:translate-y-0" href="#section-summary">
           Lewati navigasi
         </a>
 
