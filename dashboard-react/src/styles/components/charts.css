@@ -65,13 +65,13 @@
 }
 
 .heatmap-legend-box.is-0 { background: var(--panel); }
-.heatmap-legend-box.is-1 { background: rgba(232, 104, 58, 0.12); }
-.heatmap-legend-box.is-2 { background: rgba(232, 104, 58, 0.3); }
-.heatmap-legend-box.is-3 { background: rgba(176, 61, 34, 0.55); }
-.heatmap-legend-box.is-4 { background: rgba(142, 51, 32, 0.88); }
+.heatmap-legend-box.is-1 { background: rgba(225, 48, 108, 0.12); }
+.heatmap-legend-box.is-2 { background: rgba(225, 48, 108, 0.3); }
+.heatmap-legend-box.is-3 { background: rgba(193, 53, 132, 0.55); }
+.heatmap-legend-box.is-4 { background: rgba(131, 58, 180, 0.85); }
 
 .heatmap-cell {
-  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--border));
+  border: 1px solid color-mix(in srgb, var(--ig-pink) 14%, var(--border));
   font-weight: 800;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }

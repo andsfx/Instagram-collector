@@ -11,7 +11,7 @@ export function HeatmapPresentation({ data }: { data: DashboardRecord }) {
     <SectionCard
       eyebrow="Heatmap"
       title="Distribusi waktu posting per akun"
-      description="Heatmap diperlakukan sebagai lembar referensi waktu, jadi legenda, selector, dan grid dibawa ke format appendix yang lebih sunyi."
+      
       actions={
         <label className="grid gap-1.5">
           <span className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Akun</span>
@@ -28,11 +28,11 @@ export function HeatmapPresentation({ data }: { data: DashboardRecord }) {
 
       <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400" aria-label="Legenda intensitas heatmap">
         <span>Rendah</span>
-        <span className="h-3 w-3 rounded bg-[rgba(232,104,58,0.10)]" />
-        <span className="h-3 w-3 rounded bg-[rgba(232,104,58,0.18)]" />
-        <span className="h-3 w-3 rounded bg-[rgba(232,104,58,0.28)]" />
-        <span className="h-3 w-3 rounded bg-[rgba(232,104,58,0.38)]" />
-        <span className="h-3 w-3 rounded bg-[rgba(142,51,32,0.64)]" />
+        <span className="h-3 w-3 rounded bg-[rgba(225,48,108,0.10)]" />
+        <span className="h-3 w-3 rounded bg-[rgba(225,48,108,0.22)]" />
+        <span className="h-3 w-3 rounded bg-[rgba(193,53,132,0.38)]" />
+        <span className="h-3 w-3 rounded bg-[rgba(131,58,180,0.55)]" />
+        <span className="h-3 w-3 rounded bg-[rgba(131,58,180,0.85)]" />
         <span>Tinggi</span>
       </div>
 
@@ -53,7 +53,7 @@ export function HeatmapPresentation({ data }: { data: DashboardRecord }) {
                   key={`${cell.day}-${cell.slot}`}
                   className="flex min-h-[68px] items-center justify-center rounded-[0.9rem] border border-slate-200/60 text-sm font-semibold shadow-sm dark:border-white/10"
                   style={{
-                    background: `linear-gradient(180deg, rgba(232, 104, 58, ${Math.max(cell.intensity * 0.14, 0.05)}), rgba(142, 51, 32, ${Math.max(cell.intensity * 0.72, 0.08)}))`,
+                    background: `linear-gradient(180deg, rgba(225, 48, 108, ${Math.max(cell.intensity * 0.18, 0.04)}), rgba(131, 58, 180, ${Math.max(cell.intensity * 0.75, 0.06)}))`,
                     color: cell.intensity >= 0.45 ? '#ffffff' : 'var(--text)',
                   }}
                   title={`${cell.day} · ${cell.slot} (${cell.sublabel}) · ${cell.value} post`}
