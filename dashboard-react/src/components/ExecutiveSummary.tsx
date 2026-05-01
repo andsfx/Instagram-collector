@@ -1,66 +1,46 @@
 import type { ExecutiveSummaryData } from '../data/selectors'
 import { SectionCard } from './ui'
 
+const TONE_STYLES = [
+  { card: 'bg-gradient-to-br from-[rgba(225,48,108,0.06)] to-[var(--panel)]', border: 'before:bg-[image:var(--ig-gradient)]' },
+  { card: 'bg-gradient-to-br from-[rgba(46,204,113,0.06)] to-[var(--panel)]', border: 'before:bg-gradient-to-b before:from-[var(--success)] before:to-[#16a34a]' },
+  { card: 'bg-gradient-to-br from-[rgba(247,119,55,0.08)] to-[var(--panel)]', border: 'before:bg-gradient-to-b before:from-[var(--ig-yellow)] before:to-[var(--ig-orange)]' },
+  { card: 'bg-gradient-to-br from-[rgba(131,58,180,0.06)] to-[var(--panel)]', border: 'before:bg-gradient-to-b before:from-[var(--ig-purple)] before:to-[var(--ig-blue)]' },
+]
+
 export function ExecutiveSummary({ summary }: { summary: ExecutiveSummaryData }) {
-  const [leadKpi, ...supportingKpis] = summary.kpis
-
   return (
-    <SectionCard
-      eyebrow="Executive Summary"
-      title="Sinyal utama brand"
-      description="Satu KPI memimpin. Sisanya mendukung keputusan."
-    >
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
-        <div className="grid gap-7">
-          {leadKpi ? (
-            <article className="grid gap-3 border-b border-slate-200/80 pb-6 dark:border-white/10">
-              <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                {leadKpi.label}
+    <SectionCard eyebrow="Executive Summary" title="Sinyal utama brand">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {summary.kpis.map((kpi, index) => {
+          const style = TONE_STYLES[index % TONE_STYLES.length]
+          return (
+            <article
+              key={kpi.key}
+              className={`relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] p-4 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-[var(--radius-lg)] ${style.card} ${style.border}`}
+            >
+              <div className="text-[10px] font-bold uppercase tracking-[0.5px] text-[var(--text-soft)]">{kpi.label}</div>
+              <div className="mt-1 font-display text-[clamp(1.3rem,1.1rem+0.5vw,1.7rem)] font-extrabold leading-tight tracking-tight text-[var(--text)]">{kpi.value}</div>
+              <div className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+                {kpi.account ? `@${kpi.account}` : 'Lintas akun'}
               </div>
-              <div className="font-display text-[clamp(3.4rem,3rem+1.3vw,5rem)] font-semibold leading-[0.88] tracking-[-0.08em] text-slate-950 dark:text-white">
-                {leadKpi.value}
-              </div>
-                <div className="max-w-[34rem] text-[0.94rem] leading-6 text-slate-600 dark:text-slate-300">
-                  {leadKpi.account ? `@${leadKpi.account} menjadi acuan utama untuk membaca skala kompetisi saat ini.` : 'KPI ini menjadi acuan utama untuk membaca posisi brand.'}
-                </div>
             </article>
-          ) : null}
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {supportingKpis.map((kpi) => (
-              <article key={kpi.key} className="grid gap-2 border-t border-slate-200/80 pt-4 dark:border-white/10">
-                <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{kpi.label}</div>
-                <div className="font-display text-[clamp(1.55rem,1.3rem+0.7vw,2.25rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-slate-950 dark:text-white">
-                  {kpi.value}
-                </div>
-                <div className="text-[0.92rem] leading-[1.65] text-slate-600 dark:text-slate-300">
-                  {kpi.account ? `Akun: @${kpi.account}` : 'Lintas akun / insight agregat'}
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <aside className="grid content-start gap-4 border-t border-slate-200/80 pt-6 dark:border-white/10 xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0">
-          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Key interpretation</div>
-          <h3 className="font-display text-[clamp(1.24rem,1.08rem+0.46vw,1.7rem)] font-semibold leading-[1.06] tracking-[-0.04em] text-slate-950 dark:text-white">
-            Apa yang perlu dibawa ke ruang rapat hari ini
-          </h3>
-          <p className="text-[0.94rem] leading-7 text-slate-600 dark:text-slate-300">
-            Baca angka utama lebih dulu, lalu gunakan poin ini untuk menutup pembahasan dengan cepat.
-          </p>
-          <ul className="grid gap-3 text-[0.95rem] leading-7 text-slate-600 dark:text-slate-300">
-            {summary.bullets.map((bullet, index) => (
-              <li key={bullet} className="grid grid-cols-[auto_1fr] gap-3 border-t border-slate-200/70 pt-3 first:border-t-0 first:pt-0 dark:border-white/10">
-                <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[color:color-mix(in_srgb,var(--brand-soft)_28%,white)] text-[0.72rem] font-semibold text-slate-700 dark:bg-[color:color-mix(in_srgb,var(--brand)_16%,transparent)] dark:text-slate-200">
-                  {index + 1}
-                </span>
+          )
+        })}
+      </div>
+      {summary.bullets.length > 0 && (
+        <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-4 shadow-[var(--shadow-sm)]">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Key Takeaways</div>
+          <ul className="grid gap-2">
+            {summary.bullets.map((bullet, i) => (
+              <li key={bullet} className="flex items-start gap-2 text-sm leading-relaxed text-[var(--text-muted)]">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[10px] font-bold text-[var(--brand)]">{i + 1}</span>
                 <span>{bullet}</span>
               </li>
             ))}
           </ul>
-        </aside>
-      </div>
+        </div>
+      )}
     </SectionCard>
   )
 }
