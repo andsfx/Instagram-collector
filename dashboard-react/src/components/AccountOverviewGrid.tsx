@@ -23,7 +23,7 @@ export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[]
               className={`relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-lg)] hover:-translate-y-0.5 before:absolute before:inset-x-0 before:top-0 before:h-1 before:rounded-t-[var(--radius-lg)] ${accentClass} ${isBrand ? 'bg-gradient-to-b from-[rgba(225,48,108,0.03)] to-[var(--panel)]' : ''}`}
             >
               <div className="mb-3 flex items-center justify-between">
-                <span className="font-display text-sm font-bold text-[var(--text)]">{acc.name}</span>
+                <span className="font-display text-sm font-bold text-[var(--text)] truncate">{acc.name}</span>
                 {isBrand ? (
                   <span className="rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">Brand</span>
                 ) : (

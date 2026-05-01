@@ -69,7 +69,7 @@ export function PostSnapshot({ data }: { data: DashboardRecord }) {
                 <div className="grid gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-[var(--text)]">@{card.account}</span>
-                    <span className="rounded-[var(--radius-pill)] bg-[var(--brand-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--brand)]">
+                    <span className="rounded-[var(--radius-pill)] bg-[var(--brand-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--brand)]">
                       ER {card.averagePostEr > 0 ? `${(card.averagePostEr * 100).toFixed(2)}%` : '-'}
                     </span>
                   </div>
@@ -80,8 +80,8 @@ export function PostSnapshot({ data }: { data: DashboardRecord }) {
                     <span className="text-[var(--danger)]"><strong>{card.underperformPosts}</strong> underperform</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    <span className="rounded-[var(--radius-pill)] bg-[var(--brand-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--brand)]">{card.dominantType ?? 'unknown'}</span>
-                    {card.campaignTerms.slice(0, 2).map((t) => <span key={t} className="rounded-[var(--radius-pill)] bg-[var(--warning-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--warning)]">{t}</span>)}
+                    <span className="rounded-[var(--radius-pill)] bg-[var(--brand-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--brand)]">{card.dominantType ?? 'unknown'}</span>
+                    {card.campaignTerms.slice(0, 2).map((t) => <span key={t} className="rounded-[var(--radius-pill)] bg-[var(--warning-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--warning)]">{t}</span>)}
                   </div>
                 </div>
                 {/* Right: Featured Post */}

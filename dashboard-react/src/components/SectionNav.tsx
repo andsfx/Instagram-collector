@@ -136,7 +136,7 @@ export function SectionNav({
           </div>
           <span className="text-sm font-bold text-[var(--text)]">IG Dashboard</span>
         </div>
-        <button type="button" className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+        <button type="button" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(true)} aria-label="Open menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         </button>
       </div>

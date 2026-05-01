@@ -21,7 +21,7 @@ export function ExecutiveSummary({ summary }: { summary: ExecutiveSummaryData })
             >
               <div className="text-[10px] font-bold uppercase tracking-[0.5px] text-[var(--text-soft)]">{kpi.label}</div>
               <div className="mt-1 font-display text-[clamp(1.5rem,1.2rem+0.6vw,2rem)] font-extrabold leading-tight tracking-tight text-[var(--text)]">{kpi.value}</div>
-              <div className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+              <div className="mt-1 text-xs leading-relaxed text-[var(--text-muted)] line-clamp-2">
                 {kpi.account ? `@${kpi.account}` : 'Lintas akun'}
               </div>
             </article>

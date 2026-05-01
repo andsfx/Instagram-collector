@@ -108,11 +108,11 @@ export default function App() {
       <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus={refreshStatus} onRefresh={retry} />
 
       <main id="main-content" className="lg:ml-[220px] flex-1 overflow-x-clip pb-20 pt-[60px] lg:pt-0">
-        <a className="absolute left-4 top-[68px] lg:left-[240px] lg:top-4 z-50 -translate-y-16 rounded-[var(--radius-pill)] bg-[var(--ig-purple)] px-4 py-2 text-sm font-medium text-white shadow-lg transition focus:translate-y-0" href="#section-summary">
+        <a className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-[68px] focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-[var(--ig-purple)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg lg:focus:left-[240px] lg:focus:top-4" href="#section-summary">
           Lewati navigasi
         </a>
 
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
+        <header className="sticky top-0 z-20 hidden items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:flex lg:px-8">
           <div className="flex items-center gap-3">
             <h1 className="text-base font-bold text-[var(--text)]">{heroSummary?.title ?? 'Dashboard Performa Instagram'}</h1>
             <span className="hidden text-sm text-[var(--text-soft)] sm:inline">{heroSummary?.subtitle ?? ''}</span>

@@ -82,3 +82,16 @@ button {
   background: var(--panel-muted);
   border-radius: var(--radius-sm);
 }
+
+/* Mobile text overflow prevention */
+p, span, div {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Mobile touch target minimum */
+@media (max-width: 1023px) {
+  select, button {
+    min-height: 44px;
+  }
+}
