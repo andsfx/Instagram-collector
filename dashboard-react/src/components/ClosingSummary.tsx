@@ -30,7 +30,7 @@ export function ClosingSummary({
               {insights.items.slice(0, 3).map((item, i) => (
                 <div key={item.title} className="flex items-start gap-2 text-sm text-[var(--text-muted)]">
                   <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[10px] font-bold text-[var(--brand)]">{i + 1}</span>
-                  <span><strong className="text-[var(--text)]">{item.title}</strong> — {item.description}</span>
+                  <span><strong className="text-[var(--text)] break-words">{item.title}</strong> — {item.description}</span>
                 </div>
               ))}
             </div>

@@ -16,7 +16,7 @@ export function TodaySummary({ today }: { today: TodaySummaryData }) {
             <article key={item.label} className="border-t border-[var(--border)] pt-3 first:border-t-0 first:pt-0 md:border-l md:border-t-0 md:pl-4 md:pt-0 md:first:border-l-0 md:first:pl-0">
               <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">{item.label}</div>
               <div className="mt-1 font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">{item.value}</div>
-              <div className="mt-0.5 text-xs text-[var(--text-muted)]">{item.detail}</div>
+              <div className="mt-0.5 text-xs text-[var(--text-muted)] break-words">{item.detail}</div>
             </article>
           ))}
         </div>

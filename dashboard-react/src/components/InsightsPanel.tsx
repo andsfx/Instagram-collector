@@ -8,7 +8,7 @@ export function InsightsPanel({ insights }: { insights: InsightsData }) {
         {insights.items.map((item) => (
           <article
             key={item.title}
-            className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-4 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5"
+            className="grid gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-4 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5"
           >
             <div className={`inline-flex w-fit items-center gap-1.5 rounded-[var(--radius-pill)] px-3 py-1 text-[10px] font-bold ${
               item.tone === 'positive' ? 'bg-[var(--success-soft)] text-[var(--success)]'
@@ -18,8 +18,8 @@ export function InsightsPanel({ insights }: { insights: InsightsData }) {
             }`}>
               {item.label}
             </div>
-            <h3 className="font-display text-base font-bold tracking-tight text-[var(--text)]">{item.title}</h3>
-            <p className="text-sm leading-relaxed text-[var(--text-muted)]">{item.description}</p>
+            <h3 className="font-display text-base font-bold tracking-tight text-[var(--text)] break-words">{item.title}</h3>
+            <p className="text-sm leading-relaxed text-[var(--text-muted)] break-words">{item.description}</p>
           </article>
         ))}
       </div>
