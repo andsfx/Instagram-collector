@@ -12,10 +12,11 @@ import { DailyMetrics } from './components/DailyMetrics'
 import { SectionNav, type SectionNavItem } from './components/SectionNav'
 import { InsightsPanel } from './components/InsightsPanel'
 import { useTheme } from './hooks/useTheme'
-import { ErrorState, LoadingState } from './components/ui'
-import { SectionAsyncBoundary, SectionLoadingFallback } from './components/SectionAsyncBoundary'
+import { ErrorState } from './components/ui'
+import { SectionAsyncBoundary } from './components/SectionAsyncBoundary'
 import { SummaryStrip } from './components/SummaryStrip'
 import { ClosingSummary } from './components/ClosingSummary'
+import { GrowthSkeleton, HeadToHeadSkeleton, HeatmapSkeleton, ChartSuiteSkeleton, DashboardSkeleton } from './components/SkeletonFallbacks'
 import type { Period } from './components/PeriodFilter'
 import type { RefreshStatus } from './components/RefreshIndicator'
 
@@ -40,7 +41,6 @@ export default function App() {
   const { data, error, loading, retry } = useDashboardData()
   const { theme, toggleTheme } = useTheme()
   const [asyncResetKey, setAsyncResetKey] = useState(0)
-  const [isVisualAppendixOpen, setIsVisualAppendixOpen] = useState(false)
   const [period, setPeriod] = useState<Period>('day')
 
   const freshness = useMemo(() => data ? getFreshnessSummary(data) : null, [data])
@@ -59,49 +59,53 @@ export default function App() {
 
   const refreshStatus: RefreshStatus = loading ? 'loading' : error ? 'cached' : 'live'
 
-  if (loading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6 py-16">
-        <LoadingState title="Memuat dashboard..." description="Data sedang divalidasi dari endpoint." />
-      </main>
-    )
-  }
-
-  if (error || !data || !freshness || !executive || !today || !quickVisual || !insights) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6 py-16">
-        <div className="grid gap-4 text-center">
-          <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Gagal memuat data.'} />
-          <button type="button" className="mx-auto inline-flex items-center rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(225,48,108,0.24)]" onClick={retry}>
-            Coba lagi
-          </button>
-        </div>
-      </main>
-    )
-  }
-
   const sections: SectionNavItem[] = [
     { id: 'section-growth', label: 'Growth' },
     { id: 'section-summary', label: 'Summary' },
     { id: 'section-content', label: 'Content' },
     { id: 'section-comparison', label: 'Comparison' },
+    { id: 'section-charts', label: 'Charts' },
     { id: 'section-pattern', label: 'Pattern' },
     { id: 'section-recap', label: 'Recap' },
   ]
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-[var(--bg)]">
+        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="loading" />
+        <main className="ml-[220px] flex-1 overflow-x-clip">
+          <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
+            <div className="h-4 w-48 skeleton rounded" />
+          </header>
+          <div className="mx-auto w-full max-w-[1080px] px-6 lg:px-8">
+            <DashboardSkeleton />
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (error || !data || !freshness || !executive || !today || !quickVisual || !insights) {
+    return (
+      <div className="flex min-h-screen bg-[var(--bg)]">
+        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="cached" />
+        <main className="ml-[220px] flex min-h-screen flex-1 items-center justify-center px-6 py-16">
+          <div className="grid gap-4 text-center">
+            <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Gagal memuat data.'} />
+            <button type="button" className="mx-auto inline-flex items-center rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(225,48,108,0.24)]" onClick={retry}>
+              Coba lagi
+            </button>
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   const shell = 'mx-auto w-full max-w-[1080px] px-6 lg:px-8'
 
   return (
     <div className="flex min-h-screen bg-[var(--bg)]">
-      <SectionNav
-        items={sections}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        period={period}
-        onPeriodChange={setPeriod}
-        refreshStatus={refreshStatus}
-        onRefresh={retry}
-      />
+      <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus={refreshStatus} onRefresh={retry} />
 
       <main id="main-content" className="ml-[220px] flex-1 overflow-x-clip pb-20">
         <a className="absolute left-[240px] top-4 z-50 -translate-y-16 rounded-[var(--radius-pill)] bg-[var(--ig-purple)] px-4 py-2 text-sm font-medium text-white shadow-lg transition focus:translate-y-0" href="#section-summary">
@@ -123,18 +127,18 @@ export default function App() {
           </div>
         </header>
 
-        {/* Growth - Bento KPI only, NO leaderboard summary (redundant with bar chart) */}
+        {/* Growth */}
         <section id="section-growth" className="scroll-mt-16 py-8">
           <div className={`${shell} space-y-6`}>
             <SectionAsyncBoundary resetKey={asyncResetKey + 3} onReset={retryAsyncSection} loadingTitle="Memuat growth" loadingDescription="Data sedang disiapkan." errorTitle="Gagal memuat" errorDescription="Chunk gagal dimuat.">
-              <Suspense fallback={<SectionLoadingFallback title="Memuat growth" description="Data sedang disiapkan." />}>
+              <Suspense fallback={<GrowthSkeleton />}>
                 <FeaturedGrowthChart data={quickVisual} />
               </Suspense>
             </SectionAsyncBoundary>
           </div>
         </section>
 
-        {/* Summary - Executive KPIs + Today + Insights */}
+        {/* Summary */}
         <section id="section-summary" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
           <div className={`${shell} space-y-6`}>
             <ExecutiveSummary summary={executive} />
@@ -144,7 +148,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* Content - Breakdown + Post Snapshot */}
+        {/* Content */}
         <section id="section-content" className="scroll-mt-16 py-8">
           <div className={`${shell} space-y-6`}>
             <ContentBreakdownPresentation data={data} />
@@ -152,53 +156,44 @@ export default function App() {
           </div>
         </section>
 
-        {/* Comparison - Full table + Account cards + H2H */}
+        {/* Comparison */}
         <section id="section-comparison" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
           <div className={`${shell} space-y-6`}>
             <RankingGrowthPresentation data={data} mode="table" />
             <AccountOverviewGrid accounts={accountSummaries} />
             <SectionAsyncBoundary resetKey={asyncResetKey} onReset={retryAsyncSection} loadingTitle="Memuat head-to-head" loadingDescription="Perbandingan sedang disiapkan." errorTitle="Gagal memuat head-to-head" errorDescription="Chunk gagal dimuat.">
-              <Suspense fallback={<SectionLoadingFallback title="Memuat head-to-head" description="Perbandingan sedang disiapkan." />}>
+              <Suspense fallback={<HeadToHeadSkeleton />}>
                 <HeadToHead data={data} />
               </Suspense>
             </SectionAsyncBoundary>
           </div>
         </section>
 
-        {/* Pattern - Daily Metrics + Heatmap + Visual Appendix */}
-        <section id="section-pattern" className="scroll-mt-16 py-8">
+        {/* Charts - formerly hidden in dropdown, now a full section */}
+        <section id="section-charts" className="scroll-mt-16 py-8">
+          <div className={`${shell} space-y-6`}>
+            <SectionAsyncBoundary resetKey={asyncResetKey + 2} onReset={retryAsyncSection} loadingTitle="Memuat chart suite" loadingDescription="Visual analytics sedang dimuat." errorTitle="Gagal memuat chart suite" errorDescription="Chunk visual gagal.">
+              <Suspense fallback={<ChartSuiteSkeleton />}>
+                <QuickVisual data={quickVisual} />
+              </Suspense>
+            </SectionAsyncBoundary>
+          </div>
+        </section>
+
+        {/* Pattern */}
+        <section id="section-pattern" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
           <div className={`${shell} space-y-6`}>
             <DailyMetrics data={data} />
             <SectionAsyncBoundary resetKey={asyncResetKey + 1} onReset={retryAsyncSection} loadingTitle="Memuat heatmap" loadingDescription="Agregasi waktu posting." errorTitle="Gagal memuat heatmap" errorDescription="Chunk heatmap gagal.">
-              <Suspense fallback={<SectionLoadingFallback title="Memuat heatmap" description="Agregasi waktu posting." />}>
+              <Suspense fallback={<HeatmapSkeleton />}>
                 <Heatmap data={data} />
               </Suspense>
-            </SectionAsyncBoundary>
-            <SectionAsyncBoundary resetKey={asyncResetKey + 2} onReset={retryAsyncSection} loadingTitle="Memuat chart suite" loadingDescription="Visual analytics tambahan." errorTitle="Gagal memuat chart suite" errorDescription="Chunk visual gagal.">
-              <details open={isVisualAppendixOpen} onToggle={(event) => setIsVisualAppendixOpen(event.currentTarget.open)} className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)]">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-                  <div>
-                    <div className="text-sm font-bold text-[var(--text)]">Visual Appendix</div>
-                    <div className="text-xs text-[var(--text-soft)]">Chart suite: projection, engagement, share, radar</div>
-                  </div>
-                  <span className="inline-flex h-7 items-center rounded-[var(--radius-pill)] border border-[var(--border)] px-3 text-[10px] font-bold uppercase text-[var(--text-soft)]">
-                    {isVisualAppendixOpen ? 'Tutup' : 'Buka'}
-                  </span>
-                </summary>
-                {isVisualAppendixOpen ? (
-                  <div className="pt-5">
-                    <Suspense fallback={<SectionLoadingFallback title="Memuat chart suite" description="Visual analytics." />}>
-                      <QuickVisual data={quickVisual} />
-                    </Suspense>
-                  </div>
-                ) : null}
-              </details>
             </SectionAsyncBoundary>
           </div>
         </section>
 
         {/* Recap */}
-        <section id="section-recap" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
+        <section id="section-recap" className="scroll-mt-16 py-8">
           <div className={`${shell} space-y-6`}>
             <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
             <FreshnessPanel freshness={freshness} />

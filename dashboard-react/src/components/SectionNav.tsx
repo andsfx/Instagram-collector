@@ -13,6 +13,7 @@ const SECTION_ICONS: Record<string, string> = {
   'section-summary': 'M4 6h16M4 12h16M4 18h10',
   'section-content': 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',
   'section-comparison': 'M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M20 8v6M23 11h-6',
+  'section-charts': 'M18 20V10M12 20V4M6 20V14',
   'section-pattern': 'M3 3h18v18H3zM3 9h18M9 21V9',
   'section-recap': 'M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2',
 }
