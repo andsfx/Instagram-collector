@@ -37,10 +37,6 @@ export interface DashboardRecord {
     executiveKpis: Array<{ key: string; label: string; account: string | null; value: string }>
     executiveBullets: string[]
   }
-  meta: {
-    brandAccount: AccountKey | null
-    historyDays?: number
-  }
   history: Array<{ date: string; values: Record<AccountKey, MetricEntry> }>
   meta: {
     brandAccount: string | null
