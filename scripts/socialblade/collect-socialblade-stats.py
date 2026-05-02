@@ -49,6 +49,44 @@ def extract_from_embedded_json(html: str):
     return result
 
 
+def extract_from_daily_table(html: str):
+    """Extract data from SocialBlade's daily statistics table.
+    
+    Table row pattern:
+    <td><span>Fri</span>2026-05-01</td><td>15</td><td>95,056</td><td>--</td><td>270</td><td>9</td><td>11,551</td>
+    
+    Columns: date | followers_gained | followers_total | following_gained | following_total | posts_gained | posts_total
+    """
+    rows = re.findall(
+        r'<td[^>]*><span[^>]*>[A-Za-z]+</span>(\d{4}-\d{2}-\d{2})</td>'
+        r'<td[^>]*>([^<]*)</td>'   # followers gained
+        r'<td[^>]*>([^<]*)</td>'   # followers total
+        r'<td[^>]*>([^<]*)</td>'   # following gained
+        r'<td[^>]*>([^<]*)</td>'   # following total
+        r'<td[^>]*>([^<]*)</td>'   # posts gained
+        r'<td[^>]*>([^<]*)</td>',  # posts total
+        html
+    )
+    
+    if not rows:
+        return []
+    
+    results = []
+    for row in rows:
+        date_str, f_gained, f_total, fg_gained, fg_total, p_gained, p_total = row
+        results.append({
+            'date': date_str,
+            'followers': parse_number(f_total),
+            'followers_gained': parse_number(f_gained) if f_gained.strip() != '--' else 0,
+            'following': parse_number(fg_total),
+            'following_gained': parse_number(fg_gained) if fg_gained.strip() != '--' else 0,
+            'posts_count': parse_number(p_total),
+            'posts_gained': parse_number(p_gained) if p_gained.strip() != '--' else 0,
+        })
+    
+    return results
+
+
 def extract_from_html_blocks(html: str):
     result = {
         'followers': None,
@@ -132,10 +170,30 @@ def main():
 
     embedded = extract_from_embedded_json(html)
     blocks = extract_from_html_blocks(html)
+    daily_table = extract_from_daily_table(html)
 
-    followers = embedded['followers'] or blocks['followers']
-    following = embedded['following'] or blocks['following']
-    posts_count = embedded['posts_count'] or blocks['posts_count']
+    # Determine today's date (UTC)
+    today = datetime.now(timezone.utc).date().isoformat()
+
+    # Priority: daily table today > embedded/html_blocks
+    daily_today = None
+    daily_latest = None
+    if daily_table:
+        daily_latest = daily_table[-1]  # most recent row
+        for row in daily_table:
+            if row['date'] == today:
+                daily_today = row
+                break
+
+    # Use daily table data if available for today
+    if daily_today and daily_today['followers'] is not None:
+        followers = daily_today['followers']
+        following = daily_today['following']
+        posts_count = daily_today['posts_count']
+    else:
+        followers = embedded['followers'] or blocks['followers']
+        following = embedded['following'] or blocks['following']
+        posts_count = embedded['posts_count'] or blocks['posts_count']
 
     if followers is None:
         warnings.append('followers not confidently extracted')
@@ -145,7 +203,7 @@ def main():
         warnings.append('posts_count not confidently extracted')
 
     result = {
-        'date': datetime.now(timezone.utc).date().isoformat(),
+        'date': today,
         'username': username,
         'followers': followers,
         'following': following,
@@ -157,6 +215,9 @@ def main():
         'debug': {
             'embedded': embedded,
             'html_blocks': blocks,
+            'daily_table': daily_today or daily_latest,
+            'daily_table_rows': len(daily_table),
+            'daily_table_source_used': daily_today is not None,
             'html_has_followers_value': followers is not None,
         }
     }
