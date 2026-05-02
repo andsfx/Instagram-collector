@@ -136,9 +136,17 @@ export function SectionNav({
           </div>
           <span className="text-sm font-bold text-[var(--text)]">IG Dashboard</span>
         </div>
-        <button type="button" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+        <div className="flex items-center gap-2">
+          {onRefresh && (
+            <button type="button" className="flex h-11 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--brand)] bg-[var(--brand-soft)] px-3 text-[11px] font-bold text-[var(--brand)] transition hover:bg-[var(--brand)] hover:text-white" onClick={onRefresh} aria-label="Refresh data">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+          )}
+          <button type="button" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(true)} aria-label="Open menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
+          </button>
+        </div>
       </div>
 
       {/* Mobile overlay */}
