@@ -6,7 +6,7 @@ function runGog(args) {
     throw new Error('GOG_ACCOUNT environment variable is not set');
   }
   const env = { ...process.env };
-  return execFileSync('/root/.local/bin/gog', args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  return execFileSync('/home/ubuntu/.local/bin/gog', args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
 const data = JSON.parse(fs.readFileSync('/root/.openclaw/workspace/incoming/Instagram-collector/apify-profiles.json', 'utf8'));

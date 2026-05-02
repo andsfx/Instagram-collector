@@ -63,7 +63,7 @@ function requireEnv(name) {
 
 function gogBin() {
   if (process.env.GOG_BIN) return process.env.GOG_BIN;
-  return process.platform === 'win32' ? 'gog' : '/root/.local/bin/gog';
+  return process.platform === 'win32' ? 'gog' : '/home/ubuntu/.local/bin/gog';
 }
 
 function checkGogSheetsAuth(repoRoot) {

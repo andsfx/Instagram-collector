@@ -4,7 +4,7 @@ function runGog(args) {
     throw new Error('GOG_ACCOUNT environment variable is not set');
   }
   const env = { ...process.env };
-  return execFileSync('/root/.local/bin/gog', args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  return execFileSync('/home/ubuntu/.local/bin/gog', args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
 const eng20 = [
   ['2026-03-20', 'metmalbekasi', '12', '64.58', '6.58', '0.08', '775', '79'],

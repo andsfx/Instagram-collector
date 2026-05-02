@@ -1,7 +1,7 @@
 const { execFileSync } = require('child_process');
 function runGog(args) {
   const env = { ...process.env, GOG_ACCOUNT: 'andysafii9@gmail.com' };
-  return execFileSync('/root/.local/bin/gog', args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  return execFileSync('/home/ubuntu/.local/bin/gog', args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
 // Update metmalbekasi (Columns B, C, D) for 19th and 20th

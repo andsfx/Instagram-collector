@@ -55,7 +55,7 @@ function loadConfig(repoRoot) {
 
 function runGog(args, options = {}) {
   const env = { ...process.env };
-  const platformBin = process.platform === "win32" ? "gog" : "/root/.local/bin/gog";
+  const platformBin = process.platform === "win32" ? "gog" : "/home/ubuntu/.local/bin/gog";
   const gogBin = process.env.GOG_BIN || platformBin;
   if (!env.GOG_ACCOUNT) {
     if (!process.env.GOG_ACCOUNT) {
