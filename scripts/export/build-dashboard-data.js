@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { supabase } = require('../lib/supabase');
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -34,25 +34,7 @@ function updateHtmlAssetVersion(repoRoot, assetVersion) {
   return { updated: true, assetVersion, htmlPath };
 }
 
-function gogBin() {
-  if (process.env.GOG_BIN) return process.env.GOG_BIN;
-  return process.platform === 'win32' ? 'gog' : '/home/ubuntu/.local/bin/gog';
-}
 
-function runGog(args) {
-  const env = { ...process.env };
-  if (!env.GOG_ACCOUNT) env.GOG_ACCOUNT = 'andysafii9@gmail.com';
-  return execFileSync(gogBin(), args, {
-    env,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
-  });
-}
-
-function getSheetRows(spreadsheetId, range) {
-  const out = runGog(['sheets', 'get', spreadsheetId, range, '--json', '--results-only', '--no-input']);
-  return JSON.parse(out || '[]');
-}
 
 function formatWib(isoUtc) {
   const d = new Date(isoUtc);
@@ -71,82 +53,75 @@ function ratio(followers, following) {
   return Number((followers / following).toFixed(2));
 }
 
-function buildFollowerHistoryMap(rows, accounts) {
-  if (!rows.length) return [];
-  const header = rows[0] || [];
-  const dataRows = rows.slice(1);
-  const indices = {};
-  for (const username of accounts) {
-    indices[username] = {
-      followers: header.indexOf(`${username}_followers`),
-      following: header.indexOf(`${username}_following`),
-      posts: header.indexOf(`${username}_posts`),
-    };
-  }
-  return dataRows.map((row) => {
-    const item = { date: row[0] || '' };
-    for (const username of accounts) {
-      const idx = indices[username];
-      item[username] = {
-        followers: idx.followers >= 0 ? Number(row[idx.followers] || 0) || null : null,
-        following: idx.following >= 0 ? Number(row[idx.following] || 0) || null : null,
-        posts: idx.posts >= 0 ? Number(row[idx.posts] || 0) || null : null,
+function buildFollowerHistoryFromSupabase(rows, accounts) {
+  if (!rows || !rows.length) return [];
+  const dateMap = new Map();
+  for (const row of rows) {
+    if (!row.date) continue;
+    if (!dateMap.has(row.date)) {
+      const item = { date: row.date };
+      for (const username of accounts) {
+        item[username] = { followers: null, following: null, posts: null };
+      }
+      dateMap.set(row.date, item);
+    }
+    const item = dateMap.get(row.date);
+    if (accounts.includes(row.username)) {
+      item[row.username] = {
+        followers: row.followers ?? null,
+        following: row.following ?? null,
+        posts: row.posts ?? null,
       };
     }
-    return item;
-  }).filter((x) => x.date);
+  }
+  return Array.from(dateMap.values()).sort((a, b) => a.date.localeCompare(b.date));
 }
 
-function buildEngagementMap(rows) {
+function buildEngagementFromSupabase(rows) {
   const map = new Map();
-  for (let i = 1; i < rows.length; i += 1) {
-    const row = rows[i] || [];
-    const date = row[0];
-    const username = row[1];
-    if (!date || !username) continue;
-    if (!map.has(date)) map.set(date, {});
-    map.get(date)[username] = {
-      avg_likes: Number(row[3] || 0) || 0,
-      avg_comments: Number(row[4] || 0) || 0,
-      engagement_rate: Number(row[5] || 0) || 0,
-      posts_analyzed: Number(row[2] || 0) || 0,
-      total_likes: Number(row[6] || 0) || 0,
-      total_comments: Number(row[7] || 0) || 0,
+  for (const row of rows) {
+    if (!row.date || !row.username) continue;
+    if (!map.has(row.date)) map.set(row.date, {});
+    map.get(row.date)[row.username] = {
+      avg_likes: Number(row.avg_likes || 0) || 0,
+      avg_comments: Number(row.avg_comments || 0) || 0,
+      engagement_rate: Number(row.engagement_rate || 0) || 0,
+      posts_analyzed: Number(row.posts_analyzed || 0) || 0,
+      total_likes: Number(row.total_likes_last12 || 0) || 0,
+      total_comments: Number(row.total_comments_last12 || 0) || 0,
     };
   }
   return map;
 }
 
-function buildContentBreakdownMap(rows) {
+function buildContentBreakdownFromSupabase(rows) {
   const map = new Map();
-  for (let i = 1; i < rows.length; i += 1) {
-    const row = rows[i] || [];
-    const date = row[0];
-    const username = row[1];
-    if (!date || !username) continue;
-    map.set(username, {
-      date,
-      reels: Number(row[2] || 0) || 0,
-      carousel: Number(row[3] || 0) || 0,
-      image: Number(row[4] || 0) || 0,
-      video: Number(row[5] || 0) || 0,
-      total_posts_analyzed: Number(row[6] || 0) || 0,
-      avg_likes: Number(row[7] || 0) || 0,
-      avg_comments: Number(row[8] || 0) || 0,
-      engagement_rate: Number(row[9] || 0) || 0,
-      reels_avg_likes: row[10] === '' ? null : Number(row[10]),
-      reels_avg_comments: row[11] === '' ? null : Number(row[11]),
-      reels_er: row[12] === '' ? null : Number(row[12]),
-      carousel_avg_likes: row[13] === '' ? null : Number(row[13]),
-      carousel_avg_comments: row[14] === '' ? null : Number(row[14]),
-      carousel_er: row[15] === '' ? null : Number(row[15]),
-      image_avg_likes: row[16] === '' ? null : Number(row[16]),
-      image_avg_comments: row[17] === '' ? null : Number(row[17]),
-      image_er: row[18] === '' ? null : Number(row[18]),
-      best_post_url: row[19] || null,
-      best_post_type: row[20] || null,
-      best_post_likes: row[21] === '' ? null : Number(row[21]),
-      best_post_comments: row[22] === '' ? null : Number(row[22]),
+  for (const row of rows) {
+    if (!row.username) continue;
+    if (map.has(row.username)) continue;
+    map.set(row.username, {
+      date: row.date,
+      reels: Number(row.reels || 0) || 0,
+      carousel: Number(row.carousel || 0) || 0,
+      image: Number(row.image || 0) || 0,
+      video: Number(row.video || 0) || 0,
+      total_posts_analyzed: Number(row.total_posts_analyzed || 0) || 0,
+      avg_likes: Number(row.avg_likes || 0) || 0,
+      avg_comments: Number(row.avg_comments || 0) || 0,
+      engagement_rate: Number(row.engagement_rate || 0) || 0,
+      reels_avg_likes: row.reels_avg_likes != null ? Number(row.reels_avg_likes) : null,
+      reels_avg_comments: row.reels_avg_comments != null ? Number(row.reels_avg_comments) : null,
+      reels_er: row.reels_er != null ? Number(row.reels_er) : null,
+      carousel_avg_likes: row.carousel_avg_likes != null ? Number(row.carousel_avg_likes) : null,
+      carousel_avg_comments: row.carousel_avg_comments != null ? Number(row.carousel_avg_comments) : null,
+      carousel_er: row.carousel_er != null ? Number(row.carousel_er) : null,
+      image_avg_likes: row.image_avg_likes != null ? Number(row.image_avg_likes) : null,
+      image_avg_comments: row.image_avg_comments != null ? Number(row.image_avg_comments) : null,
+      image_er: row.image_er != null ? Number(row.image_er) : null,
+      best_post_url: row.best_post_url || null,
+      best_post_type: row.best_post_type || null,
+      best_post_likes: row.best_post_likes != null ? Number(row.best_post_likes) : null,
+      best_post_comments: row.best_post_comments != null ? Number(row.best_post_comments) : null,
     });
   }
   return map;
@@ -502,7 +477,7 @@ function buildPresentationReport(data) {
       generatedAtWib: metrics.generatedAtWib,
       accountCount: data.accounts.length,
       historyDays: data.meta?.history_days || 0,
-      source: ['SocialBlade', 'Apify', 'Google Sheets'],
+      source: ['SocialBlade', 'Apify', 'Supabase'],
       version: 'presentation-v1'
     },
     cover: {
@@ -565,20 +540,36 @@ function buildPresentationReport(data) {
   };
 }
 
-function main() {
+async function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   const accountsCfg = readJson(path.join(repoRoot, 'config', 'accounts.json')).filter((a) => a.enabled);
   const accounts = accountsCfg.map((a) => a.username);
-  const sheets = readJson(path.join(repoRoot, 'config', 'sheets.json'));
-  const spreadsheetId = sheets.spreadsheetId;
 
-  const followerRows = getSheetRows(spreadsheetId, 'Follower History!A1:ZZ');
-  const engagementRows = getSheetRows(spreadsheetId, 'Engagement!A1:H');
-  const contentRows = getSheetRows(spreadsheetId, 'Content Breakdown!A1:W');
+  // Fetch from Supabase
+  const { data: followerData, error: fhError } = await supabase
+    .from('follower_history')
+    .select('date, username, followers, following, posts')
+    .order('date', { ascending: true })
+    .limit(10000);
+  if (fhError) throw new Error('Failed to fetch follower_history: ' + fhError.message);
 
-  const historyBase = buildFollowerHistoryMap(followerRows, accounts);
-  const engagementByDate = buildEngagementMap(engagementRows);
-  const contentByUser = buildContentBreakdownMap(contentRows);
+  const { data: engagementData, error: engError } = await supabase
+    .from('engagement')
+    .select('*')
+    .order('date', { ascending: true })
+    .limit(10000);
+  if (engError) throw new Error('Failed to fetch engagement: ' + engError.message);
+
+  const { data: contentData, error: cbError } = await supabase
+    .from('content_breakdown')
+    .select('*')
+    .order('date', { ascending: false })
+    .limit(10000);
+  if (cbError) throw new Error('Failed to fetch content_breakdown: ' + cbError.message);
+
+  const historyBase = buildFollowerHistoryFromSupabase(followerData || [], accounts);
+  const engagementByDate = buildEngagementFromSupabase(engagementData || []);
+  const contentByUser = buildContentBreakdownFromSupabase(contentData || []);
 
   const history = historyBase.map((row) => {
     const date = row.date;
@@ -639,12 +630,43 @@ function main() {
     content_breakdown[username] = contentByUser.get(username) || null;
   }
 
+  // Fetch post insights from Supabase as fallback when local files are missing
+  const { data: supabasePostInsights } = await supabase
+    .from('post_insights')
+    .select('*')
+    .order('date', { ascending: false })
+    .limit(10000);
+
+  const supabasePostsByUser = {};
+  if (supabasePostInsights && supabasePostInsights.length) {
+    for (const row of supabasePostInsights) {
+      if (!row.username) continue;
+      if (!supabasePostsByUser[row.username]) supabasePostsByUser[row.username] = [];
+      supabasePostsByUser[row.username].push({
+        shortcode: row.shortcode,
+        url: row.url,
+        type: row.post_type,
+        likes: Number(row.likes || 0),
+        comments: Number(row.comments || 0),
+        published_at: row.published_at,
+        caption_snippet: row.caption_snippet,
+      });
+    }
+  }
+
   const post_insights = {};
-for (const username of accounts) {
-  const rawPosts = loadLatestPostData(repoRoot, username);
-  const followers = latest[username] && Number.isFinite(latest[username].followers) ? latest[username].followers : null;
-  post_insights[username] = buildPostInsight(rawPosts, followers);
-}
+  for (const username of accounts) {
+    const rawPosts = loadLatestPostData(repoRoot, username);
+    const followers = latest[username] && Number.isFinite(latest[username].followers) ? latest[username].followers : null;
+    if (rawPosts) {
+      post_insights[username] = buildPostInsight(rawPosts, followers);
+    } else if (supabasePostsByUser[username] && supabasePostsByUser[username].length) {
+      // Fallback: build from Supabase post_insights data
+      post_insights[username] = buildPostInsight({ posts: supabasePostsByUser[username] }, followers);
+    } else {
+      post_insights[username] = null;
+    }
+  }
 
 const now = new Date();
   const generatedAt = now.toISOString();
@@ -673,8 +695,24 @@ const now = new Date();
   const outPath = path.join(repoRoot, 'dashboard', 'data.json');
   ensureDir(path.dirname(outPath));
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
+
+  // Cache in Supabase for the API endpoint
+  const { error: cacheError } = await supabase
+    .from('dashboard_cache')
+    .insert({
+      generated_at: output.generated_at,
+      payload: output,
+      version: output.version,
+    });
+  if (cacheError) {
+    console.warn('Warning: Failed to cache dashboard in Supabase:', cacheError.message);
+  }
+
   const assetUpdate = updateHtmlAssetVersion(repoRoot, assetVersion);
   console.log(JSON.stringify({ outPath, generated_at: output.generated_at, history_days: output.meta.history_days, accounts, asset_version: assetVersion, index_html_updated: assetUpdate.updated }, null, 2));
 }
 
-main();
+main().catch((err) => {
+  console.error('Fatal:', err.message);
+  process.exit(1);
+});

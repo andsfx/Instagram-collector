@@ -83,7 +83,7 @@ function inferMainJobHealth(run) {
     return { ok: false, reason, ambiguous };
   }
 
-  if (/(APIFY_TOKEN|GOG_KEYRING_PASSWORD|GOG_ACCOUNT|autentikasi|auth|blocker)/i.test(summaryText)) {
+  if (/(APIFY_TOKEN|SUPABASE_URL|SUPABASE_SERVICE_ROLE_KEY|autentikasi|auth|blocker)/i.test(summaryText)) {
     return { ok: false, reason: summaryText, ambiguous: false };
   }
 

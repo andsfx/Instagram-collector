@@ -48,7 +48,7 @@ function main() {
 
   // 2) Update Follower History from collected stats
   try {
-    const out = run('node', [path.join(repoRoot, 'scripts', 'socialblade', 'update-follower-history.js')], { cwd: repoRoot });
+    const out = run('node', [path.join(repoRoot, 'scripts', 'socialblade', 'update-follower-history-supabase.js')], { cwd: repoRoot });
     summary.followerHistory = JSON.parse(out);
   } catch (error) {
     summary.followerHistory = { status: 'error', reason: error.message };
@@ -64,9 +64,8 @@ function main() {
 
   // 4) Sync Engagement + Content Breakdown
   try {
-    const out = run('node', [path.join(repoRoot, 'scripts', 'sync', 'update-google-sheet.js'), '--all'], {
-      cwd: repoRoot,
-      env: process.env.GOG_KEYRING_PASSWORD ? { GOG_KEYRING_PASSWORD: process.env.GOG_KEYRING_PASSWORD } : {}
+    const out = run('node', [path.join(repoRoot, 'scripts', 'sync', 'update-supabase.js'), '--all'], {
+      cwd: repoRoot
     });
     summary.sheetSync = JSON.parse(out);
   } catch (error) {

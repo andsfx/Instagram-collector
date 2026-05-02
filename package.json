@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:dashboard",
+    "test": "npm run test:dashboard && npm --prefix ./dashboard-react test",
     "test:dashboard": "node ./scripts/test/dashboard-smoke.js && node ./scripts/test/dashboard-phase3-smoke.js"
   },
   "keywords": [],
@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.1",
     "playwright": "^1.58.2"
   }
 }

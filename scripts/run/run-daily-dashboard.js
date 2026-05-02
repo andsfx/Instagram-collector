@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
 
-const SHEET_ID = '1MdTlen1rcq1ZplbTwfHzj-kHFBoQufgahzRAxZPqt7U';
+// Supabase credentials loaded from .env by scripts/lib/supabase.js
 
 function loadEnvFile(filePath) {
   const fs = require('fs');
@@ -61,20 +61,13 @@ function requireEnv(name) {
   }
 }
 
-function gogBin() {
-  if (process.env.GOG_BIN) return process.env.GOG_BIN;
-  return process.platform === 'win32' ? 'gog' : '/home/ubuntu/.local/bin/gog';
-}
-
-function checkGogSheetsAuth(repoRoot) {
-  run(gogBin(), [
-    'sheets', 'get',
-    SHEET_ID,
-    'Follower History!A1:A2',
-    '--json',
-    '--results-only',
-    '--no-input'
-  ], { cwd: repoRoot });
+function checkSupabaseAuth() {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const err = new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
+    err.code = 'MISSING_SUPABASE_CREDENTIALS';
+    err.stage = 'preflight';
+    throw err;
+  }
 }
 
 function assertHybridSummaryHealthy(summary) {
@@ -165,10 +158,10 @@ function main() {
       ok: false,
       env: {
         APIFY_TOKEN: false,
-        GOG_KEYRING_PASSWORD: false,
-        GOG_ACCOUNT: false,
+        SUPABASE_URL: false,
+        SUPABASE_SERVICE_ROLE_KEY: false,
       },
-      gogSheetsAuth: false,
+      supabaseAuth: false,
     },
     hybridMaster: null,
     dashboardBuild: null,
@@ -184,13 +177,13 @@ function main() {
   try {
     requireEnv('APIFY_TOKEN');
     summary.preflight.env.APIFY_TOKEN = true;
-    requireEnv('GOG_KEYRING_PASSWORD');
-    summary.preflight.env.GOG_KEYRING_PASSWORD = true;
-    requireEnv('GOG_ACCOUNT');
-    summary.preflight.env.GOG_ACCOUNT = true;
+    requireEnv('SUPABASE_URL');
+    summary.preflight.env.SUPABASE_URL = true;
+    requireEnv('SUPABASE_SERVICE_ROLE_KEY');
+    summary.preflight.env.SUPABASE_SERVICE_ROLE_KEY = true;
 
-    checkGogSheetsAuth(repoRoot);
-    summary.preflight.gogSheetsAuth = true;
+    checkSupabaseAuth();
+    summary.preflight.supabaseAuth = true;
     summary.preflight.ok = true;
 
     if (!skipCollect) {
