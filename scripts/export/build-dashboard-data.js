@@ -128,7 +128,23 @@ function buildContentBreakdownFromSupabase(rows) {
 }
 
 const HASHTAG_REGEX = /#[\p{L}0-9_]+/gu;
-const POST_CAMPAIGN_TERMS = ['promo', 'diskon', 'event', 'grand opening', 'new tenant', 'launch', 'special', 'giveaway', 'limited', 'opening', 'promo menarik'];
+const POST_CAMPAIGN_TERMS = [
+  // Promo & diskon
+  'promo', 'diskon', 'sale', 'cashback', 'buy 1 get 1', 'buy 1 free', 'buy more', 'flash sale',
+  'late night sale', 'weekend deals', 'shopping guide', 'free',
+  // Event & aktivitas
+  'event', 'giveaway', 'contest', 'workshop', 'festival', 'bazaar', 'exhibition',
+  'urban fest', 'crave market', 'got talent', 'trial class',
+  // Tenant & opening
+  'grand opening', 'new tenant', 'now open', 'coming soon', 'launch', 'opening',
+  'officially open', 'is here', 'is back',
+  // Seasonal & thematic
+  'ramadan', 'lebaran', 'idul fitri', 'natal', 'tahun baru', 'imlek',
+  'hari buruh', 'hari ibu', 'valentine', 'anniversary',
+  // Mall-specific
+  'shop till you win', 'belanja', 'reward', 'voucher', 'grand prize',
+  'special offer', 'limited', 'promo menarik', 'hemat',
+];
 
 function loadLatestPostData(repoRoot, username) {
   const candidates = [
