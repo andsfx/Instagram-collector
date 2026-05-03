@@ -713,16 +713,18 @@ const now = new Date();
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
 
   // Cache in Supabase for the API endpoint
-  const { error: cacheError } = await supabase
-    .from('dashboard_cache')
-    .insert({
-      generated_at: output.generated_at,
-      payload: output,
-      version: output.version,
-    });
-  if (cacheError) {
-    console.warn('Warning: Failed to cache dashboard in Supabase:', cacheError.message);
-  }
+  // DISABLED: PostgREST body size limit (~64KB) rejects large payloads (PGRST102)
+  // API route now uses GitHub raw directly (see dashboard-react/api/dashboard-data.ts)
+  // const { error: cacheError } = await supabase
+  //   .from('dashboard_cache')
+  //   .insert({
+  //     generated_at: output.generated_at,
+  //     payload: output,
+  //     version: output.version,
+  //   });
+  // if (cacheError) {
+  //   console.warn('Warning: Failed to cache dashboard in Supabase:', cacheError.message);
+  // }
 
   const assetUpdate = updateHtmlAssetVersion(repoRoot, assetVersion);
   console.log(JSON.stringify({ outPath, generated_at: output.generated_at, history_days: output.meta.history_days, accounts, asset_version: assetVersion, index_html_updated: assetUpdate.updated }, null, 2));
