@@ -30,25 +30,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
   response.setHeader('CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
   response.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
 
-  // Strategy 1: Supabase dashboard_cache
-  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-    try {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: { persistSession: false, autoRefreshToken: false },
-      })
-
-      const { data, error } = await supabase
-        .rpc('get_latest_dashboard')
-
-      if (!error && data) {
-        const text = typeof data === 'string' ? data : JSON.stringify(data)
-        response.status(200).send(text)
-        return
-      }
-    } catch {
-      // Fall through to GitHub raw fallback
-    }
-  }
+  // Strategy 1: Supabase dashboard_cache (DISABLED — PostgREST body size limit)
+  // Skip Supabase for now, use GitHub raw directly
 
   // Strategy 2: GitHub raw (existing fallback)
   try {
