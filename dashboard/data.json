@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-08T04:02:56.333Z",
-  "generated_at_wib": "2026-05-08T11:02:56+07:00",
+  "generated_at": "2026-05-09T04:02:49.346Z",
+  "generated_at_wib": "2026-05-09T11:02:49+07:00",
   "version": 2,
   "sources": {
     "stats": "socialblade",
@@ -14,15 +14,15 @@
     "pakuwonmallbekasi"
   ],
   "latest": {
-    "date": "2026-05-08",
+    "date": "2026-05-09",
     "metmalbekasi": {
-      "followers": 97644,
+      "followers": 97331,
       "following": 269,
-      "posts": 16679,
-      "avg_likes": 40.42,
-      "avg_comments": 2.92,
+      "posts": 16684,
+      "avg_likes": 37.25,
+      "avg_comments": 2.67,
       "engagement_rate": 0.04,
-      "ff_ratio": 362.99,
+      "ff_ratio": 361.83,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -30,13 +30,13 @@
       }
     },
     "grandmetropolitan": {
-      "followers": 95002,
+      "followers": 94837,
       "following": 271,
-      "posts": 11583,
-      "avg_likes": 213.83,
-      "avg_comments": 8.92,
-      "engagement_rate": 0.23,
-      "ff_ratio": 350.56,
+      "posts": 11589,
+      "avg_likes": 170,
+      "avg_comments": 9.83,
+      "engagement_rate": 0.19,
+      "ff_ratio": 349.95,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -44,12 +44,12 @@
       }
     },
     "metmalcileungsi": {
-      "followers": 82767,
+      "followers": 82780,
       "following": 2146,
-      "posts": 18560,
-      "avg_likes": 74.75,
-      "avg_comments": 5.83,
-      "engagement_rate": 0.1,
+      "posts": 18563,
+      "avg_likes": 92.75,
+      "avg_comments": 7.67,
+      "engagement_rate": 0.12,
       "ff_ratio": 38.57,
       "verified": false,
       "sources": {
@@ -58,13 +58,13 @@
       }
     },
     "summareconmal.bekasi": {
-      "followers": 335030,
-      "following": 809,
-      "posts": 16067,
-      "avg_likes": 337.83,
-      "avg_comments": 23.17,
-      "engagement_rate": 0.11,
-      "ff_ratio": 414.13,
+      "followers": 334471,
+      "following": 802,
+      "posts": 16073,
+      "avg_likes": 794.5,
+      "avg_comments": 36.08,
+      "engagement_rate": 0.25,
+      "ff_ratio": 417.05,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -72,13 +72,13 @@
       }
     },
     "pakuwonmallbekasi": {
-      "followers": 73216,
+      "followers": 73205,
       "following": 232,
       "posts": 1680,
-      "avg_likes": 81.25,
-      "avg_comments": 4.33,
-      "engagement_rate": 0.12,
-      "ff_ratio": 315.59,
+      "avg_likes": 88.33,
+      "avg_comments": 4.5,
+      "engagement_rate": 0.13,
+      "ff_ratio": 315.54,
       "verified": false,
       "sources": {
         "stats": "socialblade",
@@ -3494,41 +3494,89 @@
         "engagement_rate": 0.12,
         "anomaly": false
       }
+    },
+    {
+      "date": "2026-05-09",
+      "metmalbekasi": {
+        "followers": 97331,
+        "following": 269,
+        "posts": 16684,
+        "avg_likes": 37.25,
+        "avg_comments": 2.67,
+        "engagement_rate": 0.04,
+        "anomaly": false
+      },
+      "grandmetropolitan": {
+        "followers": 94837,
+        "following": 271,
+        "posts": 11589,
+        "avg_likes": 170,
+        "avg_comments": 9.83,
+        "engagement_rate": 0.19,
+        "anomaly": false
+      },
+      "metmalcileungsi": {
+        "followers": 82780,
+        "following": 2146,
+        "posts": 18563,
+        "avg_likes": 92.75,
+        "avg_comments": 7.67,
+        "engagement_rate": 0.12,
+        "anomaly": false
+      },
+      "summareconmal.bekasi": {
+        "followers": 334471,
+        "following": 802,
+        "posts": 16073,
+        "avg_likes": 794.5,
+        "avg_comments": 36.08,
+        "engagement_rate": 0.25,
+        "anomaly": false
+      },
+      "pakuwonmallbekasi": {
+        "followers": 73205,
+        "following": 232,
+        "posts": 1680,
+        "avg_likes": 88.33,
+        "avg_comments": 4.5,
+        "engagement_rate": 0.13,
+        "anomaly": false
+      }
     }
   ],
   "growth": {
     "metmalbekasi": {
-      "followers_change_1d": 268,
-      "followers_change_7d": -492,
-      "pct_change_7d": -0.5,
+      "followers_change_1d": -313,
+      "followers_change_7d": -735,
+      "pct_change_7d": -0.75,
       "anomaly_detected": false,
       "notes": []
     },
     "grandmetropolitan": {
-      "followers_change_1d": 194,
-      "followers_change_7d": -15,
-      "pct_change_7d": -0.02,
+      "followers_change_1d": -165,
+      "followers_change_7d": -195,
+      "pct_change_7d": -0.21,
       "anomaly_detected": false,
       "notes": []
     },
     "metmalcileungsi": {
-      "followers_change_1d": -211,
-      "followers_change_7d": -718,
+      "followers_change_1d": 13,
+      "followers_change_7d": -721,
       "pct_change_7d": -0.86,
       "anomaly_detected": false,
       "notes": []
     },
     "summareconmal.bekasi": {
-      "followers_change_1d": 78,
-      "followers_change_7d": -1226,
-      "pct_change_7d": -0.36,
+      "followers_change_1d": -559,
+      "followers_change_7d": -1936,
+      "pct_change_7d": -0.58,
       "anomaly_detected": false,
       "notes": []
     },
     "pakuwonmallbekasi": {
-      "followers_change_1d": -42,
-      "followers_change_7d": 427,
-      "pct_change_7d": 0.59,
+      "followers_change_1d": -11,
+      "followers_change_7d": 416,
+      "pct_change_7d": 0.57,
       "anomaly_detected": false,
       "notes": []
     }
@@ -3538,49 +3586,49 @@
       {
         "rank": 1,
         "account": "summareconmal.bekasi",
-        "followers": 335030
+        "followers": 334471
       },
       {
         "rank": 2,
         "account": "metmalbekasi",
-        "followers": 97644
+        "followers": 97331
       },
       {
         "rank": 3,
         "account": "grandmetropolitan",
-        "followers": 95002
+        "followers": 94837
       },
       {
         "rank": 4,
         "account": "metmalcileungsi",
-        "followers": 82767
+        "followers": 82780
       },
       {
         "rank": 5,
         "account": "pakuwonmallbekasi",
-        "followers": 73216
+        "followers": 73205
       }
     ],
     "by_engagement_rate": [
       {
         "rank": 1,
-        "account": "grandmetropolitan",
-        "engagement_rate": 0.23
+        "account": "summareconmal.bekasi",
+        "engagement_rate": 0.25
       },
       {
         "rank": 2,
-        "account": "pakuwonmallbekasi",
-        "engagement_rate": 0.12
+        "account": "grandmetropolitan",
+        "engagement_rate": 0.19
       },
       {
         "rank": 3,
-        "account": "summareconmal.bekasi",
-        "engagement_rate": 0.11
+        "account": "pakuwonmallbekasi",
+        "engagement_rate": 0.13
       },
       {
         "rank": 4,
         "account": "metmalcileungsi",
-        "engagement_rate": 0.1
+        "engagement_rate": 0.12
       },
       {
         "rank": 5,
@@ -3592,149 +3640,149 @@
       {
         "rank": 1,
         "account": "summareconmal.bekasi",
-        "avg_likes": 337.83
+        "avg_likes": 794.5
       },
       {
         "rank": 2,
         "account": "grandmetropolitan",
-        "avg_likes": 213.83
+        "avg_likes": 170
       },
       {
         "rank": 3,
-        "account": "pakuwonmallbekasi",
-        "avg_likes": 81.25
+        "account": "metmalcileungsi",
+        "avg_likes": 92.75
       },
       {
         "rank": 4,
-        "account": "metmalcileungsi",
-        "avg_likes": 74.75
+        "account": "pakuwonmallbekasi",
+        "avg_likes": 88.33
       },
       {
         "rank": 5,
         "account": "metmalbekasi",
-        "avg_likes": 40.42
+        "avg_likes": 37.25
       }
     ]
   },
   "content_breakdown": {
     "metmalbekasi": {
-      "date": "2026-05-08",
+      "date": "2026-05-09",
       "reels": 0,
       "carousel": 8,
-      "image": 1,
-      "video": 3,
+      "image": 0,
+      "video": 4,
       "total_posts_analyzed": 12,
-      "avg_likes": 40.42,
-      "avg_comments": 2.92,
+      "avg_likes": 37.25,
+      "avg_comments": 2.67,
       "engagement_rate": 0.04,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
-      "carousel_avg_likes": 46.88,
+      "carousel_avg_likes": 46.38,
       "carousel_avg_comments": 3.25,
       "carousel_er": 0.05,
-      "image_avg_likes": 11,
-      "image_avg_comments": 1,
-      "image_er": 0.01,
+      "image_avg_likes": null,
+      "image_avg_comments": null,
+      "image_er": null,
       "best_post_url": "https://www.instagram.com/p/DWn7IFGkqHi/",
       "best_post_type": "carousel",
-      "best_post_likes": 189,
+      "best_post_likes": 190,
       "best_post_comments": 20
     },
     "grandmetropolitan": {
-      "date": "2026-05-08",
+      "date": "2026-05-09",
       "reels": 0,
       "carousel": 9,
       "image": 1,
       "video": 2,
       "total_posts_analyzed": 12,
-      "avg_likes": 213.83,
-      "avg_comments": 8.92,
-      "engagement_rate": 0.23,
+      "avg_likes": 170,
+      "avg_comments": 9.83,
+      "engagement_rate": 0.19,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
-      "carousel_avg_likes": 279,
+      "carousel_avg_likes": 215.33,
       "carousel_avg_comments": 11,
-      "carousel_er": 0.31,
-      "image_avg_likes": 15,
+      "carousel_er": 0.24,
+      "image_avg_likes": 22,
       "image_avg_comments": 0,
       "image_er": 0.02,
       "best_post_url": "https://www.instagram.com/p/DXyBhhJGLVa/",
       "best_post_type": "carousel",
-      "best_post_likes": 928,
-      "best_post_comments": 46
+      "best_post_likes": 994,
+      "best_post_comments": 66
     },
     "metmalcileungsi": {
-      "date": "2026-05-08",
+      "date": "2026-05-09",
       "reels": 0,
       "carousel": 0,
-      "image": 6,
-      "video": 6,
+      "image": 7,
+      "video": 5,
       "total_posts_analyzed": 12,
-      "avg_likes": 74.75,
-      "avg_comments": 5.83,
-      "engagement_rate": 0.1,
+      "avg_likes": 92.75,
+      "avg_comments": 7.67,
+      "engagement_rate": 0.12,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
       "carousel_avg_likes": null,
       "carousel_avg_comments": null,
       "carousel_er": null,
-      "image_avg_likes": 65.83,
-      "image_avg_comments": 10.33,
-      "image_er": 0.09,
-      "best_post_url": "https://www.instagram.com/p/DX5v7mDk7Xn/",
-      "best_post_type": "image",
-      "best_post_likes": 214,
-      "best_post_comments": 50
+      "image_avg_likes": 84.86,
+      "image_avg_comments": 11.43,
+      "image_er": 0.12,
+      "best_post_url": "https://www.instagram.com/p/DYCvdLoTMy2/",
+      "best_post_type": "video",
+      "best_post_likes": 291,
+      "best_post_comments": 7
     },
     "summareconmal.bekasi": {
-      "date": "2026-05-08",
+      "date": "2026-05-09",
       "reels": 0,
-      "carousel": 6,
-      "image": 1,
-      "video": 5,
+      "carousel": 9,
+      "image": 0,
+      "video": 3,
       "total_posts_analyzed": 12,
-      "avg_likes": 337.83,
-      "avg_comments": 23.17,
-      "engagement_rate": 0.11,
+      "avg_likes": 794.5,
+      "avg_comments": 36.08,
+      "engagement_rate": 0.25,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
-      "carousel_avg_likes": 491.17,
-      "carousel_avg_comments": 13.33,
-      "carousel_er": 0.15,
-      "image_avg_likes": 124,
-      "image_avg_comments": 162,
-      "image_er": 0.09,
-      "best_post_url": "https://www.instagram.com/p/DXjm450D7hP/",
+      "carousel_avg_likes": 982.22,
+      "carousel_avg_comments": 22.89,
+      "carousel_er": 0.3,
+      "image_avg_likes": null,
+      "image_avg_comments": null,
+      "image_er": null,
+      "best_post_url": "https://www.instagram.com/p/DYEjFl5GBnd/",
       "best_post_type": "carousel",
-      "best_post_likes": 2482,
-      "best_post_comments": 72
+      "best_post_likes": 3967,
+      "best_post_comments": 102
     },
     "pakuwonmallbekasi": {
-      "date": "2026-05-08",
+      "date": "2026-05-09",
       "reels": 0,
-      "carousel": 8,
+      "carousel": 9,
       "image": 0,
-      "video": 4,
+      "video": 3,
       "total_posts_analyzed": 12,
-      "avg_likes": 81.25,
-      "avg_comments": 4.33,
-      "engagement_rate": 0.12,
+      "avg_likes": 88.33,
+      "avg_comments": 4.5,
+      "engagement_rate": 0.13,
       "reels_avg_likes": null,
       "reels_avg_comments": null,
       "reels_er": null,
-      "carousel_avg_likes": 15.88,
-      "carousel_avg_comments": 4,
+      "carousel_avg_likes": 15.78,
+      "carousel_avg_comments": 3.56,
       "carousel_er": 0.03,
       "image_avg_likes": null,
       "image_avg_comments": null,
       "image_er": null,
       "best_post_url": "https://www.instagram.com/p/DYAAsGgz5Gq/",
       "best_post_type": "video",
-      "best_post_likes": 452,
+      "best_post_likes": 488,
       "best_post_comments": 6
     }
   },
@@ -3742,40 +3790,28 @@
     "metmalbekasi": {
       "posts": [
         {
-          "shortcode": "DYB-9Fekq5N",
-          "url": "https://www.instagram.com/p/DYB-9Fekq5N/",
+          "shortcode": "DX8pYkkEhJz",
+          "url": "https://www.instagram.com/p/DX8pYkkEhJz/",
           "type": "carousel",
-          "likes": 8,
-          "comments": 0,
-          "published_at": "2026-05-07T08:37:30.000Z",
-          "caption_snippet": "Baru! Rice Men! 😍 Selain mie lurus & mie keriting, kini kamu bisa menikmati kuah ramen fa...",
-          "interactions": 8,
-          "post_er": 0.0082,
-          "performance_label": "underperform"
+          "likes": 89,
+          "comments": 2,
+          "published_at": "2026-05-05T06:52:49.000Z",
+          "caption_snippet": "✨COMING SOON NEW TENANTS!✨ Metropolitan Mall Bekasi bakal makin seru dengan kehadiran tena...",
+          "interactions": 91,
+          "post_er": 0.0935,
+          "performance_label": "viral"
         },
         {
-          "shortcode": "DYCLCtjS7Gl",
-          "url": "https://www.instagram.com/p/DYCLCtjS7Gl/",
-          "type": "video",
-          "likes": 33,
-          "comments": 0,
-          "published_at": "2026-05-07T10:24:15.000Z",
-          "caption_snippet": "Lagi asik jalan-jalan, tiba-tiba baterai HP lowbat bahkan mati? 😭📱 Tenang, di Metropolit...",
-          "interactions": 33,
-          "post_er": 0.0338,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DX8npPBkrar",
-          "url": "https://www.instagram.com/p/DX8npPBkrar/",
+          "shortcode": "DXGpOAIkh2D",
+          "url": "https://www.instagram.com/p/DXGpOAIkh2D/",
           "type": "carousel",
-          "likes": 9,
-          "comments": 0,
-          "published_at": "2026-05-05T06:37:37.000Z",
-          "caption_snippet": "BARU! Ikon legendaris asal Surabaya, kini hadir di The People's Cafe✨ Cobain cita rasa Jaw...",
-          "interactions": 9,
-          "post_er": 0.0092,
-          "performance_label": "underperform"
+          "likes": 49,
+          "comments": 4,
+          "published_at": "2026-04-14T07:32:23.000Z",
+          "caption_snippet": "APRIL makin seru di Metropolitan Mall Bekasi! 🎉✨ Belanja makin cuan lewat APRIL SHOPPING...",
+          "interactions": 53,
+          "post_er": 0.0545,
+          "performance_label": "viral"
         },
         {
           "shortcode": "DX_opmfyPvf",
@@ -3790,123 +3826,134 @@
           "performance_label": "normal"
         },
         {
-          "shortcode": "DWn7IFGkqHi",
-          "url": "https://www.instagram.com/p/DWn7IFGkqHi/",
-          "type": "carousel",
-          "likes": 189,
-          "comments": 20,
-          "published_at": "2026-04-02T09:12:24.000Z",
-          "caption_snippet": "✨NOW OPEN NEW TENANTS! ✨ Ada yang baru nih di Metropolitan Mall Bekasi! Beragam tenant bar...",
-          "interactions": 209,
-          "post_er": 0.214,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DX_EpesEg8e",
-          "url": "https://www.instagram.com/p/DX_EpesEg8e/",
-          "type": "image",
+          "shortcode": "DYEfKhCSYC-",
+          "url": "https://www.instagram.com/p/DYEfKhCSYC-/",
+          "type": "video",
           "likes": 11,
-          "comments": 1,
-          "published_at": "2026-05-06T05:29:57.000Z",
-          "caption_snippet": "🚗✨ SIM Keliling Hadir di Metropolitan Mall Bekasi! ✨🚗 Kabar baik untuk kamu yang ingin p...",
-          "interactions": 12,
-          "post_er": 0.0123,
+          "comments": 3,
+          "published_at": "2026-05-08T07:58:17.000Z",
+          "caption_snippet": "Upgrade style kamu sekarang juga 😎✨ Manzone lagi ada promo spesial dengan diskon hingga 4...",
+          "interactions": 14,
+          "post_er": 0.0144,
           "performance_label": "normal"
         },
         {
-          "shortcode": "DX_ESwlEhYi",
-          "url": "https://www.instagram.com/p/DX_ESwlEhYi/",
+          "shortcode": "DYEIMxKEulA",
+          "url": "https://www.instagram.com/p/DYEIMxKEulA/",
           "type": "carousel",
-          "likes": 7,
+          "likes": 3,
           "comments": 0,
-          "published_at": "2026-05-06T05:26:26.000Z",
-          "caption_snippet": "Every love story deserves a beginning that feels just right. 💍✨ At Goldmart, we believe a...",
-          "interactions": 7,
-          "post_er": 0.0072,
+          "published_at": "2026-05-08T04:36:46.000Z",
+          "caption_snippet": "DOUBLE DEAL ALERT!🔥 Lagi pengen makan enak tapi tetap hemat? Gas ke Gokana sekarang! 🍜✨...",
+          "interactions": 3,
+          "post_er": 0.0031,
           "performance_label": "underperform"
+        },
+        {
+          "shortcode": "DYEYRcdSs_m",
+          "url": "https://www.instagram.com/p/DYEYRcdSs_m/",
+          "type": "video",
+          "likes": 10,
+          "comments": 3,
+          "published_at": "2026-05-08T06:59:10.000Z",
+          "caption_snippet": "Cari outfit cowok buat hangout, ngedate, sampai daily look? 👀 Saatnya upgrade style kamu...",
+          "interactions": 13,
+          "post_er": 0.0134,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DYEheeBEggz",
+          "url": "https://www.instagram.com/p/DYEheeBEggz/",
+          "type": "carousel",
+          "likes": 6,
+          "comments": 0,
+          "published_at": "2026-05-08T08:17:38.000Z",
+          "caption_snippet": "Warning: new arrivals from @colorbox that’ll leave you wanting for more 😍 Koleksi terbaru...",
+          "interactions": 6,
+          "post_er": 0.0062,
+          "performance_label": "underperform"
+        },
+        {
+          "shortcode": "DWn7IFGkqHi",
+          "url": "https://www.instagram.com/p/DWn7IFGkqHi/",
+          "type": "carousel",
+          "likes": 190,
+          "comments": 20,
+          "published_at": "2026-04-02T09:12:24.000Z",
+          "caption_snippet": "✨NOW OPEN NEW TENANTS! ✨ Ada yang baru nih di Metropolitan Mall Bekasi! Beragam tenant bar...",
+          "interactions": 210,
+          "post_er": 0.2158,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DYEHfKXEiOi",
+          "url": "https://www.instagram.com/p/DYEHfKXEiOi/",
+          "type": "carousel",
+          "likes": 4,
+          "comments": 0,
+          "published_at": "2026-05-08T04:30:32.000Z",
+          "caption_snippet": "May Deals Madness! Untungnya Blipat lipat 💸✨ Promo besar tengah tahun, jangan sampai lewa...",
+          "interactions": 4,
+          "post_er": 0.0041,
+          "performance_label": "underperform"
+        },
+        {
+          "shortcode": "DYCLCtjS7Gl",
+          "url": "https://www.instagram.com/p/DYCLCtjS7Gl/",
+          "type": "video",
+          "likes": 39,
+          "comments": 0,
+          "published_at": "2026-05-07T10:24:15.000Z",
+          "caption_snippet": "Lagi asik jalan-jalan, tiba-tiba baterai HP lowbat bahkan mati? 😭📱 Tenang, di Metropolit...",
+          "interactions": 39,
+          "post_er": 0.0401,
+          "performance_label": "viral"
         },
         {
           "shortcode": "DYBhq6-Eh1F",
           "url": "https://www.instagram.com/p/DYBhq6-Eh1F/",
           "type": "carousel",
-          "likes": 19,
+          "likes": 22,
           "comments": 0,
           "published_at": "2026-05-07T04:21:37.000Z",
           "caption_snippet": "Weekend makin seru ditemani deretan film terbaru di XXI Metropolitan Mall Bekasi! 🎬🍿 Mul...",
-          "interactions": 19,
-          "post_er": 0.0195,
+          "interactions": 22,
+          "post_er": 0.0226,
           "performance_label": "normal"
         },
         {
-          "shortcode": "DX8pYkkEhJz",
-          "url": "https://www.instagram.com/p/DX8pYkkEhJz/",
+          "shortcode": "DYB-9Fekq5N",
+          "url": "https://www.instagram.com/p/DYB-9Fekq5N/",
           "type": "carousel",
-          "likes": 83,
-          "comments": 2,
-          "published_at": "2026-05-05T06:52:49.000Z",
-          "caption_snippet": "✨COMING SOON NEW TENANTS!✨ Metropolitan Mall Bekasi bakal makin seru dengan kehadiran tena...",
-          "interactions": 85,
-          "post_er": 0.0871,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DX8yFKGEsI_",
-          "url": "https://www.instagram.com/p/DX8yFKGEsI_/",
-          "type": "carousel",
-          "likes": 11,
+          "likes": 8,
           "comments": 0,
-          "published_at": "2026-05-05T08:08:48.000Z",
-          "caption_snippet": "Nikmati Promo 5.5 di Metropolitan Mall Bekasi!! Jangan cuma lihat… langsung datang & rasak...",
-          "interactions": 11,
-          "post_er": 0.0113,
+          "published_at": "2026-05-07T08:37:30.000Z",
+          "caption_snippet": "Baru! Rice Men! 😍 Selain mie lurus & mie keriting, kini kamu bisa menikmati kuah ramen fa...",
+          "interactions": 8,
+          "post_er": 0.0082,
           "performance_label": "normal"
-        },
-        {
-          "shortcode": "DXGpOAIkh2D",
-          "url": "https://www.instagram.com/p/DXGpOAIkh2D/",
-          "type": "carousel",
-          "likes": 49,
-          "comments": 4,
-          "published_at": "2026-04-14T07:32:23.000Z",
-          "caption_snippet": "APRIL makin seru di Metropolitan Mall Bekasi! 🎉✨ Belanja makin cuan lewat APRIL SHOPPING...",
-          "interactions": 53,
-          "post_er": 0.0543,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DX_f3ozy-8q",
-          "url": "https://www.instagram.com/p/DX_f3ozy-8q/",
-          "type": "video",
-          "likes": 50,
-          "comments": 8,
-          "published_at": "2026-05-06T09:28:41.000Z",
-          "caption_snippet": "Masih mikir parkir di Metropolitan Mall Bekasi itu ribet? Eitss engga kok! 🚗✨ Banyak yang...",
-          "interactions": 58,
-          "post_er": 0.0594,
-          "performance_label": "viral"
         }
       ],
-      "average_likes": 40.42,
-      "average_comments": 2.92,
-      "average_post_er": 0.0444,
+      "average_likes": 37.25,
+      "average_comments": 2.67,
+      "average_post_er": 0.041,
       "dominant_type": "carousel",
       "top_hashtags": [
         "#metropolitanmallbekasi",
-        "#mmbekasi",
-        "#ramenya"
+        "#promo",
+        "#mensfashion"
       ],
       "campaign_terms": [
         "promo",
-        "diskon",
         "new tenant",
-        "now open",
-        "belanja",
-        "free",
         "coming soon",
-        "sale",
+        "belanja",
         "reward",
         "voucher",
-        "hemat"
+        "hemat",
+        "diskon",
+        "sale",
+        "now open"
       ],
       "viral_posts": 4,
       "underperform_posts": 3
@@ -3914,153 +3961,153 @@
     "grandmetropolitan": {
       "posts": [
         {
-          "shortcode": "DYCQ_XgmLcl",
-          "url": "https://www.instagram.com/p/DYCQ_XgmLcl/",
-          "type": "image",
-          "likes": 15,
+          "shortcode": "DYE1Hf0GPv7",
+          "url": "https://www.instagram.com/p/DYE1Hf0GPv7/",
+          "type": "carousel",
+          "likes": 7,
           "comments": 0,
-          "published_at": "2026-05-07T11:15:02.000Z",
-          "caption_snippet": "Rayakan momen spesialmu di venue yang elegan & berkesan ✨ Mulai dari seminar, gathering, w...",
-          "interactions": 15,
-          "post_er": 0.0158,
+          "published_at": "2026-05-08T11:09:16.000Z",
+          "caption_snippet": "Dapatkan penawaran luar biasa dari seluruh jenis produk Farmers Market, mulai dari sayuran...",
+          "interactions": 7,
+          "post_er": 0.0074,
           "performance_label": "underperform"
-        },
-        {
-          "shortcode": "DYCNx0CE3V-",
-          "url": "https://www.instagram.com/p/DYCNx0CE3V-/",
-          "type": "carousel",
-          "likes": 32,
-          "comments": 2,
-          "published_at": "2026-05-07T10:47:02.000Z",
-          "caption_snippet": "Lomba Mewarnai bersama Gizzi @gizzi.indonesia 🗓 Minggu , 24 Mei 2026 📌 Atrium Utama Gran...",
-          "interactions": 34,
-          "post_er": 0.0358,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DYCK1PHGAUj",
-          "url": "https://www.instagram.com/p/DYCK1PHGAUj/",
-          "type": "carousel",
-          "likes": 66,
-          "comments": 0,
-          "published_at": "2026-05-07T10:21:17.000Z",
-          "caption_snippet": "✨MAYGICAL JOURNEY✨ Ini dia keseruan dari rangkaian event Maygical Journey (1 - 31 May 2026...",
-          "interactions": 66,
-          "post_er": 0.0695,
-          "performance_label": "normal"
         },
         {
           "shortcode": "DXDcbrVGFxo",
           "url": "https://www.instagram.com/p/DXDcbrVGFxo/",
           "type": "carousel",
-          "likes": 273,
+          "likes": 274,
           "comments": 15,
           "published_at": "2026-04-13T01:42:56.000Z",
           "caption_snippet": "✅TAP & TREAT 25K✨ Download Metland Card, Gratis E-Voucher Kampung Rasa 25K (13 April - 30...",
-          "interactions": 288,
-          "post_er": 0.3032,
+          "interactions": 289,
+          "post_er": 0.3047,
           "performance_label": "viral"
-        },
-        {
-          "shortcode": "DYCLBzwmOyy",
-          "url": "https://www.instagram.com/p/DYCLBzwmOyy/",
-          "type": "carousel",
-          "likes": 16,
-          "comments": 1,
-          "published_at": "2026-05-07T10:23:00.000Z",
-          "caption_snippet": "✨𝐌𝐀𝐘𝐆𝐈𝐂𝐀𝐋 𝐉𝐎𝐔𝐑𝐍𝐄𝐘✨ Ini dia keseruan dari rangkaian event 𝐌𝐚𝐲𝐠𝐢𝐜𝐚𝐥 \ud835...",
-          "interactions": 17,
-          "post_er": 0.0179,
-          "performance_label": "underperform"
-        },
-        {
-          "shortcode": "DYCLbM_GIb-",
-          "url": "https://www.instagram.com/p/DYCLbM_GIb-/",
-          "type": "carousel",
-          "likes": 57,
-          "comments": 1,
-          "published_at": "2026-05-07T10:26:28.000Z",
-          "caption_snippet": "✨𝐌𝐀𝐘𝐆𝐈𝐂𝐀𝐋 𝐉𝐎𝐔𝐑𝐍𝐄𝐘✨ Ini dia keseruan dari rangkaian event 𝐌𝐚𝐲𝐠𝐢𝐜𝐚𝐥 \ud835...",
-          "interactions": 58,
-          "post_er": 0.0611,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DYD3NfJS_HS",
-          "url": "https://www.instagram.com/p/DYD3NfJS_HS/",
-          "type": "video",
-          "likes": 13,
-          "comments": 0,
-          "published_at": "2026-05-08T02:10:12.000Z",
-          "caption_snippet": "Cuma mau bilang Wajib ikutan kelas pound Poundsterra setiap Rabu jam 18.30 di Gavenue @gra...",
-          "interactions": 13,
-          "post_er": 0.0137,
-          "performance_label": "underperform"
-        },
-        {
-          "shortcode": "DX5sd-8mB40",
-          "url": "https://www.instagram.com/p/DX5sd-8mB40/",
-          "type": "carousel",
-          "likes": 489,
-          "comments": 13,
-          "published_at": "2026-05-04T03:22:02.000Z",
-          "caption_snippet": "✨MAYGICAL JOURNEY✨ Ini dia keseruan dari rangkaian event Maygical Journey (1 - 31 May 2026...",
-          "interactions": 502,
-          "post_er": 0.5284,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DYCImCtGD6n",
-          "url": "https://www.instagram.com/p/DYCImCtGD6n/",
-          "type": "carousel",
-          "likes": 621,
-          "comments": 20,
-          "published_at": "2026-05-07T10:01:44.000Z",
-          "caption_snippet": "✨TRIBUTE TO OASIS✨ Siap-siap buat sing along sekeras mungkin! Akhir bulan ini kita bakal b...",
-          "interactions": 641,
-          "post_er": 0.6747,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DXyBhhJGLVa",
-          "url": "https://www.instagram.com/p/DXyBhhJGLVa/",
-          "type": "carousel",
-          "likes": 928,
-          "comments": 46,
-          "published_at": "2026-05-01T03:52:06.000Z",
-          "caption_snippet": "✨𝐌𝐀𝐘𝐆𝐈𝐂𝐀𝐋 𝐉𝐎𝐔𝐑𝐍𝐄𝐘✨ Ini dia keseruan dari rangkaian event 𝐌𝐚𝐲𝐠𝐢𝐜𝐚𝐥 \ud835...",
-          "interactions": 974,
-          "post_er": 1.0252,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DYCIwBnmK_V",
-          "url": "https://www.instagram.com/p/DYCIwBnmK_V/",
-          "type": "carousel",
-          "likes": 29,
-          "comments": 1,
-          "published_at": "2026-05-07T10:03:06.000Z",
-          "caption_snippet": "✨TRIBUTE TO OASIS✨ Siap-siap buat sing along sekeras mungkin! Akhir bulan ini kita bakal b...",
-          "interactions": 30,
-          "post_er": 0.0316,
-          "performance_label": "normal"
         },
         {
           "shortcode": "DYDmuyeT6ve",
           "url": "https://www.instagram.com/p/DYDmuyeT6ve/",
           "type": "video",
-          "likes": 27,
-          "comments": 8,
+          "likes": 53,
+          "comments": 18,
           "published_at": "2026-05-07T23:46:15.000Z",
           "caption_snippet": "HACK SAUCE COCOLAN DI SHABURI KINTAN Kalau ke AYCE satu ini jangan sampe gagal pas racik s...",
-          "interactions": 35,
-          "post_er": 0.0368,
+          "interactions": 71,
+          "post_er": 0.0749,
           "performance_label": "normal"
+        },
+        {
+          "shortcode": "DX5sd-8mB40",
+          "url": "https://www.instagram.com/p/DX5sd-8mB40/",
+          "type": "carousel",
+          "likes": 520,
+          "comments": 14,
+          "published_at": "2026-05-04T03:22:02.000Z",
+          "caption_snippet": "✨MAYGICAL JOURNEY✨ Ini dia keseruan dari rangkaian event Maygical Journey (1 - 31 May 2026...",
+          "interactions": 534,
+          "post_er": 0.5631,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DYE2JA-GKbr",
+          "url": "https://www.instagram.com/p/DYE2JA-GKbr/",
+          "type": "carousel",
+          "likes": 9,
+          "comments": 0,
+          "published_at": "2026-05-08T11:18:12.000Z",
+          "caption_snippet": "Hallo Mama Papa, yukk segera hubungi @smilemusic_official karna apa?? karna akan ada kelas...",
+          "interactions": 9,
+          "post_er": 0.0095,
+          "performance_label": "underperform"
+        },
+        {
+          "shortcode": "DYFGQFJGPBJ",
+          "url": "https://www.instagram.com/p/DYFGQFJGPBJ/",
+          "type": "carousel",
+          "likes": 11,
+          "comments": 1,
+          "published_at": "2026-05-08T13:38:59.000Z",
+          "caption_snippet": "HALO WARGA BEKASI!!! Kapan lagi kinclongin mobil cuma BAYAR SETENGAH HARGA? Buat kamu yang...",
+          "interactions": 12,
+          "post_er": 0.0127,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DYExeGmGPdY",
+          "url": "https://www.instagram.com/p/DYExeGmGPdY/",
+          "type": "carousel",
+          "likes": 5,
+          "comments": 0,
+          "published_at": "2026-05-08T10:37:24.000Z",
+          "caption_snippet": "Celebrate this @wacoal_id Mid Year Offer with pieces that are made to support, shape and m...",
+          "interactions": 5,
+          "post_er": 0.0053,
+          "performance_label": "underperform"
+        },
+        {
+          "shortcode": "DYD3NfJS_HS",
+          "url": "https://www.instagram.com/p/DYD3NfJS_HS/",
+          "type": "video",
+          "likes": 27,
+          "comments": 1,
+          "published_at": "2026-05-08T02:10:12.000Z",
+          "caption_snippet": "Cuma mau bilang Wajib ikutan kelas pound Poundsterra setiap Rabu jam 18.30 di Gavenue @gra...",
+          "interactions": 28,
+          "post_er": 0.0295,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DYCNx0CE3V-",
+          "url": "https://www.instagram.com/p/DYCNx0CE3V-/",
+          "type": "carousel",
+          "likes": 41,
+          "comments": 2,
+          "published_at": "2026-05-07T10:47:02.000Z",
+          "caption_snippet": "Lomba Mewarnai bersama Gizzi @gizzi.indonesia 🗓 Minggu , 24 Mei 2026 📌 Atrium Utama Gran...",
+          "interactions": 43,
+          "post_er": 0.0453,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DXyBhhJGLVa",
+          "url": "https://www.instagram.com/p/DXyBhhJGLVa/",
+          "type": "carousel",
+          "likes": 994,
+          "comments": 66,
+          "published_at": "2026-05-01T03:52:06.000Z",
+          "caption_snippet": "✨𝐌𝐀𝐘𝐆𝐈𝐂𝐀𝐋 𝐉𝐎𝐔𝐑𝐍𝐄𝐘✨ Ini dia keseruan dari rangkaian event 𝐌𝐚𝐲𝐠𝐢𝐜𝐚𝐥 \ud835...",
+          "interactions": 1060,
+          "post_er": 1.1177,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DYCQ_XgmLcl",
+          "url": "https://www.instagram.com/p/DYCQ_XgmLcl/",
+          "type": "image",
+          "likes": 22,
+          "comments": 0,
+          "published_at": "2026-05-07T11:15:02.000Z",
+          "caption_snippet": "Rayakan momen spesialmu di venue yang elegan & berkesan ✨ Mulai dari seminar, gathering, w...",
+          "interactions": 22,
+          "post_er": 0.0232,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DYCLbM_GIb-",
+          "url": "https://www.instagram.com/p/DYCLbM_GIb-/",
+          "type": "carousel",
+          "likes": 77,
+          "comments": 1,
+          "published_at": "2026-05-07T10:26:28.000Z",
+          "caption_snippet": "✨𝐌𝐀𝐘𝐆𝐈𝐂𝐀𝐋 𝐉𝐎𝐔𝐑𝐍𝐄𝐘✨ Ini dia keseruan dari rangkaian event 𝐌𝐚𝐲𝐠𝐢𝐜𝐚𝐥 \ud835...",
+          "interactions": 78,
+          "post_er": 0.0822,
+          "performance_label": "viral"
         }
       ],
-      "average_likes": 213.83,
-      "average_comments": 8.92,
-      "average_post_er": 0.2345,
+      "average_likes": 170,
+      "average_comments": 9.83,
+      "average_post_er": 0.1896,
       "dominant_type": "carousel",
       "top_hashtags": [
         "#eventbekasi",
@@ -4068,10 +4115,12 @@
         "#bekasievent"
       ],
       "campaign_terms": [
-        "event",
-        "diskon",
         "promo",
-        "voucher"
+        "belanja",
+        "hemat",
+        "voucher",
+        "event",
+        "diskon"
       ],
       "viral_posts": 4,
       "underperform_posts": 3
@@ -4079,15 +4128,27 @@
     "metmalcileungsi": {
       "posts": [
         {
-          "shortcode": "DX5w8crkhPV",
-          "url": "https://www.instagram.com/p/DX5w8crkhPV/",
-          "type": "video",
-          "likes": 59,
-          "comments": 3,
-          "published_at": "2026-05-04T04:01:32.000Z",
-          "caption_snippet": "Wanginya bikin ngiler! 🤤 Rahasia kelezatan Rujak Aceh kami ada di saus mangga kweni asli...",
-          "interactions": 62,
-          "post_er": 0.0749,
+          "shortcode": "DXqza6cE9-J",
+          "url": "https://www.instagram.com/p/DXqza6cE9-J/",
+          "type": "image",
+          "likes": 44,
+          "comments": 0,
+          "published_at": "2026-04-28T08:40:38.000Z",
+          "caption_snippet": "Lagi cari aktivitas seru bareng keluarga atau bestie? Saatnya ke URBAN FEST 2026 di Metrop...",
+          "interactions": 44,
+          "post_er": 0.0532,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DX6mx4iExXg",
+          "url": "https://www.instagram.com/p/DX6mx4iExXg/",
+          "type": "image",
+          "likes": 48,
+          "comments": 0,
+          "published_at": "2026-05-04T11:53:13.000Z",
+          "caption_snippet": "Setelah seharian beraktivitas, saatnya santai sejenak sambil ditemani alunan musik favorit...",
+          "interactions": 48,
+          "post_er": 0.058,
           "performance_label": "normal"
         },
         {
@@ -4103,39 +4164,99 @@
           "performance_label": "underperform"
         },
         {
-          "shortcode": "DXqza6cE9-J",
-          "url": "https://www.instagram.com/p/DXqza6cE9-J/",
+          "shortcode": "DYEHyacE006",
+          "url": "https://www.instagram.com/p/DYEHyacE006/",
           "type": "image",
-          "likes": 44,
+          "likes": 42,
           "comments": 0,
-          "published_at": "2026-04-28T08:40:38.000Z",
-          "caption_snippet": "Lagi cari aktivitas seru bareng keluarga atau bestie? Saatnya ke URBAN FEST 2026 di Metrop...",
-          "interactions": 44,
-          "post_er": 0.0532,
+          "published_at": "2026-05-08T04:38:21.000Z",
+          "caption_snippet": "🎉 PESTA WIRAUSAHA KABUPATEN BOGOR 🎉 Hadir dengan berbagai kegiatan seru dan penuh insigh...",
+          "interactions": 42,
+          "post_er": 0.0507,
           "performance_label": "underperform"
         },
         {
           "shortcode": "DYCvdLoTMy2",
           "url": "https://www.instagram.com/p/DYCvdLoTMy2/",
           "type": "video",
-          "likes": 199,
-          "comments": 2,
+          "likes": 291,
+          "comments": 7,
           "published_at": "2026-05-07T15:43:43.000Z",
           "caption_snippet": "YEEAYY! 💕🎬 Film Shaka Oh Shaka sekarang sudah tayang di XXI Metmall Cileungsi! ✨ Siap-si...",
-          "interactions": 201,
-          "post_er": 0.2429,
+          "interactions": 298,
+          "post_er": 0.36,
           "performance_label": "viral"
         },
         {
-          "shortcode": "DX5z18hkzeG",
-          "url": "https://www.instagram.com/p/DX5z18hkzeG/",
+          "shortcode": "DYEIyITE_9t",
+          "url": "https://www.instagram.com/p/DYEIyITE_9t/",
           "type": "image",
-          "likes": 36,
-          "comments": 9,
-          "published_at": "2026-05-04T04:28:01.000Z",
-          "caption_snippet": "LEVEL UP YOUR CONFIDENCE WITH MODELING CLASS! 😎⚡ Yuk, ikutan Modeling Class bareng @sangg...",
-          "interactions": 45,
-          "post_er": 0.0544,
+          "likes": 181,
+          "comments": 27,
+          "published_at": "2026-05-08T04:43:42.000Z",
+          "caption_snippet": "Yuk ramaikan SMART CIBINONG SCHOOL SHOWCASE dan saksikan berbagai penampilan seru & inspir...",
+          "interactions": 208,
+          "post_er": 0.2513,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DYEyC1VToBg",
+          "url": "https://www.instagram.com/p/DYEyC1VToBg/",
+          "type": "video",
+          "likes": 54,
+          "comments": 3,
+          "published_at": "2026-05-08T10:42:55.000Z",
+          "caption_snippet": "🎉 LAST DAY OF I LOVE JCO! 🎉 2 LUSIN DONAT cuma 118 ribu! 👀🍩 Ini kesempatan terakhir bu...",
+          "interactions": 57,
+          "post_er": 0.0689,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DX60xZNzJzX",
+          "url": "https://www.instagram.com/p/DX60xZNzJzX/",
+          "type": "video",
+          "likes": 118,
+          "comments": 1,
+          "published_at": "2026-05-04T13:59:29.000Z",
+          "caption_snippet": "Metropolitan Ballroom hari ini dipenuhi oleh @smkmetland ! 🎉 Terima kasih telah mempercay...",
+          "interactions": 119,
+          "post_er": 0.1438,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DX5v7mDk7Xn",
+          "url": "https://www.instagram.com/p/DX5v7mDk7Xn/",
+          "type": "image",
+          "likes": 218,
+          "comments": 50,
+          "published_at": "2026-05-04T04:00:02.000Z",
+          "caption_snippet": "Si kecil siap jadi juara? 🍼✨ Yuk ikutan URBAN BABY RACE yang super gemes & penuh keseruan...",
+          "interactions": 268,
+          "post_er": 0.3237,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DX_RU3xS2Cf",
+          "url": "https://www.instagram.com/p/DX_RU3xS2Cf/",
+          "type": "video",
+          "likes": 53,
+          "comments": 0,
+          "published_at": "2026-05-06T07:21:14.000Z",
+          "caption_snippet": "Get your Reformer Pilates session at Red Fitness Cileungsi ✨ Build strength, improve flexi...",
+          "interactions": 53,
+          "post_er": 0.064,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DX6n3-RE8Nn",
+          "url": "https://www.instagram.com/p/DX6n3-RE8Nn/",
+          "type": "image",
+          "likes": 53,
+          "comments": 3,
+          "published_at": "2026-05-04T12:02:12.000Z",
+          "caption_snippet": "REMINDER: SIM KELILING AT MMC! 🚨 Jangan lupa! Setiap hari Kamis waktunya layanan SIM Keli...",
+          "interactions": 56,
+          "post_er": 0.0676,
           "performance_label": "normal"
         },
         {
@@ -4149,270 +4270,202 @@
           "interactions": 4,
           "post_er": 0.0048,
           "performance_label": "underperform"
-        },
-        {
-          "shortcode": "DX6mx4iExXg",
-          "url": "https://www.instagram.com/p/DX6mx4iExXg/",
-          "type": "image",
-          "likes": 44,
-          "comments": 0,
-          "published_at": "2026-05-04T11:53:13.000Z",
-          "caption_snippet": "Setelah seharian beraktivitas, saatnya santai sejenak sambil ditemani alunan musik favorit...",
-          "interactions": 44,
-          "post_er": 0.0532,
-          "performance_label": "underperform"
-        },
-        {
-          "shortcode": "DX60xZNzJzX",
-          "url": "https://www.instagram.com/p/DX60xZNzJzX/",
-          "type": "video",
-          "likes": 112,
-          "comments": 1,
-          "published_at": "2026-05-04T13:59:29.000Z",
-          "caption_snippet": "Metropolitan Ballroom hari ini dipenuhi oleh @smkmetland ! 🎉 Terima kasih telah mempercay...",
-          "interactions": 113,
-          "post_er": 0.1365,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DX6ky34TCVd",
-          "url": "https://www.instagram.com/p/DX6ky34TCVd/",
-          "type": "video",
-          "likes": 82,
-          "comments": 1,
-          "published_at": "2026-05-04T11:48:30.000Z",
-          "caption_snippet": "Buruan cobain Cheesecuit yang lagi viral ini di Metmall Cileungsi! 🧀✨ Lembut, creamy, dan...",
-          "interactions": 83,
-          "post_er": 0.1003,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DX_RU3xS2Cf",
-          "url": "https://www.instagram.com/p/DX_RU3xS2Cf/",
-          "type": "video",
-          "likes": 47,
-          "comments": 0,
-          "published_at": "2026-05-06T07:21:14.000Z",
-          "caption_snippet": "Get your Reformer Pilates session at Red Fitness Cileungsi ✨ Build strength, improve flexi...",
-          "interactions": 47,
-          "post_er": 0.0568,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DX6n3-RE8Nn",
-          "url": "https://www.instagram.com/p/DX6n3-RE8Nn/",
-          "type": "image",
-          "likes": 49,
-          "comments": 3,
-          "published_at": "2026-05-04T12:02:12.000Z",
-          "caption_snippet": "REMINDER: SIM KELILING AT MMC! 🚨 Jangan lupa! Setiap hari Kamis waktunya layanan SIM Keli...",
-          "interactions": 52,
-          "post_er": 0.0628,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DX5v7mDk7Xn",
-          "url": "https://www.instagram.com/p/DX5v7mDk7Xn/",
-          "type": "image",
-          "likes": 214,
-          "comments": 50,
-          "published_at": "2026-05-04T04:00:02.000Z",
-          "caption_snippet": "Si kecil siap jadi juara? 🍼✨ Yuk ikutan URBAN BABY RACE yang super gemes & penuh keseruan...",
-          "interactions": 264,
-          "post_er": 0.319,
-          "performance_label": "viral"
         }
       ],
-      "average_likes": 74.75,
-      "average_comments": 5.83,
-      "average_post_er": 0.0974,
-      "dominant_type": "video",
+      "average_likes": 92.75,
+      "average_comments": 7.67,
+      "average_post_er": 0.1213,
+      "dominant_type": "image",
       "top_hashtags": [
         "#cileungsi",
         "#metmallcileungsi",
-        "#mmc"
+        "#metropolitanmallcileungsi"
       ],
       "campaign_terms": [
-        "bazaar",
         "event",
         "urban fest",
+        "bazaar",
+        "promo",
+        "reward",
         "diskon",
         "voucher"
       ],
       "viral_posts": 4,
-      "underperform_posts": 4
+      "underperform_posts": 3
     },
     "summareconmal.bekasi": {
       "posts": [
         {
-          "shortcode": "DYCDB2jhZxB",
-          "url": "https://www.instagram.com/p/DYCDB2jhZxB/",
-          "type": "video",
-          "likes": 584,
-          "comments": 16,
-          "published_at": "2026-05-07T09:16:42.000Z",
-          "caption_snippet": "We were beyond thrilled to welcome SAVIKARA, Puteri Indonesia 2026 @agnesrahajeng, Puteri...",
-          "interactions": 600,
-          "post_er": 0.1791,
-          "performance_label": "viral"
-        },
-        {
-          "shortcode": "DYBe7WZyFVW",
-          "url": "https://www.instagram.com/p/DYBe7WZyFVW/",
-          "type": "video",
-          "likes": 66,
-          "comments": 14,
-          "published_at": "2026-05-07T04:03:46.000Z",
-          "caption_snippet": "RESTO KELUARGA CANTIK & ESTETIK DI SUMMARECON MALL BEKASI 2 ✨ Ga mesti jauh-jauh lagi, sek...",
-          "interactions": 80,
-          "post_er": 0.0239,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DYB1f4CGCmI",
-          "url": "https://www.instagram.com/p/DYB1f4CGCmI/",
-          "type": "carousel",
-          "likes": 22,
-          "comments": 0,
-          "published_at": "2026-05-07T07:14:52.000Z",
-          "caption_snippet": "Now arriving in MOCHA. A subtle, sophisticated update to business-ready travel. @samsonite...",
-          "interactions": 22,
-          "post_er": 0.0066,
-          "performance_label": "underperform"
-        },
-        {
-          "shortcode": "DX_xbRuDEEh",
-          "url": "https://www.instagram.com/p/DX_xbRuDEEh/",
-          "type": "video",
-          "likes": 56,
-          "comments": 3,
-          "published_at": "2026-05-06T12:01:10.000Z",
-          "caption_snippet": "This month of May, as the sun sets, the fire comes alive🥩🔥 Join the hottest club in Beka...",
-          "interactions": 59,
-          "post_er": 0.0176,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DYD-kHymDLW",
-          "url": "https://www.instagram.com/p/DYD-kHymDLW/",
+          "shortcode": "DX3rI0tGNKe",
+          "url": "https://www.instagram.com/p/DX3rI0tGNKe/",
           "type": "carousel",
           "likes": 44,
-          "comments": 0,
-          "published_at": "2026-05-08T03:12:34.000Z",
-          "caption_snippet": "‼️ WEEKEND SHOPPING GUIDE AT SUMMARECON MALL BEKASI ‼️ Enjoy weekend deals with discounts...",
-          "interactions": 44,
-          "post_er": 0.0131,
-          "performance_label": "underperform"
+          "comments": 1,
+          "published_at": "2026-05-03T08:31:56.000Z",
+          "caption_snippet": "Stay active, stay rewarded ⛹️🏊🏻‍♀️ Join the FIT & FORWARD shopping program. Shop your sp...",
+          "interactions": 45,
+          "post_er": 0.0135,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DYEvg3eRzsF",
+          "url": "https://www.instagram.com/p/DYEvg3eRzsF/",
+          "type": "video",
+          "likes": -1,
+          "comments": 206,
+          "published_at": "2026-05-08T10:22:59.000Z",
+          "caption_snippet": "🎊 🎉 SPECIAL GIVEAWAY 🎉🎊 Cara ikutan: 1️⃣ Komen kalian team matcha or coffee 2️⃣ Mentio...",
+          "interactions": 205,
+          "post_er": 0.0613,
+          "performance_label": "normal"
         },
         {
           "shortcode": "DUcHM3aklax",
           "url": "https://www.instagram.com/p/DUcHM3aklax/",
           "type": "carousel",
-          "likes": 159,
-          "comments": 7,
+          "likes": 165,
+          "comments": 8,
           "published_at": "2026-02-07T02:04:14.000Z",
           "caption_snippet": "More shopping, more rewards! 🎉 Calling all Summarecon Mall App members—join our Grand Pri...",
-          "interactions": 166,
-          "post_er": 0.0495,
+          "interactions": 173,
+          "post_er": 0.0517,
           "performance_label": "normal"
         },
         {
-          "shortcode": "DYBiLVJmEj7",
-          "url": "https://www.instagram.com/p/DYBiLVJmEj7/",
+          "shortcode": "DYFPmromHu5",
+          "url": "https://www.instagram.com/p/DYFPmromHu5/",
           "type": "carousel",
-          "likes": 205,
-          "comments": 1,
-          "published_at": "2026-05-07T04:26:02.000Z",
-          "caption_snippet": "<SAVE & SHARE> Yesss! Ini dia rekomendasi film ASIK minggu ini di @cinema.21 XXI SMB✨😎 Bu...",
-          "interactions": 206,
-          "post_er": 0.0615,
+          "likes": 1831,
+          "comments": 14,
+          "published_at": "2026-05-08T15:00:43.000Z",
+          "caption_snippet": "An intimate night filled with beautiful songs and unforgettable performances by @natasyasa...",
+          "interactions": 1845,
+          "post_er": 0.5516,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DYD-kHymDLW",
+          "url": "https://www.instagram.com/p/DYD-kHymDLW/",
+          "type": "carousel",
+          "likes": 119,
+          "comments": 3,
+          "published_at": "2026-05-08T03:12:34.000Z",
+          "caption_snippet": "‼️ WEEKEND SHOPPING GUIDE AT SUMMARECON MALL BEKASI ‼️ Enjoy weekend deals with discounts...",
+          "interactions": 122,
+          "post_er": 0.0365,
           "performance_label": "normal"
         },
         {
-          "shortcode": "DXjm450D7hP",
-          "url": "https://www.instagram.com/p/DXjm450D7hP/",
+          "shortcode": "DYEjFl5GBnd",
+          "url": "https://www.instagram.com/p/DYEjFl5GBnd/",
           "type": "carousel",
-          "likes": 2482,
-          "comments": 72,
-          "published_at": "2026-04-25T13:30:00.000Z",
-          "caption_snippet": "Calling all matcha lovers, coffee addicts & dessert seekers! Your dream event is here 😍🍵...",
-          "interactions": 2554,
-          "post_er": 0.7623,
+          "likes": 3967,
+          "comments": 102,
+          "published_at": "2026-05-08T08:31:43.000Z",
+          "caption_snippet": "⚡️GELEGAR PLN MOBILE EXPERIENCE DAY 2026⚡️ \"Berbagi Terang, Nyalakan Harapan\"💙 Yuk ramaik...",
+          "interactions": 4069,
+          "post_er": 1.2165,
           "performance_label": "viral"
         },
         {
-          "shortcode": "DYCKxs-gYg1",
-          "url": "https://www.instagram.com/p/DYCKxs-gYg1/",
-          "type": "image",
-          "likes": 124,
-          "comments": 162,
-          "published_at": "2026-05-07T10:22:42.000Z",
-          "caption_snippet": "‼️GIVEAWAY ALERT‼️ Calling all Japanese food lovers 🍱🇯🇵✨ Yuk ikutan Giveaway SMB & mena...",
-          "interactions": 286,
-          "post_er": 0.0854,
-          "performance_label": "viral"
+          "shortcode": "DYFAiGsGCRp",
+          "url": "https://www.instagram.com/p/DYFAiGsGCRp/",
+          "type": "carousel",
+          "likes": 161,
+          "comments": 2,
+          "published_at": "2026-05-08T12:49:01.000Z",
+          "caption_snippet": "Today’s Pairing Contest Matcha/Coffee with @yukmakan.channel at Crave Market was full of f...",
+          "interactions": 163,
+          "post_er": 0.0487,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DYGjfXeGD2Q",
+          "url": "https://www.instagram.com/p/DYGjfXeGD2Q/",
+          "type": "carousel",
+          "likes": 12,
+          "comments": 0,
+          "published_at": "2026-05-09T03:13:43.000Z",
+          "caption_snippet": "Banyak event menarik di #WeekendBarengSummarecon yang selalu siap nemenin kamu 🤗 Yuk cata...",
+          "interactions": 12,
+          "post_er": 0.0036,
+          "performance_label": "underperform"
         },
         {
           "shortcode": "DYCab7zh-P6",
           "url": "https://www.instagram.com/p/DYCab7zh-P6/",
           "type": "video",
-          "likes": 210,
-          "comments": 2,
+          "likes": 696,
+          "comments": 7,
           "published_at": "2026-05-07T12:39:13.000Z",
           "caption_snippet": "‼️ONLY 3 DAYS LEFT‼️ Crave Market is still here at Summarecon Mall Bekasi 😱🍵☕🍰 Don’t mi...",
-          "interactions": 212,
-          "post_er": 0.0633,
+          "interactions": 703,
+          "post_er": 0.2102,
           "performance_label": "viral"
         },
         {
-          "shortcode": "DYBVAB3S6qS",
-          "url": "https://www.instagram.com/p/DYBVAB3S6qS/",
-          "type": "video",
-          "likes": 67,
-          "comments": 1,
-          "published_at": "2026-05-07T02:35:25.000Z",
-          "caption_snippet": "POV: you finally booked that massage you’ve been thinking about💆🏻‍♀️✨ With calming aroma...",
-          "interactions": 68,
-          "post_er": 0.0203,
-          "performance_label": "normal"
+          "shortcode": "DXjm450D7hP",
+          "url": "https://www.instagram.com/p/DXjm450D7hP/",
+          "type": "carousel",
+          "likes": 2508,
+          "comments": 74,
+          "published_at": "2026-04-25T13:30:00.000Z",
+          "caption_snippet": "Calling all matcha lovers, coffee addicts & dessert seekers! Your dream event is here 😍🍵...",
+          "interactions": 2582,
+          "post_er": 0.772,
+          "performance_label": "viral"
         },
         {
-          "shortcode": "DX3rI0tGNKe",
-          "url": "https://www.instagram.com/p/DX3rI0tGNKe/",
+          "shortcode": "DYGjmt_xEp1",
+          "url": "https://www.instagram.com/p/DYGjmt_xEp1/",
+          "type": "video",
+          "likes": -1,
+          "comments": 14,
+          "published_at": "2026-05-09T03:16:19.000Z",
+          "caption_snippet": "Newest collection di Adidas SMB 👀 Yang lagi viral udah masuk nih, mulai dari Adidas Cheon...",
+          "interactions": 13,
+          "post_er": 0.0039,
+          "performance_label": "underperform"
+        },
+        {
+          "shortcode": "DYENLBCmNjk",
+          "url": "https://www.instagram.com/p/DYENLBCmNjk/",
           "type": "carousel",
-          "likes": 35,
-          "comments": 0,
-          "published_at": "2026-05-03T08:31:56.000Z",
-          "caption_snippet": "Stay active, stay rewarded ⛹️🏊🏻‍♀️ Join the FIT & FORWARD shopping program. Shop your sp...",
+          "likes": 33,
+          "comments": 2,
+          "published_at": "2026-05-08T05:20:13.000Z",
+          "caption_snippet": "Lebih dekat, lebih lengkap! 🙌 Atalon Sportswear akhirnya hadir di SMB 1, 2nd floor Buat k...",
           "interactions": 35,
-          "post_er": 0.0104,
+          "post_er": 0.0105,
           "performance_label": "underperform"
         }
       ],
-      "average_likes": 337.83,
-      "average_comments": 23.17,
-      "average_post_er": 0.1077,
+      "average_likes": 794.5,
+      "average_comments": 36.08,
+      "average_post_er": 0.2483,
       "dominant_type": "carousel",
       "top_hashtags": [
-        "#summareconmallbekasi",
         "#yourmallyourhome",
-        "#thenextlevellifestyle"
+        "#thenextlevellifestyle",
+        "#smbrumahke2ku"
       ],
       "campaign_terms": [
-        "weekend deals",
-        "shopping guide",
-        "promo",
         "reward",
         "voucher",
-        "grand prize",
+        "limited",
         "free",
-        "event",
-        "workshop",
-        "festival",
-        "crave market",
-        "is here",
         "giveaway",
-        "limited"
+        "workshop",
+        "crave market",
+        "promo",
+        "grand prize",
+        "weekend deals",
+        "shopping guide",
+        "contest",
+        "festival",
+        "event",
+        "is here",
+        "diskon"
       ],
       "viral_posts": 4,
       "underperform_posts": 3
@@ -4444,18 +4497,6 @@
           "performance_label": "underperform"
         },
         {
-          "shortcode": "DYCBmq1iEIP",
-          "url": "https://www.instagram.com/p/DYCBmq1iEIP/",
-          "type": "carousel",
-          "likes": 3,
-          "comments": 0,
-          "published_at": "2026-05-07T09:00:39.000Z",
-          "caption_snippet": "Meet Solaris Collection by Lino & Sons — Terinspirasi dari kehangatan matahari dan kilau l...",
-          "interactions": 3,
-          "post_er": 0.0041,
-          "performance_label": "underperform"
-        },
-        {
           "shortcode": "DYBz6N0CTy9",
           "url": "https://www.instagram.com/p/DYBz6N0CTy9/",
           "type": "carousel",
@@ -4468,73 +4509,73 @@
           "performance_label": "underperform"
         },
         {
-          "shortcode": "DX_szzQRJNJ",
-          "url": "https://www.instagram.com/p/DX_szzQRJNJ/",
-          "type": "video",
-          "likes": 115,
-          "comments": 3,
-          "published_at": "2026-05-06T11:22:40.000Z",
-          "caption_snippet": "Hi, Sobat Pakuwon! Berani masuk ke dunia lain? 👀👻 Ada kesempatan buat kamu nonton 𝐓𝐞𝐚...",
-          "interactions": 118,
-          "post_er": 0.1612,
-          "performance_label": "viral"
+          "shortcode": "DYEDeuWka3l",
+          "url": "https://www.instagram.com/p/DYEDeuWka3l/",
+          "type": "carousel",
+          "likes": 14,
+          "comments": 0,
+          "published_at": "2026-05-08T03:55:31.000Z",
+          "caption_snippet": "𝙒𝙚𝙚𝙠𝙚𝙣𝙙 𝙑𝙞𝙗𝙚𝙨 𝙞𝙨 𝙃𝙚𝙧𝙚! Main✅ Belanja✅ Kulineran✅ Semua bisa di Pakuwon M...",
+          "interactions": 14,
+          "post_er": 0.0191,
+          "performance_label": "normal"
         },
         {
-          "shortcode": "DYAAsGgz5Gq",
-          "url": "https://www.instagram.com/p/DYAAsGgz5Gq/",
-          "type": "video",
-          "likes": 452,
-          "comments": 6,
-          "published_at": "2026-05-06T14:15:35.000Z",
-          "caption_snippet": "Belanja di Mall Mall ini bisa dapetin BYD Sealion, Zenix, Geely, Emas dan masih banyak lai...",
-          "interactions": 458,
-          "post_er": 0.6255,
+          "shortcode": "DXDsKaVEbW1",
+          "url": "https://www.instagram.com/p/DXDsKaVEbW1/",
+          "type": "carousel",
+          "likes": 84,
+          "comments": 31,
+          "published_at": "2026-04-13T04:00:00.000Z",
+          "caption_snippet": "𝟓𝟎% 𝐂𝐀𝐒𝐇𝐁𝐀𝐂𝐊? 𝐘𝐄𝐒, 𝐏𝐋𝐄𝐀𝐒𝐄! 🚨 Nikmatin 50% Dining Cashback di Pakuwon M...",
+          "interactions": 115,
+          "post_er": 0.1571,
           "performance_label": "viral"
         },
         {
           "shortcode": "DYCPXqdT98C",
           "url": "https://www.instagram.com/p/DYCPXqdT98C/",
           "type": "video",
-          "likes": 30,
+          "likes": 39,
           "comments": 0,
           "published_at": "2026-05-07T11:00:00.000Z",
           "caption_snippet": "Belanja tapi malah DAPET VOUCHER GRATIS ⁉️ Cuman di Pakuwon Mall Bekasi kalian bisa belanj...",
-          "interactions": 30,
-          "post_er": 0.041,
-          "performance_label": "normal"
+          "interactions": 39,
+          "post_er": 0.0533,
+          "performance_label": "viral"
         },
         {
-          "shortcode": "DX_qixhkSaE",
-          "url": "https://www.instagram.com/p/DX_qixhkSaE/",
+          "shortcode": "DYGo1o8AT12",
+          "url": "https://www.instagram.com/p/DYGo1o8AT12/",
           "type": "carousel",
-          "likes": 12,
+          "likes": 0,
           "comments": 0,
-          "published_at": "2026-05-06T11:00:00.000Z",
-          "caption_snippet": "Sudah siap menyambut koleksi spesial Bath & Body Works X Disney Princess? 👑✨ Rasakan sent...",
-          "interactions": 12,
-          "post_er": 0.0164,
-          "performance_label": "normal"
-        },
-        {
-          "shortcode": "DYEDeuWka3l",
-          "url": "https://www.instagram.com/p/DYEDeuWka3l/",
-          "type": "carousel",
-          "likes": 2,
-          "comments": 0,
-          "published_at": "2026-05-08T03:55:31.000Z",
-          "caption_snippet": "𝙒𝙚𝙚𝙠𝙚𝙣𝙙 𝙑𝙞𝙗𝙚𝙨 𝙞𝙨 𝙃𝙚𝙧𝙚! Main✅ Belanja✅ Kulineran✅ Semua bisa di Pakuwon M...",
-          "interactions": 2,
-          "post_er": 0.0027,
+          "published_at": "2026-05-09T04:00:27.000Z",
+          "caption_snippet": "Bring the quiet comfort of a spa into your everyday ritual. @sensatiabotanicals bath and b...",
+          "interactions": 0,
+          "post_er": 0,
           "performance_label": "underperform"
         },
         {
-          "shortcode": "DYCPXOSEQh1",
-          "url": "https://www.instagram.com/p/DYCPXOSEQh1/",
+          "shortcode": "DYAAsGgz5Gq",
+          "url": "https://www.instagram.com/p/DYAAsGgz5Gq/",
+          "type": "video",
+          "likes": 488,
+          "comments": 6,
+          "published_at": "2026-05-06T14:15:35.000Z",
+          "caption_snippet": "Belanja di Mall Mall ini bisa dapetin BYD Sealion, Zenix, Geely, Emas dan masih banyak lai...",
+          "interactions": 494,
+          "post_er": 0.6748,
+          "performance_label": "viral"
+        },
+        {
+          "shortcode": "DYEEDMxmpB0",
+          "url": "https://www.instagram.com/p/DYEEDMxmpB0/",
           "type": "carousel",
           "likes": 9,
           "comments": 0,
-          "published_at": "2026-05-07T11:00:00.000Z",
-          "caption_snippet": "✨𝐍𝐨𝐰 𝐏𝐥𝐚𝐲𝐢𝐧𝐠 𝐚𝐭 𝐏𝐚𝐤𝐮𝐰𝐨𝐧 𝐌𝐚𝐥𝐥 𝐁𝐞𝐤𝐚𝐬𝐢✨ 🎬 Salmokji: Whispering...",
+          "published_at": "2026-05-08T07:00:00.000Z",
+          "caption_snippet": "Wujudkan impian ke China, Korea & Japan dengan harga terbaik di booth Dwidayatour. Nikmati...",
           "interactions": 9,
           "post_er": 0.0123,
           "performance_label": "normal"
@@ -4543,30 +4584,42 @@
           "shortcode": "DYBglWdpQil",
           "url": "https://www.instagram.com/p/DYBglWdpQil/",
           "type": "video",
-          "likes": 251,
-          "comments": 11,
+          "likes": 391,
+          "comments": 16,
           "published_at": "2026-05-07T04:16:14.000Z",
           "caption_snippet": "CASHBACK 50% CUMA DI PAKUWON MALL BEKASI ‼️ Kapan lagi bisa makan di resto enak cuma bayar...",
-          "interactions": 262,
-          "post_er": 0.3578,
+          "interactions": 407,
+          "post_er": 0.556,
           "performance_label": "viral"
         },
         {
-          "shortcode": "DXDsKaVEbW1",
-          "url": "https://www.instagram.com/p/DXDsKaVEbW1/",
+          "shortcode": "DYCPXOSEQh1",
+          "url": "https://www.instagram.com/p/DYCPXOSEQh1/",
           "type": "carousel",
-          "likes": 80,
-          "comments": 31,
-          "published_at": "2026-04-13T04:00:00.000Z",
-          "caption_snippet": "𝟓𝟎% 𝐂𝐀𝐒𝐇𝐁𝐀𝐂𝐊? 𝐘𝐄𝐒, 𝐏𝐋𝐄𝐀𝐒𝐄! 🚨 Nikmatin 50% Dining Cashback di Pakuwon M...",
-          "interactions": 111,
-          "post_er": 0.1516,
-          "performance_label": "viral"
+          "likes": 11,
+          "comments": 0,
+          "published_at": "2026-05-07T11:00:00.000Z",
+          "caption_snippet": "✨𝐍𝐨𝐰 𝐏𝐥𝐚𝐲𝐢𝐧𝐠 𝐚𝐭 𝐏𝐚𝐤𝐮𝐰𝐨𝐧 𝐌𝐚𝐥𝐥 𝐁𝐞𝐤𝐚𝐬𝐢✨ 🎬 Salmokji: Whispering...",
+          "interactions": 11,
+          "post_er": 0.015,
+          "performance_label": "normal"
+        },
+        {
+          "shortcode": "DYCBmq1iEIP",
+          "url": "https://www.instagram.com/p/DYCBmq1iEIP/",
+          "type": "carousel",
+          "likes": 3,
+          "comments": 0,
+          "published_at": "2026-05-07T09:00:39.000Z",
+          "caption_snippet": "Meet Solaris Collection by Lino & Sons — Terinspirasi dari kehangatan matahari dan kilau l...",
+          "interactions": 3,
+          "post_er": 0.0041,
+          "performance_label": "underperform"
         }
       ],
-      "average_likes": 81.25,
-      "average_comments": 4.33,
-      "average_post_er": 0.1169,
+      "average_likes": 88.33,
+      "average_comments": 4.5,
+      "average_post_er": 0.1268,
       "dominant_type": "carousel",
       "top_hashtags": [
         "#pakuwonmallbekasi",
@@ -4576,11 +4629,11 @@
       "campaign_terms": [
         "belanja",
         "diskon",
-        "giveaway",
-        "voucher",
-        "cashback",
         "promo",
-        "limited"
+        "cashback",
+        "voucher",
+        "limited",
+        "free"
       ],
       "viral_posts": 4,
       "underperform_posts": 4
@@ -4588,10 +4641,10 @@
   },
   "presentation_report": {
     "meta": {
-      "generatedAt": "2026-05-08T04:02:56.333Z",
-      "generatedAtWib": "2026-05-08T11:02:56+07:00",
+      "generatedAt": "2026-05-09T04:02:49.346Z",
+      "generatedAtWib": "2026-05-09T11:02:49+07:00",
       "accountCount": 5,
-      "historyDays": 71,
+      "historyDays": 72,
       "source": [
         "SocialBlade",
         "Apify",
@@ -4602,8 +4655,8 @@
     "cover": {
       "title": "Instagram Competitor Performance Report",
       "subtitle": "Laporan ringkas performa kompetitor Instagram",
-      "periodLabel": "Update: 08 Mei 2026",
-      "scopeLabel": "5 akun dipantau · 71 hari histori",
+      "periodLabel": "Update: 09 Mei 2026",
+      "scopeLabel": "5 akun dipantau · 72 hari histori",
       "brand": {
         "name": "Metropolitan Mall Bekasi",
         "theme": {
@@ -4619,19 +4672,19 @@
           "key": "top_followers",
           "label": "Top Followers",
           "account": "summareconmal.bekasi",
-          "value": "335K"
+          "value": "334.5K"
         },
         {
           "key": "top_engagement",
           "label": "Top Engagement",
-          "account": "grandmetropolitan",
-          "value": "0.23%"
+          "account": "summareconmal.bekasi",
+          "value": "0.25%"
         },
         {
           "key": "fastest_growth",
           "label": "Fastest Growth",
           "account": "pakuwonmallbekasi",
-          "value": "+0.59%"
+          "value": "+0.57%"
         },
         {
           "key": "top_content_format",
@@ -4643,7 +4696,7 @@
           "key": "top_campaign",
           "label": "Tema Campaign Teratas",
           "account": null,
-          "value": "voucher"
+          "value": "promo"
         },
         {
           "key": "most_viral_account",
@@ -4654,83 +4707,83 @@
         {
           "key": "best_avg_post_er",
           "label": "Avg Post ER Tertinggi",
-          "account": "grandmetropolitan",
-          "value": "0.23%"
+          "account": "summareconmal.bekasi",
+          "value": "0.25%"
         }
       ],
       "bullets": [
         "@summareconmal.bekasi masih memimpin dari sisi ukuran audiens dan menjadi patokan awareness di periode ini.",
-        "Meski skalanya tidak terbesar, @grandmetropolitan mencatat kualitas interaksi terbaik di periode ini.",
-        "Tema voucher paling sering muncul, dengan format Carousel terlihat paling konsisten dipakai."
+        "@summareconmal.bekasi unggul dari sisi kualitas interaksi dan efisiensi konten.",
+        "Tema promo paling sering muncul, dengan format Carousel terlihat paling konsisten dipakai."
       ]
     },
     "competitiveOverview": [
       {
         "account": "metmalbekasi",
-        "followers": 97644,
-        "followersLabel": "97.6K",
-        "growth": -0.5,
-        "growthLabel": "-0.50%",
+        "followers": 97331,
+        "followersLabel": "97.3K",
+        "growth": -0.75,
+        "growthLabel": "-0.75%",
         "engagementRate": 0.04,
         "engagementRateLabel": "0.04%",
-        "avgPostEr": 0.0444,
+        "avgPostEr": 0.041,
         "avgPostErLabel": "0.04%",
+        "dominantType": "carousel",
+        "viralPosts": 4,
+        "positioningTag": "Watchlist"
+      },
+      {
+        "account": "grandmetropolitan",
+        "followers": 94837,
+        "followersLabel": "94.8K",
+        "growth": -0.21,
+        "growthLabel": "-0.21%",
+        "engagementRate": 0.19,
+        "engagementRateLabel": "0.19%",
+        "avgPostEr": 0.1896,
+        "avgPostErLabel": "0.19%",
         "dominantType": "carousel",
         "viralPosts": 4,
         "positioningTag": "Stable Player"
       },
       {
-        "account": "grandmetropolitan",
-        "followers": 95002,
-        "followersLabel": "95K",
-        "growth": -0.02,
-        "growthLabel": "-0.02%",
-        "engagementRate": 0.23,
-        "engagementRateLabel": "0.23%",
-        "avgPostEr": 0.2345,
-        "avgPostErLabel": "0.23%",
-        "dominantType": "carousel",
-        "viralPosts": 4,
-        "positioningTag": "High Engagement"
-      },
-      {
         "account": "metmalcileungsi",
-        "followers": 82767,
+        "followers": 82780,
         "followersLabel": "82.8K",
         "growth": -0.86,
         "growthLabel": "-0.86%",
-        "engagementRate": 0.1,
-        "engagementRateLabel": "0.1%",
-        "avgPostEr": 0.0974,
-        "avgPostErLabel": "0.1%",
-        "dominantType": "video",
+        "engagementRate": 0.12,
+        "engagementRateLabel": "0.12%",
+        "avgPostEr": 0.1213,
+        "avgPostErLabel": "0.12%",
+        "dominantType": "image",
         "viralPosts": 4,
-        "positioningTag": "Watchlist"
+        "positioningTag": "Stable Player"
       },
       {
         "account": "summareconmal.bekasi",
-        "followers": 335030,
-        "followersLabel": "335K",
-        "growth": -0.36,
-        "growthLabel": "-0.36%",
-        "engagementRate": 0.11,
-        "engagementRateLabel": "0.11%",
-        "avgPostEr": 0.1077,
-        "avgPostErLabel": "0.11%",
+        "followers": 334471,
+        "followersLabel": "334.5K",
+        "growth": -0.58,
+        "growthLabel": "-0.58%",
+        "engagementRate": 0.25,
+        "engagementRateLabel": "0.25%",
+        "avgPostEr": 0.2483,
+        "avgPostErLabel": "0.25%",
         "dominantType": "carousel",
         "viralPosts": 4,
         "positioningTag": "Leader"
       },
       {
         "account": "pakuwonmallbekasi",
-        "followers": 73216,
+        "followers": 73205,
         "followersLabel": "73.2K",
-        "growth": 0.59,
-        "growthLabel": "+0.59%",
-        "engagementRate": 0.12,
-        "engagementRateLabel": "0.12%",
-        "avgPostEr": 0.1169,
-        "avgPostErLabel": "0.12%",
+        "growth": 0.57,
+        "growthLabel": "+0.57%",
+        "engagementRate": 0.13,
+        "engagementRateLabel": "0.13%",
+        "avgPostEr": 0.1268,
+        "avgPostErLabel": "0.13%",
         "dominantType": "carousel",
         "viralPosts": 4,
         "positioningTag": "Challenger"
@@ -4740,50 +4793,50 @@
       "followersRanking": [
         {
           "account": "summareconmal.bekasi",
-          "value": 335030,
-          "label": "335K"
+          "value": 334471,
+          "label": "334.5K"
         },
         {
           "account": "metmalbekasi",
-          "value": 97644,
-          "label": "97.6K"
+          "value": 97331,
+          "label": "97.3K"
         },
         {
           "account": "grandmetropolitan",
-          "value": 95002,
-          "label": "95K"
+          "value": 94837,
+          "label": "94.8K"
         },
         {
           "account": "metmalcileungsi",
-          "value": 82767,
+          "value": 82780,
           "label": "82.8K"
         },
         {
           "account": "pakuwonmallbekasi",
-          "value": 73216,
+          "value": 73205,
           "label": "73.2K"
         }
       ],
       "growthRanking": [
         {
           "account": "pakuwonmallbekasi",
-          "value": 0.59,
-          "label": "+0.59%"
+          "value": 0.57,
+          "label": "+0.57%"
         },
         {
           "account": "grandmetropolitan",
-          "value": -0.02,
-          "label": "-0.02%"
+          "value": -0.21,
+          "label": "-0.21%"
         },
         {
           "account": "summareconmal.bekasi",
-          "value": -0.36,
-          "label": "-0.36%"
+          "value": -0.58,
+          "label": "-0.58%"
         },
         {
           "account": "metmalbekasi",
-          "value": -0.5,
-          "label": "-0.50%"
+          "value": -0.75,
+          "label": "-0.75%"
         },
         {
           "account": "metmalcileungsi",
@@ -4794,18 +4847,18 @@
       "roles": [
         {
           "account": "metmalbekasi",
+          "role": "Watchlist",
+          "reason": "Layak dipantau lebih dekat karena menunjukkan sinyal performa yang menonjol atau belum stabil."
+        },
+        {
+          "account": "grandmetropolitan",
           "role": "Stable Player",
           "reason": "Performa relatif stabil dan konsisten di periode ini."
         },
         {
-          "account": "grandmetropolitan",
-          "role": "High Engagement",
-          "reason": "Memiliki kualitas interaksi paling kuat dibanding akun lain."
-        },
-        {
           "account": "metmalcileungsi",
-          "role": "Watchlist",
-          "reason": "Layak dipantau lebih dekat karena menunjukkan sinyal performa yang menonjol atau belum stabil."
+          "role": "Stable Player",
+          "reason": "Performa relatif stabil dan konsisten di periode ini."
         },
         {
           "account": "summareconmal.bekasi",
@@ -4821,70 +4874,70 @@
       "overviewRows": [
         {
           "account": "metmalbekasi",
-          "followers": 97644,
-          "followersLabel": "97.6K",
-          "growth": -0.5,
-          "growthLabel": "-0.50%",
+          "followers": 97331,
+          "followersLabel": "97.3K",
+          "growth": -0.75,
+          "growthLabel": "-0.75%",
           "engagementRate": 0.04,
           "engagementRateLabel": "0.04%",
-          "avgPostEr": 0.0444,
+          "avgPostEr": 0.041,
           "avgPostErLabel": "0.04%",
+          "dominantType": "carousel",
+          "viralPosts": 4,
+          "positioningTag": "Watchlist"
+        },
+        {
+          "account": "grandmetropolitan",
+          "followers": 94837,
+          "followersLabel": "94.8K",
+          "growth": -0.21,
+          "growthLabel": "-0.21%",
+          "engagementRate": 0.19,
+          "engagementRateLabel": "0.19%",
+          "avgPostEr": 0.1896,
+          "avgPostErLabel": "0.19%",
           "dominantType": "carousel",
           "viralPosts": 4,
           "positioningTag": "Stable Player"
         },
         {
-          "account": "grandmetropolitan",
-          "followers": 95002,
-          "followersLabel": "95K",
-          "growth": -0.02,
-          "growthLabel": "-0.02%",
-          "engagementRate": 0.23,
-          "engagementRateLabel": "0.23%",
-          "avgPostEr": 0.2345,
-          "avgPostErLabel": "0.23%",
-          "dominantType": "carousel",
-          "viralPosts": 4,
-          "positioningTag": "High Engagement"
-        },
-        {
           "account": "metmalcileungsi",
-          "followers": 82767,
+          "followers": 82780,
           "followersLabel": "82.8K",
           "growth": -0.86,
           "growthLabel": "-0.86%",
-          "engagementRate": 0.1,
-          "engagementRateLabel": "0.1%",
-          "avgPostEr": 0.0974,
-          "avgPostErLabel": "0.1%",
-          "dominantType": "video",
+          "engagementRate": 0.12,
+          "engagementRateLabel": "0.12%",
+          "avgPostEr": 0.1213,
+          "avgPostErLabel": "0.12%",
+          "dominantType": "image",
           "viralPosts": 4,
-          "positioningTag": "Watchlist"
+          "positioningTag": "Stable Player"
         },
         {
           "account": "summareconmal.bekasi",
-          "followers": 335030,
-          "followersLabel": "335K",
-          "growth": -0.36,
-          "growthLabel": "-0.36%",
-          "engagementRate": 0.11,
-          "engagementRateLabel": "0.11%",
-          "avgPostEr": 0.1077,
-          "avgPostErLabel": "0.11%",
+          "followers": 334471,
+          "followersLabel": "334.5K",
+          "growth": -0.58,
+          "growthLabel": "-0.58%",
+          "engagementRate": 0.25,
+          "engagementRateLabel": "0.25%",
+          "avgPostEr": 0.2483,
+          "avgPostErLabel": "0.25%",
           "dominantType": "carousel",
           "viralPosts": 4,
           "positioningTag": "Leader"
         },
         {
           "account": "pakuwonmallbekasi",
-          "followers": 73216,
+          "followers": 73205,
           "followersLabel": "73.2K",
-          "growth": 0.59,
-          "growthLabel": "+0.59%",
-          "engagementRate": 0.12,
-          "engagementRateLabel": "0.12%",
-          "avgPostEr": 0.1169,
-          "avgPostErLabel": "0.12%",
+          "growth": 0.57,
+          "growthLabel": "+0.57%",
+          "engagementRate": 0.13,
+          "engagementRateLabel": "0.13%",
+          "avgPostEr": 0.1268,
+          "avgPostErLabel": "0.13%",
           "dominantType": "carousel",
           "viralPosts": 4,
           "positioningTag": "Challenger"
@@ -4892,7 +4945,7 @@
       ]
     },
     "campaignAnalysis": {
-      "topCampaignTerm": "voucher",
+      "topCampaignTerm": "promo",
       "topHashtag": "#metropolitanmallbekasi",
       "topContentFormat": "carousel",
       "accounts": [
@@ -4900,23 +4953,23 @@
           "account": "metmalbekasi",
           "campaignTerms": [
             "promo",
-            "diskon",
-            "new tenant"
+            "new tenant",
+            "coming soon"
           ],
           "topHashtags": [
             "#metropolitanmallbekasi",
-            "#mmbekasi",
-            "#ramenya"
+            "#promo",
+            "#mensfashion"
           ],
           "dominantType": "carousel",
-          "campaignIntensity": 11
+          "campaignIntensity": 10
         },
         {
           "account": "grandmetropolitan",
           "campaignTerms": [
-            "event",
-            "diskon",
-            "promo"
+            "promo",
+            "belanja",
+            "hemat"
           ],
           "topHashtags": [
             "#eventbekasi",
@@ -4924,44 +4977,44 @@
             "#bekasievent"
           ],
           "dominantType": "carousel",
-          "campaignIntensity": 4
+          "campaignIntensity": 6
         },
         {
           "account": "metmalcileungsi",
           "campaignTerms": [
-            "bazaar",
             "event",
-            "urban fest"
+            "urban fest",
+            "bazaar"
           ],
           "topHashtags": [
             "#cileungsi",
             "#metmallcileungsi",
-            "#mmc"
+            "#metropolitanmallcileungsi"
           ],
-          "dominantType": "video",
-          "campaignIntensity": 5
+          "dominantType": "image",
+          "campaignIntensity": 7
         },
         {
           "account": "summareconmal.bekasi",
           "campaignTerms": [
-            "weekend deals",
-            "shopping guide",
-            "promo"
+            "reward",
+            "voucher",
+            "limited"
           ],
           "topHashtags": [
-            "#summareconmallbekasi",
             "#yourmallyourhome",
-            "#thenextlevellifestyle"
+            "#thenextlevellifestyle",
+            "#smbrumahke2ku"
           ],
           "dominantType": "carousel",
-          "campaignIntensity": 14
+          "campaignIntensity": 16
         },
         {
           "account": "pakuwonmallbekasi",
           "campaignTerms": [
             "belanja",
             "diskon",
-            "giveaway"
+            "promo"
           ],
           "topHashtags": [
             "#pakuwonmallbekasi",
@@ -4973,18 +5026,18 @@
         }
       ],
       "summary": [
-        "Tema voucher muncul paling sering lintas akun.",
+        "Tema promo muncul paling sering lintas akun.",
         "Format Carousel menjadi format paling konsisten dipakai."
       ]
     },
     "contentSnapshot": [
       {
         "account": "metmalbekasi",
-        "averageLikes": 40.42,
-        "averageLikesLabel": "40.42",
-        "averageComments": 2.92,
-        "averageCommentsLabel": "2.92",
-        "averagePostEr": 0.0444,
+        "averageLikes": 37.25,
+        "averageLikesLabel": "37.25",
+        "averageComments": 2.67,
+        "averageCommentsLabel": "2.67",
+        "averagePostEr": 0.041,
         "averagePostErLabel": "0.04%",
         "viralPosts": 4,
         "underperformPosts": 3,
@@ -4993,12 +5046,12 @@
       },
       {
         "account": "grandmetropolitan",
-        "averageLikes": 213.83,
-        "averageLikesLabel": "213.83",
-        "averageComments": 8.92,
-        "averageCommentsLabel": "8.92",
-        "averagePostEr": 0.2345,
-        "averagePostErLabel": "0.23%",
+        "averageLikes": 170,
+        "averageLikesLabel": "170",
+        "averageComments": 9.83,
+        "averageCommentsLabel": "9.83",
+        "averagePostEr": 0.1896,
+        "averagePostErLabel": "0.19%",
         "viralPosts": 4,
         "underperformPosts": 3,
         "dominantType": "carousel",
@@ -5006,25 +5059,25 @@
       },
       {
         "account": "metmalcileungsi",
-        "averageLikes": 74.75,
-        "averageLikesLabel": "74.75",
-        "averageComments": 5.83,
-        "averageCommentsLabel": "5.83",
-        "averagePostEr": 0.0974,
-        "averagePostErLabel": "0.1%",
+        "averageLikes": 92.75,
+        "averageLikesLabel": "92.75",
+        "averageComments": 7.67,
+        "averageCommentsLabel": "7.67",
+        "averagePostEr": 0.1213,
+        "averagePostErLabel": "0.12%",
         "viralPosts": 4,
-        "underperformPosts": 4,
-        "dominantType": "video",
-        "qualityTag": "Needs Attention"
+        "underperformPosts": 3,
+        "dominantType": "image",
+        "qualityTag": "Strong"
       },
       {
         "account": "summareconmal.bekasi",
-        "averageLikes": 337.83,
-        "averageLikesLabel": "337.83",
-        "averageComments": 23.17,
-        "averageCommentsLabel": "23.17",
-        "averagePostEr": 0.1077,
-        "averagePostErLabel": "0.11%",
+        "averageLikes": 794.5,
+        "averageLikesLabel": "794.5",
+        "averageComments": 36.08,
+        "averageCommentsLabel": "36.08",
+        "averagePostEr": 0.2483,
+        "averagePostErLabel": "0.25%",
         "viralPosts": 4,
         "underperformPosts": 3,
         "dominantType": "carousel",
@@ -5032,12 +5085,12 @@
       },
       {
         "account": "pakuwonmallbekasi",
-        "averageLikes": 81.25,
-        "averageLikesLabel": "81.25",
-        "averageComments": 4.33,
-        "averageCommentsLabel": "4.33",
-        "averagePostEr": 0.1169,
-        "averagePostErLabel": "0.12%",
+        "averageLikes": 88.33,
+        "averageLikesLabel": "88.33",
+        "averageComments": 4.5,
+        "averageCommentsLabel": "4.5",
+        "averagePostEr": 0.1268,
+        "averagePostErLabel": "0.13%",
         "viralPosts": 4,
         "underperformPosts": 4,
         "dominantType": "carousel",
@@ -5047,94 +5100,110 @@
     "viralHighlights": [
       {
         "rank": 1,
+        "account": "summareconmal.bekasi",
+        "captionSnippet": "⚡️GELEGAR PLN MOBILE EXPERIENCE DAY 2026⚡️ \"Berbagi Terang, Nyalakan Harapan\"💙 Yuk ramaik...",
+        "type": "carousel",
+        "likes": 3967,
+        "comments": 102,
+        "postEr": 1.2165,
+        "postErLabel": "1.22%",
+        "publishedAt": "2026-05-08T08:31:43.000Z",
+        "publishedAtLabel": "08 Mei 2026",
+        "performanceLabel": "viral",
+        "campaignTerms": [
+          "reward",
+          "voucher",
+          "limited",
+          "free",
+          "giveaway",
+          "workshop",
+          "crave market",
+          "promo",
+          "grand prize",
+          "weekend deals",
+          "shopping guide",
+          "contest",
+          "festival",
+          "event",
+          "is here",
+          "diskon"
+        ],
+        "url": "https://www.instagram.com/p/DYEjFl5GBnd/"
+      },
+      {
+        "rank": 2,
         "account": "grandmetropolitan",
         "captionSnippet": "✨𝐌𝐀𝐘𝐆𝐈𝐂𝐀𝐋 𝐉𝐎𝐔𝐑𝐍𝐄𝐘✨ Ini dia keseruan dari rangkaian event 𝐌𝐚𝐲𝐠𝐢𝐜𝐚𝐥 \ud835...",
         "type": "carousel",
-        "likes": 928,
-        "comments": 46,
-        "postEr": 1.0252,
-        "postErLabel": "1.03%",
+        "likes": 994,
+        "comments": 66,
+        "postEr": 1.1177,
+        "postErLabel": "1.12%",
         "publishedAt": "2026-05-01T03:52:06.000Z",
         "publishedAtLabel": "01 Mei 2026",
         "performanceLabel": "viral",
         "campaignTerms": [
-          "event",
-          "diskon",
           "promo",
-          "voucher"
+          "belanja",
+          "hemat",
+          "voucher",
+          "event",
+          "diskon"
         ],
         "url": "https://www.instagram.com/p/DXyBhhJGLVa/"
       },
       {
-        "rank": 2,
+        "rank": 3,
         "account": "summareconmal.bekasi",
         "captionSnippet": "Calling all matcha lovers, coffee addicts & dessert seekers! Your dream event is here 😍🍵...",
         "type": "carousel",
-        "likes": 2482,
-        "comments": 72,
-        "postEr": 0.7623,
-        "postErLabel": "0.76%",
+        "likes": 2508,
+        "comments": 74,
+        "postEr": 0.772,
+        "postErLabel": "0.77%",
         "publishedAt": "2026-04-25T13:30:00.000Z",
         "publishedAtLabel": "25 Apr 2026",
         "performanceLabel": "viral",
         "campaignTerms": [
-          "weekend deals",
-          "shopping guide",
-          "promo",
           "reward",
           "voucher",
-          "grand prize",
+          "limited",
           "free",
-          "event",
-          "workshop",
-          "festival",
-          "crave market",
-          "is here",
           "giveaway",
-          "limited"
+          "workshop",
+          "crave market",
+          "promo",
+          "grand prize",
+          "weekend deals",
+          "shopping guide",
+          "contest",
+          "festival",
+          "event",
+          "is here",
+          "diskon"
         ],
         "url": "https://www.instagram.com/p/DXjm450D7hP/"
-      },
-      {
-        "rank": 3,
-        "account": "grandmetropolitan",
-        "captionSnippet": "✨TRIBUTE TO OASIS✨ Siap-siap buat sing along sekeras mungkin! Akhir bulan ini kita bakal b...",
-        "type": "carousel",
-        "likes": 621,
-        "comments": 20,
-        "postEr": 0.6747,
-        "postErLabel": "0.67%",
-        "publishedAt": "2026-05-07T10:01:44.000Z",
-        "publishedAtLabel": "07 Mei 2026",
-        "performanceLabel": "viral",
-        "campaignTerms": [
-          "event",
-          "diskon",
-          "promo",
-          "voucher"
-        ],
-        "url": "https://www.instagram.com/p/DYCImCtGD6n/"
       },
       {
         "rank": 4,
         "account": "pakuwonmallbekasi",
         "captionSnippet": "Belanja di Mall Mall ini bisa dapetin BYD Sealion, Zenix, Geely, Emas dan masih banyak lai...",
         "type": "video",
-        "likes": 452,
+        "likes": 488,
         "comments": 6,
-        "postEr": 0.6255,
-        "postErLabel": "0.63%",
+        "postEr": 0.6748,
+        "postErLabel": "0.67%",
         "publishedAt": "2026-05-06T14:15:35.000Z",
         "publishedAtLabel": "06 Mei 2026",
         "performanceLabel": "viral",
         "campaignTerms": [
           "belanja",
           "diskon",
-          "giveaway",
-          "voucher",
-          "cashback",
           "promo",
-          "limited"
+          "cashback",
+          "voucher",
+          "limited",
+          "free"
         ],
         "url": "https://www.instagram.com/p/DYAAsGgz5Gq/"
       },
@@ -5143,18 +5212,20 @@
         "account": "grandmetropolitan",
         "captionSnippet": "✨MAYGICAL JOURNEY✨ Ini dia keseruan dari rangkaian event Maygical Journey (1 - 31 May 2026...",
         "type": "carousel",
-        "likes": 489,
-        "comments": 13,
-        "postEr": 0.5284,
-        "postErLabel": "0.53%",
+        "likes": 520,
+        "comments": 14,
+        "postEr": 0.5631,
+        "postErLabel": "0.56%",
         "publishedAt": "2026-05-04T03:22:02.000Z",
         "publishedAtLabel": "04 Mei 2026",
         "performanceLabel": "viral",
         "campaignTerms": [
-          "event",
-          "diskon",
           "promo",
-          "voucher"
+          "belanja",
+          "hemat",
+          "voucher",
+          "event",
+          "diskon"
         ],
         "url": "https://www.instagram.com/p/DX5sd-8mB40/"
       }
@@ -5162,28 +5233,24 @@
     "opportunities": {
       "accountsNeedingAttention": [
         {
-          "account": "metmalcileungsi",
+          "account": "pakuwonmallbekasi",
           "reason": "Jumlah post perlu optimasi termasuk tinggi (4 post)."
         },
         {
-          "account": "pakuwonmallbekasi",
-          "reason": "Jumlah post perlu optimasi termasuk tinggi (4 post)."
+          "account": "metmalbekasi",
+          "reason": "Jumlah post perlu optimasi termasuk tinggi (3 post)."
         }
       ],
       "weakPatterns": [
-        "@metmalcileungsi memiliki post perlu optimasi paling banyak di periode ini.",
+        "@pakuwonmallbekasi memiliki post perlu optimasi paling banyak di periode ini.",
         "Intensitas campaign belum selalu diikuti performa interaksi yang kuat."
       ],
       "opportunityAreas": [
         "Perbanyak format Carousel karena paling sering muncul pada konten dengan performa tinggi.",
-        "Gunakan @grandmetropolitan sebagai benchmark kualitas konten."
+        "Gunakan @summareconmal.bekasi sebagai benchmark kualitas konten."
       ]
     },
     "strategicTakeaways": [
-      {
-        "title": "Awareness leader tidak otomatis jadi engagement leader",
-        "detail": "Ukuran audiens besar belum tentu menghasilkan kualitas interaksi terbaik."
-      },
       {
         "title": "Ada akun yang perlu dipantau dari sisi pertumbuhan",
         "detail": "@pakuwonmallbekasi mencatat pertumbuhan tercepat di periode ini."
@@ -5194,16 +5261,16 @@
       },
       {
         "title": "Tema campaign mulai terkonsentrasi",
-        "detail": "Tema voucher paling sering muncul lintas akun."
+        "detail": "Tema promo paling sering muncul lintas akun."
       }
     ],
     "recommendations": {
       "scale": [
         "Perbanyak format Carousel karena paling sering muncul pada konten yang kuat.",
-        "Jadikan @grandmetropolitan sebagai benchmark kualitas engagement."
+        "Jadikan @summareconmal.bekasi sebagai benchmark kualitas engagement."
       ],
       "improve": [
-        "Prioritaskan evaluasi konten @metmalcileungsi.",
+        "Prioritaskan evaluasi konten @pakuwonmallbekasi.",
         "Pastikan campaign yang sering diulang juga punya hook interaksi yang kuat."
       ],
       "watchlist": [
@@ -5214,6 +5281,6 @@
   },
   "meta": {
     "brand_account": "metmalbekasi",
-    "history_days": 71
+    "history_days": 72
   }
 }
