@@ -27,7 +27,8 @@ function run(cmd, args, options = {}) {
     cwd: options.cwd,
     env: { ...process.env, ...(options.env || {}) },
     encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 10 * 1024 * 1024
   });
   if (out && out.trim()) console.log(out.trim());
   return out;
@@ -35,11 +36,30 @@ function run(cmd, args, options = {}) {
 
 function extractTrailingJson(output) {
   const text = String(output || '').trim();
-  for (let i = text.lastIndexOf('{'); i >= 0; i = text.lastIndexOf('{', i - 1)) {
-    const candidate = text.slice(i);
-    try {
-      return JSON.parse(candidate);
-    } catch (_) {}
+  if (!text) return null;
+  
+  // Find last complete JSON object by scanning backwards
+  for (let i = text.length - 1; i >= 0; i--) {
+    if (text[i] === '}') {
+      // Found potential end, now find matching opening brace
+      let depth = 0;
+      let start = -1;
+      for (let j = i; j >= 0; j--) {
+        if (text[j] === '}') depth++;
+        if (text[j] === '{') {
+          depth--;
+          if (depth === 0) {
+            start = j;
+            break;
+          }
+        }
+      }
+      if (start >= 0) {
+        try {
+          return JSON.parse(text.slice(start, i + 1));
+        } catch (_) {}
+      }
+    }
   }
   return null;
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import {
   CartesianGrid,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -36,7 +37,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         <label className="grid gap-1.5">
           <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Akun A</span>
           <select
-            className="min-h-[44px] rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
+            className="min-h-[44px] rounded-[var(--radius-lg)] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
             value={accountA}
             onChange={(event) => setAccountA(event.target.value)}
           >
@@ -46,7 +47,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         <label className="grid gap-1.5">
           <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Akun B</span>
           <select
-            className="min-h-[44px] rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
+            className="min-h-[44px] rounded-[var(--radius-lg)] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
             value={accountB}
             onChange={(event) => setAccountB(event.target.value)}
           >
@@ -56,7 +57,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         <label className="grid gap-1.5">
           <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Preset</span>
           <select
-            className="min-h-[44px] rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
+            className="min-h-[44px] rounded-[var(--radius-lg)] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-3.5 py-2.5 text-[0.95rem] text-text"
             value={presetValue}
             onChange={(event) => {
               const resolved = resolveHeadToHeadPreset(data, event.target.value, accountA, accountB)
@@ -156,6 +157,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
                   <XAxis dataKey="date" stroke={chartAxisColor} fontSize={12} />
                   <YAxis stroke={chartAxisColor} fontSize={12} />
                   <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--text)' }} itemStyle={{ color: 'var(--text)' }} />
+                  <Legend wrapperStyle={{ color: 'var(--text-muted)', fontSize: 12 }} />
                   <Line type="monotone" dataKey={view.accountA} stroke="var(--brand)" strokeWidth={2.4} dot={false} />
                   <Line type="monotone" dataKey={view.accountB} stroke="var(--success)" strokeWidth={2.4} dot={false} />
                 </LineChart>
@@ -163,7 +165,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
             </div>
           </div>
         ) : (
-          <div className="rounded-[18px] border border-dashed border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_76%,transparent)] p-4 text-[0.92rem] text-text-muted">
+          <div className="rounded-[var(--radius-lg)] border border-dashed border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_76%,transparent)] p-4 text-[0.92rem] text-text-muted">
             Trend historis untuk metrik ini belum tersedia secara granular, jadi perbandingan difokuskan ke snapshot saat ini.
           </div>
         )}

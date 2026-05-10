@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import type { SummaryStripItem } from '../data/selectors'
 
-export function SummaryStrip({ items }: { items: SummaryStripItem[] }) {
+export const SummaryStrip = memo(function SummaryStrip({ items }: { items: SummaryStripItem[] }) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
       {items.map((item, i) => (
@@ -19,4 +20,4 @@ export function SummaryStrip({ items }: { items: SummaryStripItem[] }) {
       ))}
     </div>
   )
-}
+})

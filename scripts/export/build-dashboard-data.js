@@ -53,6 +53,21 @@ function ratio(followers, following) {
   return Number((followers / following).toFixed(2));
 }
 
+function parseHistoryDays(value, fallback = 90) {
+  const days = Number.parseInt(value, 10);
+  return Number.isFinite(days) && days > 0 ? days : fallback;
+}
+
+function toDateOnlyUtc(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getWindowStartDate(anchorDate, historyDays) {
+  const d = new Date(`${anchorDate}T00:00:00.000Z`);
+  d.setUTCDate(d.getUTCDate() - Math.max(historyDays - 1, 0));
+  return toDateOnlyUtc(d);
+}
+
 function buildFollowerHistoryFromSupabase(rows, accounts) {
   if (!rows || !rows.length) return [];
   const dateMap = new Map();
@@ -561,26 +576,48 @@ async function main() {
   const accountsCfg = readJson(path.join(repoRoot, 'config', 'accounts.json')).filter((a) => a.enabled);
   const accounts = accountsCfg.map((a) => a.username);
 
-  // Fetch from Supabase
+  // Bounded date window: DASHBOARD_HISTORY_DAYS env var or default 90 days
+  const historyDays = parseHistoryDays(process.env.DASHBOARD_HISTORY_DAYS, 90);
+
+  const { data: latestDateRows, error: latestDateError } = await supabase
+    .from('follower_history')
+    .select('date')
+    .in('username', accounts)
+    .order('date', { ascending: false })
+    .limit(1);
+  if (latestDateError) throw new Error('Failed to fetch latest follower_history date: ' + latestDateError.message);
+
+  const windowEnd = latestDateRows?.[0]?.date || toDateOnlyUtc(new Date());
+  const windowStart = getWindowStartDate(windowEnd, historyDays);
+  console.log(`Fetching Supabase data: window ${windowStart} → ${windowEnd} (${historyDays} days), accounts: ${accounts.join(', ')}`);
+
+  // Fetch from Supabase — bounded by date window and account list
   const { data: followerData, error: fhError } = await supabase
     .from('follower_history')
     .select('date, username, followers, following, posts')
-    .order('date', { ascending: true })
-    .limit(10000);
+    .gte('date', windowStart)
+    .lte('date', windowEnd)
+    .in('username', accounts)
+    .order('date', { ascending: true });
   if (fhError) throw new Error('Failed to fetch follower_history: ' + fhError.message);
 
   const { data: engagementData, error: engError } = await supabase
     .from('engagement')
     .select('*')
-    .order('date', { ascending: true })
-    .limit(10000);
+    .gte('date', windowStart)
+    .lte('date', windowEnd)
+    .in('username', accounts)
+    .order('date', { ascending: true });
   if (engError) throw new Error('Failed to fetch engagement: ' + engError.message);
 
+  // content_breakdown: latest row per account — fetch recent window, builder keeps first-seen per username
   const { data: contentData, error: cbError } = await supabase
     .from('content_breakdown')
     .select('*')
-    .order('date', { ascending: false })
-    .limit(10000);
+    .gte('date', windowStart)
+    .lte('date', windowEnd)
+    .in('username', accounts)
+    .order('date', { ascending: false });
   if (cbError) throw new Error('Failed to fetch content_breakdown: ' + cbError.message);
 
   const historyBase = buildFollowerHistoryFromSupabase(followerData || [], accounts);
@@ -636,7 +673,7 @@ async function main() {
     .map((a, i) => ({ rank: i + 1, account: a.username, followers: a.followers || 0 }));
   rankings.by_engagement_rate = [...latestAccounts]
     .sort((a, b) => ((b.engagement_rate ?? -1) - (a.engagement_rate ?? -1)))
-    .map((a, i) => ({ rank: i + 1, account: a.username, engagement_rate: a.engagement_rate ?? null }));
+    .map((a, i) => ({ rank: i + 1, account: a.username, engagement_rate: Number(a.engagement_rate ?? 0) || 0 }));
   rankings.by_avg_likes = [...latestAccounts]
     .sort((a, b) => ((b.avg_likes ?? -1) - (a.avg_likes ?? -1)))
     .map((a, i) => ({ rank: i + 1, account: a.username, avg_likes: a.avg_likes ?? null }));
@@ -650,8 +687,10 @@ async function main() {
   const { data: supabasePostInsights } = await supabase
     .from('post_insights')
     .select('*')
-    .order('date', { ascending: false })
-    .limit(10000);
+    .gte('date', windowStart)
+    .lte('date', windowEnd)
+    .in('username', accounts)
+    .order('date', { ascending: false });
 
   const supabasePostsByUser = {};
   if (supabasePostInsights && supabasePostInsights.length) {

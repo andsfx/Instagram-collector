@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 export type RefreshStatus = 'live' | 'static' | 'cached' | 'loading'
 
 const STATUS_CONFIG: Record<RefreshStatus, { dotClass: string; label: string }> = {
@@ -7,7 +9,7 @@ const STATUS_CONFIG: Record<RefreshStatus, { dotClass: string; label: string }> 
   loading: { dotClass: 'bg-[var(--text-soft)]', label: 'Memuat...' },
 }
 
-export function RefreshIndicator({ status }: { status: RefreshStatus }) {
+export const RefreshIndicator = memo(function RefreshIndicator({ status }: { status: RefreshStatus }) {
   const config = STATUS_CONFIG[status]
   return (
     <div className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] shadow-[var(--shadow-sm)]">
@@ -15,4 +17,4 @@ export function RefreshIndicator({ status }: { status: RefreshStatus }) {
       <span>{config.label}</span>
     </div>
   )
-}
+})

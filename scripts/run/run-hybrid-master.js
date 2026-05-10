@@ -13,10 +13,41 @@ function run(cmd, args, options = {}) {
     cwd: options.cwd,
     env: { ...process.env, ...(options.env || {}) },
     encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 10 * 1024 * 1024
   });
   if (out && out.trim()) console.log(out.trim());
   return out;
+}
+
+function extractTrailingJson(output) {
+  const text = String(output || '').trim();
+  if (!text) return null;
+  
+  // Find last complete JSON object by scanning backwards
+  for (let i = text.length - 1; i >= 0; i--) {
+    if (text[i] === '}') {
+      // Found potential end, now find matching opening brace
+      let depth = 0;
+      let start = -1;
+      for (let j = i; j >= 0; j--) {
+        if (text[j] === '}') depth++;
+        if (text[j] === '{') {
+          depth--;
+          if (depth === 0) {
+            start = j;
+            break;
+          }
+        }
+      }
+      if (start >= 0) {
+        try {
+          return JSON.parse(text.slice(start, i + 1));
+        } catch (_) {}
+      }
+    }
+  }
+  return null;
 }
 
 function main() {
@@ -39,7 +70,8 @@ function main() {
     try {
       const out = run('/usr/bin/python3', [path.join(repoRoot, 'scripts', 'socialblade', 'collect-socialblade-stats.py'), account.username], { cwd: repoRoot });
       summary.socialblade.processed += 1;
-      summary.socialblade.accounts.push({ username: account.username, status: 'processed', output: JSON.parse(out) });
+      const parsed = extractTrailingJson(out);
+      summary.socialblade.accounts.push({ username: account.username, status: 'processed', output: parsed || {} });
     } catch (error) {
       summary.socialblade.errors += 1;
       summary.socialblade.accounts.push({ username: account.username, status: 'error', reason: error.message });
@@ -49,7 +81,7 @@ function main() {
   // 2) Update Follower History from collected stats
   try {
     const out = run('node', [path.join(repoRoot, 'scripts', 'socialblade', 'update-follower-history-supabase.js')], { cwd: repoRoot });
-    summary.followerHistory = JSON.parse(out);
+    summary.followerHistory = extractTrailingJson(out) || { status: 'unknown' };
   } catch (error) {
     summary.followerHistory = { status: 'error', reason: error.message };
   }
@@ -57,7 +89,7 @@ function main() {
   // 3) Run Apify batch
   try {
     const out = run('node', [path.join(repoRoot, 'scripts', 'apify', 'run-apify-batch.js')], { cwd: repoRoot });
-    summary.apifyBatch = JSON.parse(out);
+    summary.apifyBatch = extractTrailingJson(out) || { status: 'unknown' };
   } catch (error) {
     summary.apifyBatch = { status: 'error', reason: error.message };
   }
@@ -67,7 +99,7 @@ function main() {
     const out = run('node', [path.join(repoRoot, 'scripts', 'sync', 'update-supabase.js'), '--all'], {
       cwd: repoRoot
     });
-    summary.sheetSync = JSON.parse(out);
+    summary.sheetSync = extractTrailingJson(out) || { status: 'unknown' };
   } catch (error) {
     summary.sheetSync = { status: 'error', reason: error.message };
   }

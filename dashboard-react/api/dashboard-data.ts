@@ -1,6 +1,5 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { createClient } from '@supabase/supabase-js'
 
 interface VercelRequest {
   method?: string
@@ -13,11 +12,10 @@ interface VercelResponse {
   json(body: Record<string, unknown>): VercelResponse
 }
 
-const SUPABASE_URL = process.env.SUPABASE_URL || ''
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || ''
-
 const RAW_GITHUB_URL = process.env.DASHBOARD_DATA_URL
   || 'https://raw.githubusercontent.com/andsfx/Instagram-collector/main/dashboard/data.json'
+
+const FETCH_TIMEOUT_MS = 8000
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   if (request.method && request.method !== 'GET') {
@@ -30,14 +28,17 @@ export default async function handler(request: VercelRequest, response: VercelRe
   response.setHeader('CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
   response.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
 
-  // Strategy 1: Supabase dashboard_cache (DISABLED — PostgREST body size limit)
-  // Skip Supabase for now, use GitHub raw directly
-
-  // Strategy 2: GitHub raw (existing fallback)
+  // Strategy 1: GitHub raw
   try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
     const remoteResponse = await fetch(RAW_GITHUB_URL, {
       headers: { Accept: 'application/json' },
+      signal: controller.signal,
     })
+
+    clearTimeout(timeoutId)
 
     if (remoteResponse.ok) {
       const text = await remoteResponse.text()
@@ -49,9 +50,9 @@ export default async function handler(request: VercelRequest, response: VercelRe
     // Fall back to local file
   }
 
-  // Strategy 3: Local file (last resort)
+  // Strategy 2: Local file (last resort)
   try {
-    const localPath = resolve(process.cwd(), '../dashboard/data.json')
+    const localPath = resolve(process.cwd(), 'dashboard/data.json')
     const localData = await readFile(localPath, 'utf8')
     JSON.parse(localData)
     response.status(200).send(localData)
