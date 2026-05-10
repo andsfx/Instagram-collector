@@ -1,8 +1,14 @@
 import type { QuickVisualData } from '../data/selectors'
+import { EmptyState } from './ui'
 
 export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
   const firstPoint = data.followerTrend[0]
   const lastPoint = data.followerTrend[data.followerTrend.length - 1]
+
+  if (!firstPoint || !lastPoint || data.series.length === 0) {
+    return <EmptyState>Tidak ada data growth untuk ditampilkan.</EmptyState>
+  }
+
   const movers = data.series
     .map((series) => {
       const start = Number(firstPoint?.[series.key] ?? 0)

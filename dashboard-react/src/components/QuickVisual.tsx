@@ -21,7 +21,7 @@ import {
 } from 'recharts'
 import type { QuickVisualData } from '../data/selectors'
 import { chartAxisColor, chartGridColor, chartItemStyle, chartLabelStyle, chartLegendStyle, chartTooltipStyle } from './chart-theme'
-import { SectionCard } from './ui'
+import { EmptyState, SectionCard } from './ui'
 
 function ChartCard({ title, children, wide }: { title: string; children: React.ReactNode; wide?: boolean }) {
   return (
@@ -33,6 +33,13 @@ function ChartCard({ title, children, wide }: { title: string; children: React.R
 }
 
 export function QuickVisual({ data }: { data: QuickVisualData }) {
+  if (!data.followerTrend.length || !data.series.length) {
+    return (
+      <SectionCard eyebrow="Charts" title="Visual analytics">
+        <EmptyState>Belum ada data chart yang tersedia.</EmptyState>
+      </SectionCard>
+    )
+  }
   return (
     <SectionCard eyebrow="Charts" title="Visual analytics">
       <div className="grid gap-3 sm:grid-cols-2">

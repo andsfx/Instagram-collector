@@ -4,8 +4,11 @@
   .chart-grid,
   .ranking-grid,
   .insight-grid,
-  .controls-row,
   .h2h-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .controls-row {
     grid-template-columns: 1fr 1fr;
   }
 }

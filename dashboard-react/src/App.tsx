@@ -17,7 +17,6 @@ import { SectionAsyncBoundary } from './components/SectionAsyncBoundary'
 import { SummaryStrip } from './components/SummaryStrip'
 import { ClosingSummary } from './components/ClosingSummary'
 import { GrowthSkeleton, HeadToHeadSkeleton, HeatmapSkeleton, ChartSuiteSkeleton, DashboardSkeleton } from './components/SkeletonFallbacks'
-import type { Period } from './components/PeriodFilter'
 import type { RefreshStatus } from './components/RefreshIndicator'
 
 const QuickVisual = lazy(async () => {
@@ -41,7 +40,6 @@ export default function App() {
   const { data, error, loading, retry } = useDashboardData()
   const { theme, toggleTheme } = useTheme()
   const [asyncResetKey, setAsyncResetKey] = useState(0)
-  const [period, setPeriod] = useState<Period>('day')
 
   const freshness = useMemo(() => data ? getFreshnessSummary(data) : null, [data])
   const executive = useMemo(() => data ? getExecutiveSummary(data) : null, [data])
@@ -72,7 +70,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="loading" />
+        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus="loading" />
         <main className="lg:ml-[220px] flex-1 overflow-x-hidden pt-[60px] lg:pt-0 max-w-full">
           <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
             <div className="h-4 w-48 skeleton rounded" />
@@ -88,7 +86,7 @@ export default function App() {
   if (error || !data || !freshness || !executive || !today || !quickVisual || !insights) {
     return (
       <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus="cached" />
+        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus="cached" />
         <main className="lg:ml-[220px] flex min-h-screen flex-1 items-center justify-center overflow-x-hidden px-6 py-16 pt-[60px] lg:pt-16 max-w-full">
           <div className="grid gap-4 text-center">
             <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Gagal memuat data.'} />
@@ -105,7 +103,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-      <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} period={period} onPeriodChange={setPeriod} refreshStatus={refreshStatus} onRefresh={retry} />
+      <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus={refreshStatus} onRefresh={retry} />
 
       <main id="main-content" className="lg:ml-[220px] flex-1 overflow-x-hidden pb-20 pt-[60px] lg:pt-0 max-w-full">
         <a className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-[68px] focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-[var(--ig-purple)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg lg:focus:left-[240px] lg:focus:top-4" href="#section-summary">

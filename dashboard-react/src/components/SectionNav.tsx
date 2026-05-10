@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { PeriodFilter, type Period } from './PeriodFilter'
 import { RefreshIndicator, type RefreshStatus } from './RefreshIndicator'
 
 export interface SectionNavItem {
@@ -21,16 +20,12 @@ export function SectionNav({
   items,
   theme,
   onToggleTheme,
-  period,
-  onPeriodChange,
   refreshStatus,
   onRefresh,
 }: {
   items: SectionNavItem[]
   theme: 'light' | 'dark'
   onToggleTheme: () => void
-  period: Period
-  onPeriodChange: (p: Period) => void
   refreshStatus: RefreshStatus
   onRefresh?: () => void
 }) {
@@ -91,6 +86,8 @@ export function SectionNav({
                 key={item.id}
                 href={`#${item.id}`}
                 onClick={handleNavClick}
+                aria-label={`Navigasi ke ${item.label}`}
+                title={item.label}
                 className={`flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[13px] font-medium transition-all ${
                   activeId === item.id
                     ? 'bg-[var(--brand-soft)] text-[var(--brand)] font-semibold shadow-sm'
@@ -109,7 +106,6 @@ export function SectionNav({
       </div>
 
       <div className="grid gap-2 border-t border-[var(--border)] px-3 py-3">
-        <PeriodFilter value={period} onChange={onPeriodChange} />
         <div className="flex items-center justify-between gap-2">
           <RefreshIndicator status={refreshStatus} />
           <button type="button" className="inline-flex h-7 items-center rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-2 text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)] transition hover:text-[var(--text)] hover:border-[var(--border-strong)]" onClick={onToggleTheme} aria-label="Toggle dark mode" aria-pressed={theme === 'dark'}>
