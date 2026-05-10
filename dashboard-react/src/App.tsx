@@ -21,8 +21,8 @@ import type { RefreshStatus } from './components/RefreshIndicator'
 import type { HeadToHeadMetric } from './data/selectors'
 
 const SECTIONS: SectionNavItem[] = [
-  { id: 'section-growth', label: 'Growth', description: 'Pantau tren pertumbuhan followers dan engagement semua akun.' },
   { id: 'section-summary', label: 'Summary', description: 'Ringkasan eksekutif performa hari ini dan insight utama.' },
+  { id: 'section-growth', label: 'Growth', description: 'Pantau tren pertumbuhan followers dan engagement semua akun.' },
   { id: 'section-content', label: 'Content', description: 'Analisis jenis konten, frekuensi posting, dan snapshot postingan terbaru.' },
   { id: 'section-comparison', label: 'Comparison', description: 'Bandingkan performa antar akun secara head-to-head dan ranking.' },
   { id: 'section-charts', label: 'Charts', description: 'Visualisasi metrik lengkap dalam berbagai format chart interaktif.' },
@@ -51,7 +51,7 @@ export default function App() {
   const { data, error, loading, isLoading, isRefreshing, retry } = useDashboardData()
   const { theme, toggleTheme } = useTheme()
   const [asyncResetKey, setAsyncResetKey] = useState(0)
-  const [activeSection, setActiveSection] = useState('section-growth')
+  const [activeSection, setActiveSection] = useState('section-summary')
 
   // HeadToHead state
   const headToHeadDefaults = useMemo(() => data ? getHeadToHeadDefaults(data) : { accountA: '', accountB: '', metric: 'followers' as HeadToHeadMetric }, [data])
