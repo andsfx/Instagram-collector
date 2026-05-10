@@ -40,6 +40,7 @@ export default function App() {
   const { data, error, loading, retry } = useDashboardData()
   const { theme, toggleTheme } = useTheme()
   const [asyncResetKey, setAsyncResetKey] = useState(0)
+  const [activeSection, setActiveSection] = useState('section-growth')
 
   const freshness = useMemo(() => data ? getFreshnessSummary(data) : null, [data])
   const executive = useMemo(() => data ? getExecutiveSummary(data) : null, [data])
@@ -70,7 +71,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus="loading" />
+        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus="loading" activeSection={activeSection} onSectionChange={setActiveSection} />
         <main className="lg:ml-[220px] flex-1 overflow-x-hidden pt-[60px] lg:pt-0 max-w-full">
           <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
             <div className="h-4 w-48 skeleton rounded" />
@@ -86,7 +87,7 @@ export default function App() {
   if (error || !data || !freshness || !executive || !today || !quickVisual || !insights) {
     return (
       <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus="cached" />
+        <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus="cached" activeSection={activeSection} onSectionChange={setActiveSection} />
         <main className="lg:ml-[220px] flex min-h-screen flex-1 items-center justify-center overflow-x-hidden px-6 py-16 pt-[60px] lg:pt-16 max-w-full">
           <div className="grid gap-4 text-center">
             <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Gagal memuat data.'} />
@@ -103,14 +104,14 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-      <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus={refreshStatus} onRefresh={retry} />
+      <SectionNav items={sections} theme={theme} onToggleTheme={toggleTheme} refreshStatus={refreshStatus} onRefresh={retry} activeSection={activeSection} onSectionChange={setActiveSection} />
 
-      <main id="main-content" className="lg:ml-[220px] flex-1 overflow-x-hidden pb-20 pt-[60px] lg:pt-0 max-w-full">
+      <main id="main-content" className="lg:ml-[220px] flex-1 overflow-hidden h-screen pt-[60px] lg:pt-0 max-w-full flex flex-col">
         <a className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-[68px] focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-[var(--ig-purple)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg lg:focus:left-[240px] lg:focus:top-4" href="#section-summary">
           Lewati navigasi
         </a>
 
-        <header className="sticky top-0 z-20 hidden items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:flex lg:px-8">
+        <header className="sticky top-0 z-20 hidden items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:flex lg:px-8 shrink-0">
           <div className="flex items-center gap-3">
             <h1 className="text-base font-bold text-[var(--text)]">{heroSummary?.title ?? 'Dashboard Performa Instagram'}</h1>
             <span className="hidden text-sm text-[var(--text-soft)] sm:inline">{heroSummary?.subtitle ?? ''}</span>
@@ -130,77 +131,91 @@ export default function App() {
         </header>
 
         {/* Growth */}
-        <section id="section-growth" className="scroll-mt-16 py-8">
-          <div className={`${shell} space-y-6`}>
-            <SectionAsyncBoundary resetKey={asyncResetKey + 3} onReset={retryAsyncSection} loadingTitle="Memuat growth" loadingDescription="Data sedang disiapkan." errorTitle="Gagal memuat" errorDescription="Chunk gagal dimuat.">
-              <Suspense fallback={<GrowthSkeleton />}>
-                <FeaturedGrowthChart data={quickVisual} />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
+        {activeSection === 'section-growth' && (
+          <section key="section-growth" id="section-growth" className="flex-1 overflow-y-auto py-8">
+            <div className={`${shell} space-y-6`}>
+              <SectionAsyncBoundary resetKey={asyncResetKey + 3} onReset={retryAsyncSection} loadingTitle="Memuat growth" loadingDescription="Data sedang disiapkan." errorTitle="Gagal memuat" errorDescription="Chunk gagal dimuat.">
+                <Suspense fallback={<GrowthSkeleton />}>
+                  <FeaturedGrowthChart data={quickVisual} />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
+        )}
 
         {/* Summary */}
-        <section id="section-summary" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
-          <div className={`${shell} space-y-6`}>
-            <ExecutiveSummary summary={executive} />
-            <TodaySummary today={today} />
-            <SummaryStrip items={summaryStrip} />
-            <InsightsPanel insights={insights} />
-          </div>
-        </section>
+        {activeSection === 'section-summary' && (
+          <section key="section-summary" id="section-summary" className="flex-1 overflow-y-auto bg-[var(--panel-muted)] py-8">
+            <div className={`${shell} space-y-6`}>
+              <ExecutiveSummary summary={executive} />
+              <TodaySummary today={today} />
+              <SummaryStrip items={summaryStrip} />
+              <InsightsPanel insights={insights} />
+            </div>
+          </section>
+        )}
 
         {/* Content */}
-        <section id="section-content" className="scroll-mt-16 py-8">
-          <div className={`${shell} space-y-6`}>
-            <ContentBreakdownPresentation data={data} />
-            <PostSnapshot data={data} />
-          </div>
-        </section>
+        {activeSection === 'section-content' && (
+          <section key="section-content" id="section-content" className="flex-1 overflow-y-auto py-8">
+            <div className={`${shell} space-y-6`}>
+              <ContentBreakdownPresentation data={data} />
+              <PostSnapshot data={data} />
+            </div>
+          </section>
+        )}
 
         {/* Comparison */}
-        <section id="section-comparison" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
-          <div className={`${shell} space-y-6`}>
-            <RankingGrowthPresentation data={data} mode="table" />
-            <AccountOverviewGrid accounts={accountSummaries} />
-            <SectionAsyncBoundary resetKey={asyncResetKey} onReset={retryAsyncSection} loadingTitle="Memuat head-to-head" loadingDescription="Perbandingan sedang disiapkan." errorTitle="Gagal memuat head-to-head" errorDescription="Chunk gagal dimuat.">
-              <Suspense fallback={<HeadToHeadSkeleton />}>
-                <HeadToHead data={data} />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
+        {activeSection === 'section-comparison' && (
+          <section key="section-comparison" id="section-comparison" className="flex-1 overflow-y-auto bg-[var(--panel-muted)] py-8">
+            <div className={`${shell} space-y-6`}>
+              <RankingGrowthPresentation data={data} mode="table" />
+              <AccountOverviewGrid accounts={accountSummaries} />
+              <SectionAsyncBoundary resetKey={asyncResetKey} onReset={retryAsyncSection} loadingTitle="Memuat head-to-head" loadingDescription="Perbandingan sedang disiapkan." errorTitle="Gagal memuat head-to-head" errorDescription="Chunk gagal dimuat.">
+                <Suspense fallback={<HeadToHeadSkeleton />}>
+                  <HeadToHead data={data} />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
+        )}
 
-        {/* Charts - formerly hidden in dropdown, now a full section */}
-        <section id="section-charts" className="scroll-mt-16 py-8">
-          <div className={`${shell} space-y-6`}>
-            <SectionAsyncBoundary resetKey={asyncResetKey + 2} onReset={retryAsyncSection} loadingTitle="Memuat chart suite" loadingDescription="Visual analytics sedang dimuat." errorTitle="Gagal memuat chart suite" errorDescription="Chunk visual gagal.">
-              <Suspense fallback={<ChartSuiteSkeleton />}>
-                <QuickVisual data={quickVisual} />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
+        {/* Charts */}
+        {activeSection === 'section-charts' && (
+          <section key="section-charts" id="section-charts" className="flex-1 overflow-y-auto py-8">
+            <div className={`${shell} space-y-6`}>
+              <SectionAsyncBoundary resetKey={asyncResetKey + 2} onReset={retryAsyncSection} loadingTitle="Memuat chart suite" loadingDescription="Visual analytics sedang dimuat." errorTitle="Gagal memuat chart suite" errorDescription="Chunk visual gagal.">
+                <Suspense fallback={<ChartSuiteSkeleton />}>
+                  <QuickVisual data={quickVisual} />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
+        )}
 
         {/* Pattern */}
-        <section id="section-pattern" className="scroll-mt-16 bg-[var(--panel-muted)] py-8">
-          <div className={`${shell} space-y-6`}>
-            <DailyMetrics data={data} />
-            <SectionAsyncBoundary resetKey={asyncResetKey + 1} onReset={retryAsyncSection} loadingTitle="Memuat heatmap" loadingDescription="Agregasi waktu posting." errorTitle="Gagal memuat heatmap" errorDescription="Chunk heatmap gagal.">
-              <Suspense fallback={<HeatmapSkeleton />}>
-                <Heatmap data={data} />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
+        {activeSection === 'section-pattern' && (
+          <section key="section-pattern" id="section-pattern" className="flex-1 overflow-y-auto bg-[var(--panel-muted)] py-8">
+            <div className={`${shell} space-y-6`}>
+              <DailyMetrics data={data} />
+              <SectionAsyncBoundary resetKey={asyncResetKey + 1} onReset={retryAsyncSection} loadingTitle="Memuat heatmap" loadingDescription="Agregasi waktu posting." errorTitle="Gagal memuat heatmap" errorDescription="Chunk heatmap gagal.">
+                <Suspense fallback={<HeatmapSkeleton />}>
+                  <Heatmap data={data} />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
+        )}
 
         {/* Recap */}
-        <section id="section-recap" className="scroll-mt-16 py-8">
-          <div className={`${shell} space-y-6`}>
-            <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
-            <FreshnessPanel freshness={freshness} />
-          </div>
-        </section>
+        {activeSection === 'section-recap' && (
+          <section key="section-recap" id="section-recap" className="flex-1 overflow-y-auto py-8">
+            <div className={`${shell} space-y-6`}>
+              <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
+              <FreshnessPanel freshness={freshness} />
+            </div>
+          </section>
+        )}
       </main>
     </div>
   )

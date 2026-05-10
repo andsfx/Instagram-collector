@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { RefreshIndicator, type RefreshStatus } from './RefreshIndicator'
 
 export interface SectionNavItem {
@@ -22,40 +22,21 @@ export function SectionNav({
   onToggleTheme,
   refreshStatus,
   onRefresh,
+  activeSection,
+  onSectionChange,
 }: {
   items: SectionNavItem[]
   theme: 'light' | 'dark'
   onToggleTheme: () => void
   refreshStatus: RefreshStatus
   onRefresh?: () => void
+  activeSection: string
+  onSectionChange: (id: string) => void
 }) {
-  const [activeId, setActiveId] = useState(items[0]?.id ?? '')
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  useEffect(() => {
-    const elementToId = new Map<Element, string>()
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const sectionId = elementToId.get(entry.target)
-            if (sectionId) setActiveId(sectionId)
-          }
-        }
-      },
-      { rootMargin: '-20% 0px -60% 0px', threshold: 0.05 },
-    )
-    for (const item of items) {
-      const element = document.getElementById(item.id)
-      if (element) {
-        elementToId.set(element, item.id)
-        observer.observe(element)
-      }
-    }
-    return () => observer.disconnect()
-  }, [items])
-
-  function handleNavClick() {
+  function handleNavClick(id: string) {
+    onSectionChange(id)
     setMobileOpen(false)
   }
 
@@ -82,24 +63,24 @@ export function SectionNav({
           {items.map((item) => {
             const iconPath = SECTION_ICONS[item.id] || 'M4 6h16M4 12h16M4 18h16'
             return (
-              <a
+              <button
                 key={item.id}
-                href={`#${item.id}`}
-                onClick={handleNavClick}
+                type="button"
+                onClick={() => handleNavClick(item.id)}
                 aria-label={`Navigasi ke ${item.label}`}
                 title={item.label}
-                className={`flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[13px] font-medium transition-all ${
-                  activeId === item.id
+                className={`flex w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-left text-[13px] font-medium transition-all ${
+                  activeSection === item.id
                     ? 'bg-[var(--brand-soft)] text-[var(--brand)] font-semibold shadow-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--panel-muted)]'
                 }`}
-                aria-current={activeId === item.id ? 'location' : undefined}
+                aria-current={activeSection === item.id ? 'location' : undefined}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-70">
                   <path d={iconPath} />
                 </svg>
                 {item.label}
-              </a>
+              </button>
             )
           })}
         </div>
