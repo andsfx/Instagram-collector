@@ -11,6 +11,13 @@ const CARD_ACCENTS = [
 ]
 
 export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[] }) {
+  if (accounts.length === 0) {
+    return (
+      <SectionCard eyebrow="Overview Akun" title="Perbandingan cepat tiap akun">
+        <p className="py-8 text-center text-sm text-[var(--text-muted)]">Belum ada akun yang bisa ditampilkan.</p>
+      </SectionCard>
+    )
+  }
   return (
     <SectionCard eyebrow="Overview Akun" title="Perbandingan cepat tiap akun">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

@@ -2,6 +2,13 @@ import type { InsightsData } from '../data/selectors'
 import { SectionCard } from './ui'
 
 export function InsightsPanel({ insights }: { insights: InsightsData }) {
+  if (insights.items.length === 0) {
+    return (
+      <SectionCard eyebrow="Insights" title="Catatan keputusan">
+        <p className="py-8 text-center text-sm text-[var(--text-muted)]">Insight belum tersedia untuk periode ini.</p>
+      </SectionCard>
+    )
+  }
   return (
     <SectionCard eyebrow="Insights" title="Catatan keputusan">
       <div className="grid gap-4 md:grid-cols-3">

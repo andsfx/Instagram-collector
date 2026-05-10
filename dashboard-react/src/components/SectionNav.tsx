@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import FocusTrap from 'focus-trap-react'
 import { RefreshIndicator, type RefreshStatus } from './RefreshIndicator'
 
 export interface SectionNavItem {
   id: string
   label: string
+  description?: string
 }
 
 const SECTION_ICONS: Record<string, string> = {
@@ -16,12 +18,13 @@ const SECTION_ICONS: Record<string, string> = {
   'section-recap': 'M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2',
 }
 
-export function SectionNav({
+function SectionNavBase({
   items,
   theme,
   onToggleTheme,
   refreshStatus,
   onRefresh,
+  refreshDisabled = false,
   activeSection,
   onSectionChange,
 }: {
@@ -30,10 +33,33 @@ export function SectionNav({
   onToggleTheme: () => void
   refreshStatus: RefreshStatus
   onRefresh?: () => void
+  refreshDisabled?: boolean
   activeSection: string
   onSectionChange: (id: string) => void
 }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+  const wasMobileOpenRef = useRef(false)
+
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setMobileOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [mobileOpen])
+
+  useEffect(() => {
+    if (!mobileOpen && wasMobileOpenRef.current) {
+      hamburgerRef.current?.focus()
+    }
+    wasMobileOpenRef.current = mobileOpen
+  }, [mobileOpen])
 
   function handleNavClick(id: string) {
     onSectionChange(id)
@@ -94,7 +120,7 @@ export function SectionNav({
           </button>
         </div>
         {onRefresh && (
-          <button type="button" className="flex w-full items-center justify-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] transition hover:text-[var(--text)] hover:border-[var(--border-strong)]" onClick={onRefresh}>
+          <button type="button" className="flex w-full items-center justify-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] transition hover:text-[var(--text)] hover:border-[var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-55" onClick={onRefresh} disabled={refreshDisabled} aria-disabled={refreshDisabled}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
             Refresh
           </button>
@@ -115,12 +141,12 @@ export function SectionNav({
         </div>
         <div className="flex items-center gap-2">
           {onRefresh && (
-            <button type="button" className="flex h-11 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--brand)] bg-[var(--brand-soft)] px-3 text-[11px] font-bold text-[var(--brand)] transition hover:bg-[var(--brand)] hover:text-white" onClick={onRefresh} aria-label="Refresh data">
+            <button type="button" className="flex h-11 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--brand)] bg-[var(--brand-soft)] px-3 text-[11px] font-bold text-[var(--brand)] transition hover:bg-[var(--brand)] hover:text-white disabled:cursor-not-allowed disabled:opacity-55" onClick={onRefresh} disabled={refreshDisabled} aria-disabled={refreshDisabled} aria-label="Refresh data">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
               <span className="hidden sm:inline">Refresh</span>
             </button>
           )}
-          <button type="button" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+          <button ref={hamburgerRef} type="button" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen} aria-controls="mobile-nav-drawer">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
           </button>
         </div>
@@ -132,14 +158,19 @@ export function SectionNav({
       )}
 
       {/* Sidebar - desktop: fixed, mobile: slide-in drawer */}
-      <nav
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[220px] flex-col border-r border-[var(--border)] bg-[var(--panel)] transition-transform duration-300 ${
-          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
-        aria-label="Section navigation"
-      >
-        {sidebarContent}
-      </nav>
+      <FocusTrap active={mobileOpen}>
+        <nav
+          id="mobile-nav-drawer"
+          className={`fixed left-0 top-0 z-50 flex h-screen w-[220px] flex-col border-r border-[var(--border)] bg-[var(--panel)] transition-transform duration-300 ${
+            mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
+          aria-label="Section navigation"
+        >
+          {sidebarContent}
+        </nav>
+      </FocusTrap>
     </>
   )
 }
+
+export const SectionNav = memo(SectionNavBase)

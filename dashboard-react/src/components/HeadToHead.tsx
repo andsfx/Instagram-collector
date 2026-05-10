@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import {
   CartesianGrid,
   Legend,
@@ -12,19 +12,33 @@ import {
 import {
   type HeadToHeadMetric,
   getHeadToHeadData,
-  getHeadToHeadDefaults,
   resolveHeadToHeadPreset,
 } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
 import { chartAxisColor, chartGridColor, chartTooltipStyle } from './chart-theme'
 import { SectionCard } from './ui'
 
-export function HeadToHead({ data }: { data: DashboardRecord }) {
-  const defaults = useMemo(() => getHeadToHeadDefaults(data), [data])
-  const [accountA, setAccountA] = useState(defaults.accountA)
-  const [accountB, setAccountB] = useState(defaults.accountB)
-  const [metric, setMetric] = useState<HeadToHeadMetric>(defaults.metric)
-  const [presetValue, setPresetValue] = useState('')
+export function HeadToHead({
+  data,
+  accountA,
+  setAccountA,
+  accountB,
+  setAccountB,
+  metric,
+  setMetric,
+  presetValue,
+  setPresetValue,
+}: {
+  data: DashboardRecord
+  accountA: string
+  setAccountA: (v: string) => void
+  accountB: string
+  setAccountB: (v: string) => void
+  metric: HeadToHeadMetric
+  setMetric: (v: HeadToHeadMetric) => void
+  presetValue: string
+  setPresetValue: (v: string) => void
+}) {
 
   const view = useMemo(() => getHeadToHeadData(data, accountA, accountB, metric), [accountA, accountB, data, metric])
 
@@ -33,7 +47,7 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
       eyebrow="Head-to-Head"
       title="Bandingkan dua akun pada metrik yang paling penting"
     >
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <label className="grid gap-1.5">
           <span className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-text-soft">Akun A</span>
           <select
@@ -125,17 +139,18 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
         </div>
 
         <div className="grid gap-2 border-t border-slate-200/70 pt-4 dark:border-white/10 xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0">
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] gap-3 text-[0.76rem] font-extrabold uppercase tracking-[0.08em] text-text-soft">
+          <div className="hidden grid-cols-[minmax(0,1fr)_minmax(96px,0.7fr)_minmax(0,1fr)] gap-3 text-[0.76rem] font-extrabold uppercase tracking-[0.08em] text-text-soft sm:grid">
             <span>@{view.accountA}</span>
             <span className="text-center">Metrik</span>
             <span className="text-right">@{view.accountB}</span>
           </div>
           <div className="grid gap-2">
             {view.comparisonRows.map((row) => (
-              <div key={row.label} className="grid grid-cols-[minmax(0,1fr)_minmax(120px,0.7fr)_minmax(0,1fr)] items-center gap-3 border-b border-slate-200/70 py-3 last:border-b-0 dark:border-white/10">
-                <div className={`text-sm font-semibold ${row.rawA > row.rawB ? 'text-brand' : 'text-text'}`}>{row.valueA}</div>
-                <div className="text-center text-[0.82rem] font-semibold uppercase tracking-[0.06em] text-text-soft">{row.label}</div>
-                <div className={`text-right text-sm font-semibold ${row.rawB > row.rawA ? 'text-success' : 'text-text'}`}>{row.valueB}</div>
+              <div key={row.label} className="grid gap-1.5 border-b border-slate-200/70 py-3 last:border-b-0 dark:border-white/10 sm:grid-cols-[minmax(0,1fr)_minmax(96px,0.7fr)_minmax(0,1fr)] sm:items-center sm:gap-3">
+                <div className="text-[0.76rem] font-semibold uppercase tracking-[0.06em] text-text-soft sm:hidden">{row.label}</div>
+                <div className={`min-w-0 break-words text-sm font-semibold ${row.rawA > row.rawB ? 'text-brand' : 'text-text'}`}>{row.valueA}</div>
+                <div className="hidden text-center text-[0.82rem] font-semibold uppercase tracking-[0.06em] text-text-soft sm:block">{row.label}</div>
+                <div className={`min-w-0 break-words text-sm font-semibold sm:text-right ${row.rawB > row.rawA ? 'text-success' : 'text-text'}`}>{row.valueB}</div>
               </div>
             ))}
           </div>
@@ -149,8 +164,8 @@ export function HeadToHead({ data }: { data: DashboardRecord }) {
           <p className="text-[0.95rem] text-text-muted">{view.trendDescription}</p>
         </div>
         {view.hasTrend ? (
-          <div className="w-full overflow-x-auto">
-            <div className="h-[320px] min-w-full mobile:min-w-[680px]">
+          <div className="w-full overflow-hidden">
+            <div className="h-[320px] min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={view.trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />

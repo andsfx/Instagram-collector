@@ -9,6 +9,13 @@ const TONE_STYLES = [
 ]
 
 export function ExecutiveSummary({ summary }: { summary: ExecutiveSummaryData }) {
+  if (summary.kpis.length === 0) {
+    return (
+      <SectionCard eyebrow="Executive Summary" title="Sinyal utama brand">
+        <p className="py-8 text-center text-sm text-[var(--text-muted)]">Ringkasan belum bisa dibuat karena data belum lengkap.</p>
+      </SectionCard>
+    )
+  }
   return (
     <SectionCard eyebrow="Executive Summary" title="Sinyal utama brand">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -8,6 +8,8 @@ const DASHBOARD_DATA_ENDPOINT = '/api/dashboard-data'
 interface DashboardState {
   data: DashboardRecord | null
   loading: boolean
+  isLoading: boolean
+  isRefreshing: boolean
   error: string | null
 }
 
@@ -97,11 +99,12 @@ export function useDashboardData(): UseDashboardDataResult {
   const [state, setState] = useState<DashboardState>(() => ({
     data: dashboardCache,
     loading: dashboardCache === null,
+    isLoading: dashboardCache === null,
+    isRefreshing: false,
     error: null,
   }))
   const [reloadToken, setReloadToken] = useState(0)
   const retry = useCallback(() => {
-    dashboardCache = null
     setReloadToken((current) => current + 1)
   }, [])
 
@@ -116,6 +119,8 @@ export function useDashboardData(): UseDashboardDataResult {
           setState({
             data: dashboardCache,
             loading: false,
+            isLoading: false,
+            isRefreshing: false,
             error: null,
           })
         }
@@ -126,6 +131,8 @@ export function useDashboardData(): UseDashboardDataResult {
         setState((current) => ({
           data: current.data,
           loading: true,
+          isLoading: current.data === null,
+          isRefreshing: current.data !== null,
           error: null,
         }))
       }
@@ -138,6 +145,8 @@ export function useDashboardData(): UseDashboardDataResult {
         setState({
           data: adapted,
           loading: false,
+          isLoading: false,
+          isRefreshing: false,
           error: null,
         })
       } catch (error) {
@@ -147,6 +156,8 @@ export function useDashboardData(): UseDashboardDataResult {
         setState({
           data: dashboardCache,
           loading: false,
+          isLoading: false,
+          isRefreshing: false,
           error: error instanceof Error ? error.message : 'Gagal memuat data dashboard',
         })
       }

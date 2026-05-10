@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { formatInteger, getDailyMetricsView } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
 import { EmptyState, SectionCard } from './ui'
@@ -12,9 +12,19 @@ function renderDelta(value: number, isBaseline: boolean) {
   return <span style={{ color: 'var(--text-muted)' }}>--</span>
 }
 
-export function DailyMetrics({ data }: { data: DashboardRecord }) {
-  const [selectedAccount, setSelectedAccount] = useState<string>(data.accounts[0] ?? '')
-  const [rangeDays, setRangeDays] = useState<number>(7)
+export function DailyMetrics({
+  data,
+  selectedAccount,
+  setSelectedAccount,
+  rangeDays,
+  setRangeDays,
+}: {
+  data: DashboardRecord
+  selectedAccount: string
+  setSelectedAccount: (v: string) => void
+  rangeDays: number
+  setRangeDays: (v: number) => void
+}) {
 
   const view = useMemo(() => getDailyMetricsView(data, selectedAccount, rangeDays), [data, rangeDays, selectedAccount])
 
