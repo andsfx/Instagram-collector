@@ -408,6 +408,7 @@ export function getQuickVisualData(data: DashboardRecord): QuickVisualData {
 }
 
 export function getAccountSummaries(data: DashboardRecord): UiAccountSummary[] {
+  const brandAccount = getBrandAccount(data)
   return data.accounts
     .map((account) => {
       const latest = metricFor(data, account)
@@ -427,7 +428,11 @@ export function getAccountSummaries(data: DashboardRecord): UiAccountSummary[] {
         change7dPct: growth?.pct_change_7d ?? 0,
       }
     })
-    .sort((a, b) => b.followers - a.followers)
+    .sort((a, b) => {
+      if (a.key === brandAccount) return -1
+      if (b.key === brandAccount) return 1
+      return b.followers - a.followers
+    })
 }
 
 export function getLatestPost(posts: PostInsightPost[] | undefined) {
