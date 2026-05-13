@@ -39,13 +39,13 @@ function adaptContentBreakdown(input: DashboardApi): ContentBreakdownByAccount {
       const cb = raw[acc] as Record<string, unknown> | undefined
       if (!cb) return [acc, undefined]
 
-      // Use normalized field names only — synonyms are rejected at schema parse level
+      // Normalize field names: accept both new (carousels) and legacy (carousel)
       const shaped: ContentBreakdownAccountShape = {
         posts: num(cb.posts) ?? num(cb.total_posts_analyzed),
         reels: num(cb.reels),
-        carousels: num(cb.carousels),
-        images: num(cb.images),
-        videos: num(cb.videos),
+        carousels: num(cb.carousels) ?? num(cb.carousel),
+        images: num(cb.images) ?? num(cb.image),
+        videos: num(cb.videos) ?? num(cb.video),
         followers: num(cb.followers),
         bestPost: cb.bestPost
           ? {
@@ -57,7 +57,14 @@ function adaptContentBreakdown(input: DashboardApi): ContentBreakdownByAccount {
               id: str((cb.bestPost as Record<string, unknown>)?.id),
               caption: str((cb.bestPost as Record<string, unknown>)?.caption),
             }
-          : undefined,
+          : cb.best_post_url
+            ? {
+                url: str(cb.best_post_url),
+                type: str(cb.best_post_type),
+                interactions: num(cb.best_post_likes),
+                comments: num(cb.best_post_comments),
+              }
+            : undefined,
       }
 
       return [acc, shaped]

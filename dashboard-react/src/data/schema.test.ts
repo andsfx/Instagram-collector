@@ -71,59 +71,59 @@ describe('SUPPORTED_VERSIONS', () => {
   })
 })
 
-describe('dashboardSchema strict content_breakdown', () => {
+describe('dashboardSchema content_breakdown', () => {
   it('accepts normalized field names (carousels, images, videos, unknown)', () => {
     const payload = createValidPayload()
     const result = dashboardSchema.safeParse(payload)
     expect(result.success).toBe(true)
   })
 
-  it('rejects synonym "carousel" in content_breakdown', () => {
+  it('accepts legacy synonym "carousel" in content_breakdown (passthrough)', () => {
     const payload = createValidPayload()
     payload.content_breakdown = {
       testaccount: {
         reels: 5,
-        carousel: 3,  // synonym - should be rejected
+        carousel: 3,
         images: 2,
         videos: 1,
         unknown: 0,
       } as any,
     }
     const result = dashboardSchema.safeParse(payload)
-    expect(result.success).toBe(false)
+    expect(result.success).toBe(true)
   })
 
-  it('rejects synonym "image" in content_breakdown', () => {
+  it('accepts legacy synonym "image" in content_breakdown (passthrough)', () => {
     const payload = createValidPayload()
     payload.content_breakdown = {
       testaccount: {
         reels: 5,
         carousels: 3,
-        image: 2,  // synonym - should be rejected
+        image: 2,
         videos: 1,
         unknown: 0,
       } as any,
     }
     const result = dashboardSchema.safeParse(payload)
-    expect(result.success).toBe(false)
+    expect(result.success).toBe(true)
   })
 
-  it('rejects synonym "video" in content_breakdown', () => {
+  it('accepts legacy synonym "video" in content_breakdown (passthrough)', () => {
     const payload = createValidPayload()
     payload.content_breakdown = {
       testaccount: {
         reels: 5,
         carousels: 3,
         images: 2,
-        video: 1,  // synonym - should be rejected
+        video: 1,
         unknown: 0,
       } as any,
     }
     const result = dashboardSchema.safeParse(payload)
-    expect(result.success).toBe(false)
+    expect(result.success).toBe(true)
   })
 
-  it('rejects arbitrary unknown fields in content_breakdown', () => {
+  it('accepts additional fields in content_breakdown (passthrough for legacy data)', () => {
     const payload = createValidPayload()
     payload.content_breakdown = {
       testaccount: {
@@ -136,7 +136,7 @@ describe('dashboardSchema strict content_breakdown', () => {
       } as any,
     }
     const result = dashboardSchema.safeParse(payload)
-    expect(result.success).toBe(false)
+    expect(result.success).toBe(true)
   })
 })
 
@@ -196,22 +196,19 @@ describe('parsePayload', () => {
 
   it('returns failure with dot-path for nested field errors', () => {
     const payload = createValidPayload()
-    payload.content_breakdown = {
+    // Use an invalid type for a required field to trigger a real validation error
+    ;(payload as any).growth = {
       testaccount: {
-        reels: 5,
-        carousels: 3,
-        images: 2,
-        videos: 1,
-        unknown: 0,
-        follower_count: 999,  // not allowed in strict mode
-      } as any,
+        followers_change_1d: 'not-a-number',  // should be number
+        followers_change_7d: 300,
+        pct_change_7d: 3.1,
+      },
     }
     const result = parsePayload(payload)
     expect(result.success).toBe(false)
     if (!result.success) {
-      const pathError = result.errors.find((e) => e.path.includes('content_breakdown'))
+      const pathError = result.errors.find((e) => e.path.includes('growth'))
       expect(pathError).toBeDefined()
-      expect(pathError!.path).toContain('testaccount')
     }
   })
 

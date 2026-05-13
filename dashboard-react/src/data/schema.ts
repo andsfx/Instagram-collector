@@ -40,12 +40,9 @@ const metricSchema = z.object({
 }).passthrough()
 
 /**
- * Strict content breakdown schema for a single account.
- * Only normalized field names are accepted:
- * - `carousels` (NOT `carousel`)
- * - `images` (NOT `image`)
- * - `videos` (NOT `video`)
- * - `unknown` for unrecognized post types
+ * Content breakdown schema for a single account.
+ * Accepts both normalized names (carousels, images, videos) and legacy names
+ * (carousel, image, video) via passthrough — adapter handles normalization.
  */
 const strictContentBreakdownAccountSchema = z.object({
   reels: z.number().optional(),
@@ -65,7 +62,7 @@ const strictContentBreakdownAccountSchema = z.object({
     id: z.string().optional(),
     caption: z.string().optional(),
   }).optional(),
-}).strict()
+}).passthrough()  // Allow legacy field names — adapter normalizes
 
 // ---------------------------------------------------------------------------
 // Dashboard Schema v2 (Strict)
@@ -90,11 +87,11 @@ export const dashboardSchema = z.object({
     followers_change_1d: z.number(),
     followers_change_7d: z.number(),
     pct_change_7d: z.number(),
-  })),
+  }).passthrough()),
   rankings: z.object({
     by_followers: z.array(z.object({ rank: z.number(), account: z.string(), followers: z.number() })),
     by_engagement_rate: z.array(z.object({ rank: z.number(), account: z.string(), engagement_rate: z.number() })),
-  }),
+  }).passthrough(),
   history: z.array(z.object({ date: z.string() }).passthrough()),
   content_breakdown: z.record(strictContentBreakdownAccountSchema).optional(),
   post_insights: z.record(z.object({
