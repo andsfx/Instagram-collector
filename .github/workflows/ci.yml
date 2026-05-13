@@ -60,42 +60,8 @@ jobs:
           fi
         # Requirements: 1.7
 
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: |
-            package-lock.json
-            dashboard-react/package-lock.json
-
-      - name: Install root dependencies
-        run: npm ci
-
-      - name: Install dashboard-react dependencies
-        run: npm ci
-        working-directory: dashboard-react
-
-      - name: Build for production
-        run: npm run build
-
-      - name: Secret leakage check (pre-deploy gate)
-        run: npm run check:secrets
-        # Block production deploy until secret leakage check passes clean
-        # Requirements: 5.9
-
-      - name: Deploy to production
-        run: npm run deploy:prod --prefix dashboard-react
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  # Deploy is handled automatically by Vercel Git Integration.
+  # Vercel watches the main branch and deploys on every push.
+  # No CI deploy step needed — configure at:
+  # https://vercel.com/andy-safiis-projects/dashboard-react/settings/git
+  # Root Directory: dashboard-react
