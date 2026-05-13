@@ -1,6 +1,26 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { parsePayload } from '../src/data/schema'
+
+// ---------------------------------------------------------------------------
+// Inline payload validation (cannot import from ../src/ in Vercel serverless)
+// ---------------------------------------------------------------------------
+
+function validatePayloadBasic(payload: unknown): { valid: boolean; error?: string } {
+  if (!payload || typeof payload !== 'object') {
+    return { valid: false, error: 'Payload is not an object' }
+  }
+  const p = payload as Record<string, unknown>
+  if (typeof p.version !== 'number') {
+    return { valid: false, error: 'Missing or invalid version field' }
+  }
+  if (!Array.isArray(p.accounts)) {
+    return { valid: false, error: 'Missing or invalid accounts field' }
+  }
+  if (typeof p.generated_at !== 'string') {
+    return { valid: false, error: 'Missing or invalid generated_at field' }
+  }
+  return { valid: true }
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -175,9 +195,9 @@ export default async function handler(request: VercelRequest, response: VercelRe
         return
       }
 
-      // Validate against schema kanonik
-      const result = parsePayload(parsed)
-      if (!result.success) {
+      // Validate payload structure
+      const result = validatePayloadBasic(parsed)
+      if (!result.valid) {
         log({
           timestamp: new Date().toISOString(),
           level: 'error',

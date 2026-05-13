@@ -4,12 +4,7 @@ vi.mock('node:fs/promises', () => ({
   readFile: vi.fn(),
 }))
 
-vi.mock('../src/data/schema', () => ({
-  parsePayload: vi.fn(),
-}))
-
 import { readFile } from 'node:fs/promises'
-import { parsePayload } from '../src/data/schema'
 import handler from './dashboard-data'
 
 function createResponse() {
@@ -36,12 +31,11 @@ function createResponse() {
   }
 }
 
-const VALID_PAYLOAD = JSON.stringify({ version: 2, accounts: ['test'] })
+const VALID_PAYLOAD = JSON.stringify({ version: 2, accounts: ['test'], generated_at: '2025-01-15T10:00:00Z' })
 
 describe('/api/dashboard-data', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn())
-    vi.mocked(parsePayload).mockReturnValue({ success: true, data: {} as any })
   })
 
   afterEach(() => {
@@ -49,7 +43,7 @@ describe('/api/dashboard-data', () => {
     vi.unstubAllEnvs()
   })
 
-  it('returns remote payload when github raw fetch succeeds and schema validates', async () => {
+  it('returns remote payload when fetch succeeds and payload is valid', async () => {
     const response = createResponse()
 
     vi.mocked(fetch).mockResolvedValue({
@@ -61,7 +55,6 @@ describe('/api/dashboard-data', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toBe(VALID_PAYLOAD)
-    expect(vi.mocked(parsePayload)).toHaveBeenCalledWith(JSON.parse(VALID_PAYLOAD))
   })
 
   it('falls back to local file when remote fetch fails', async () => {
@@ -91,17 +84,13 @@ describe('/api/dashboard-data', () => {
     expect(response.body).toEqual({ error: 'Upstream response is not valid JSON' })
   })
 
-  it('returns 502 when schema validation fails', async () => {
+  it('returns 502 when payload validation fails (missing version)', async () => {
     const response = createResponse()
 
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () => '{"invalid": true}',
+      text: async () => JSON.stringify({ accounts: ['test'], generated_at: '2025-01-15T10:00:00Z' }),
     } as Response)
-    vi.mocked(parsePayload).mockReturnValue({
-      success: false,
-      errors: [{ path: 'version', message: 'Required', code: 'invalid_type' }],
-    })
 
     await handler({}, response as any)
 
