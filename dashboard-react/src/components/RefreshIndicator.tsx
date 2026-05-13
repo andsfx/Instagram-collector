@@ -12,8 +12,12 @@ const STATUS_CONFIG: Record<RefreshStatus, { dotClass: string; label: string }> 
 export const RefreshIndicator = memo(function RefreshIndicator({ status }: { status: RefreshStatus }) {
   const config = STATUS_CONFIG[status]
   return (
-    <div className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] shadow-[var(--shadow-sm)]">
-      <span className={`h-2 w-2 rounded-full ${config.dotClass}`} />
+    <div
+      className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] shadow-[var(--shadow-sm)]"
+      role="status"
+      aria-label={`Data status: ${config.label}`}
+    >
+      <span className={`h-2 w-2 rounded-full ${config.dotClass}`} aria-hidden="true" />
       <span>{config.label}</span>
     </div>
   )

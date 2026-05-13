@@ -18,7 +18,7 @@ export function SectionCard({
         <div className="grid gap-1">
           {eyebrow ? (
             <div className="flex items-center gap-2">
-              <div className="flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--ig-gradient-soft)]">
+              <div className="flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--ig-gradient-soft)]" aria-hidden="true">
                 <div className="h-2 w-2 rounded-full bg-[var(--brand)]" />
               </div>
               <span className="text-[10px] font-bold uppercase tracking-[0.5px] text-[var(--text-soft)]">{eyebrow}</span>
@@ -34,10 +34,10 @@ export function SectionCard({
   )
 }
 
-export function EmptyState({ children }: PropsWithChildren) {
+export function EmptyState({ metricName, children }: PropsWithChildren<{ metricName?: string }>) {
   return (
     <div className="rounded-[var(--radius-lg)] border border-dashed border-[var(--border)] bg-[var(--panel-muted)] px-5 py-6 text-sm text-[var(--text-muted)]">
-      {children}
+      {metricName ? `Belum ada data untuk ${metricName}.` : children}
     </div>
   )
 }
@@ -54,12 +54,41 @@ export function LoadingState({ title, description }: { title: string; descriptio
   )
 }
 
-export function ErrorState({ title, description }: { title: string; description?: string }) {
+export function ErrorState({
+  title,
+  description,
+  message,
+  httpCode,
+  onRetry,
+}: {
+  title?: string
+  description?: string
+  message?: string
+  httpCode?: number
+  onRetry?: () => void
+}) {
+  const displayTitle = title ?? 'Terjadi kesalahan'
+  const displayDescription = message ?? description
+
   return (
     <div className="rounded-[var(--radius-lg)] border border-[var(--danger-soft)] bg-[var(--danger-soft)] px-5 py-4 shadow-[var(--shadow-sm)]" role="alert">
-      <div className="grid gap-1">
-        <div className="text-sm font-bold text-[var(--danger)]">{title}</div>
-        {description ? <div className="text-xs text-[var(--text-muted)]">{description}</div> : null}
+      <div className="grid gap-2">
+        <div className="grid gap-1">
+          <div className="text-sm font-bold text-[var(--danger)]">{displayTitle}</div>
+          {httpCode != null && (
+            <div className="text-xs font-medium text-[var(--danger)]">HTTP {httpCode}</div>
+          )}
+          {displayDescription ? <div className="text-xs text-[var(--text-muted)]">{displayDescription}</div> : null}
+        </div>
+        {onRetry && (
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 self-start rounded-[var(--radius-pill)] border border-[var(--danger)] bg-transparent px-3 py-1.5 text-xs font-bold text-[var(--danger)] transition hover:bg-[var(--danger)] hover:text-white"
+            onClick={onRetry}
+          >
+            Coba lagi
+          </button>
+        )}
       </div>
     </div>
   )

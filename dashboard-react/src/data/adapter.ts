@@ -1,4 +1,5 @@
 import type { DashboardApi } from './schema'
+import { parsePayload } from './schema'
 import type {
   ContentBreakdownAccountShape,
   ContentBreakdownByAccount,
@@ -38,22 +39,25 @@ function adaptContentBreakdown(input: DashboardApi): ContentBreakdownByAccount {
       const cb = raw[acc] as Record<string, unknown> | undefined
       if (!cb) return [acc, undefined]
 
+      // Use normalized field names only — synonyms are rejected at schema parse level
       const shaped: ContentBreakdownAccountShape = {
         posts: num(cb.posts) ?? num(cb.total_posts_analyzed),
         reels: num(cb.reels),
-        carousels: num(cb.carousels) ?? num(cb.carousel),
-        images: num(cb.images) ?? num(cb.image),
-        videos: num(cb.videos) ?? num(cb.video),
-        followers: num(cb.followers) ?? num(cb.follower_count),
-        bestPost: {
-          url: str(cb.best_post_url) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.url),
-          type: str(cb.best_post_type) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.type),
-          interactions: num(cb.best_post_likes) ?? num((cb.bestPost as Record<string, unknown> | undefined)?.interactions),
-          comments: num(cb.best_post_comments) ?? num((cb.bestPost as Record<string, unknown> | undefined)?.comments),
-          timestamp: str(cb.best_post_timestamp) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.timestamp),
-          id: str(cb.best_post_id) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.id),
-          caption: str(cb.best_post_caption) ?? str((cb.bestPost as Record<string, unknown> | undefined)?.caption),
-        },
+        carousels: num(cb.carousels),
+        images: num(cb.images),
+        videos: num(cb.videos),
+        followers: num(cb.followers),
+        bestPost: cb.bestPost
+          ? {
+              url: str((cb.bestPost as Record<string, unknown>)?.url),
+              type: str((cb.bestPost as Record<string, unknown>)?.type),
+              interactions: num((cb.bestPost as Record<string, unknown>)?.interactions),
+              comments: num((cb.bestPost as Record<string, unknown>)?.comments),
+              timestamp: str((cb.bestPost as Record<string, unknown>)?.timestamp),
+              id: str((cb.bestPost as Record<string, unknown>)?.id),
+              caption: str((cb.bestPost as Record<string, unknown>)?.caption),
+            }
+          : undefined,
       }
 
       return [acc, shaped]
@@ -89,6 +93,26 @@ function adaptPostInsights(input: DashboardApi): PostInsightsByAccount {
   )
 }
 
+/**
+ * Parse a raw payload using the strict v2 schema and adapt it to the domain model.
+ * Throws if the payload is invalid (synonyms, missing fields, wrong types are all rejected).
+ */
+export function parseThenAdapt(rawPayload: unknown): DashboardRecord {
+  const result = parsePayload(rawPayload)
+  if (!result.success) {
+    const errorSummary = result.errors
+      .slice(0, 5)
+      .map((e) => `${e.path}: ${e.message}`)
+      .join('; ')
+    throw new Error(`Payload validation failed: ${errorSummary}`)
+  }
+  return adaptDashboardData(result.data)
+}
+
+/**
+ * Transform a validated DashboardApi payload into the internal DashboardRecord domain model.
+ * Expects input to already be validated against the strict v2 schema (no synonyms present).
+ */
 export function adaptDashboardData(input: DashboardApi): DashboardRecord {
   const latestEntries: Record<string, MetricEntry> = Object.fromEntries(
     input.accounts.map((account) => {

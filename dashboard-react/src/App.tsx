@@ -120,15 +120,21 @@ export default function App() {
   }
 
   if (error || !data || !freshness || !executive || !today || !quickVisual || !insights) {
+    // Extract HTTP code from error message if present
+    const httpCodeMatch = error?.match(/\((\d{3})\)/)
+    const httpCode = httpCodeMatch ? Number(httpCodeMatch[1]) : undefined
+
     return (
       <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
         <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} refreshStatus="cached" activeSection={activeSection} onSectionChange={handleSectionChange} />
         <main className="lg:ml-[220px] flex min-h-screen flex-1 items-center justify-center overflow-x-hidden px-6 py-16 pt-[60px] lg:pt-16 max-w-full">
           <div className="grid gap-4 text-center">
-            <ErrorState title="Data dashboard tidak tersedia" description={error ?? 'Gagal memuat data.'} />
-            <button type="button" className="mx-auto inline-flex items-center rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(225,48,108,0.24)]" onClick={retry}>
-              Coba lagi
-            </button>
+            <ErrorState
+              title="Data dashboard tidak tersedia"
+              message={error ?? 'Gagal memuat data.'}
+              httpCode={httpCode}
+              onRetry={retry}
+            />
           </div>
         </main>
       </div>
@@ -150,7 +156,18 @@ export default function App() {
       <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} refreshStatus={refreshStatus} onRefresh={handleRefresh} refreshDisabled={refreshDisabled} activeSection={activeSection} onSectionChange={handleSectionChange} />
 
       <main id="dashboard-main" tabIndex={-1} className="lg:ml-[220px] flex-1 overflow-hidden h-screen pt-[60px] lg:pt-0 max-w-full flex flex-col">
-        <a className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-[68px] focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-[var(--ig-purple)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg lg:focus:left-[240px] lg:focus:top-4" href="#dashboard-main">
+        <a
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-[68px] focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-[var(--ig-purple)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg lg:focus:left-[240px] lg:focus:top-4"
+          href="#dashboard-main"
+          onClick={(e) => {
+            e.preventDefault()
+            const main = document.getElementById('dashboard-main')
+            if (main) {
+              main.focus()
+              main.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+          }}
+        >
           Lewati navigasi
         </a>
 
@@ -166,8 +183,8 @@ export default function App() {
                 <span className="text-[var(--text)]">{item.value}</span>
               </div>
             ))}
-            <button type="button" className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--brand)] bg-[var(--brand-soft)] px-3 py-1.5 text-[11px] font-bold text-[var(--brand)] transition hover:bg-[var(--brand)] hover:text-white disabled:cursor-not-allowed disabled:opacity-55" onClick={handleRefresh} disabled={refreshDisabled} aria-disabled={refreshDisabled}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
+            <button type="button" className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--brand)] bg-[var(--brand-soft)] px-3 py-1.5 text-[11px] font-bold text-[var(--brand)] transition hover:bg-[var(--brand)] hover:text-white disabled:cursor-not-allowed disabled:opacity-55" onClick={handleRefresh} disabled={refreshDisabled} aria-disabled={refreshDisabled} aria-label="Refresh dashboard data">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
               Refresh Data
             </button>
           </div>

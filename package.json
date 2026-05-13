@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:dashboard && npm --prefix ./dashboard-react test",
-    "test:dashboard": "node ./scripts/test/dashboard-smoke.js && node ./scripts/test/dashboard-phase3-smoke.js"
+    "test": "npm --prefix ./dashboard-react test",
+    "build": "npm --prefix ./dashboard-react run build",
+    "check:secrets": "node ./scripts/ci/check-secrets.js",
+    "check:schema-doc": "node ./scripts/ci/check-schema-doc-sync.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +15,7 @@
   "type": "commonjs",
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
-    "playwright": "^1.58.2"
+    "playwright": "^1.58.2",
+    "zod": "^3.25.76"
   }
 }

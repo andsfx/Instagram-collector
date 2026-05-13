@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { type PostPerformanceFilter, type PostSnapshotSort, formatInteger, formatPostDate, getPostSnapshotView } from '../data/selectors'
+import { type PostPerformanceFilter, type PostSnapshotSort, formatPostDate, getPostSnapshotView } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
+import { formatEngagementRate, formatInteger } from '../utils/formatters'
 import { EmptyState, SectionCard } from './ui'
 
 const SORT_OPTIONS: Array<{ value: PostSnapshotSort; label: string }> = [
@@ -70,12 +71,12 @@ export function PostSnapshot({ data }: { data: DashboardRecord }) {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-[var(--text)]">@{card.account}</span>
                     <span className="rounded-[var(--radius-pill)] bg-[var(--brand-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--brand)]">
-                      ER {card.averagePostEr > 0 ? `${(card.averagePostEr * 100).toFixed(2)}%` : '-'}
+                      ER {card.averagePostEr > 0 ? formatEngagementRate(card.averagePostEr * 100) : '-'}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-3 text-xs">
-                    <span><strong>{formatInteger.format(Math.round(card.averageLikes))}</strong> avg likes</span>
-                    <span><strong>{formatInteger.format(Math.round(card.averageComments))}</strong> avg comments</span>
+                    <span><strong>{formatInteger(Math.round(card.averageLikes))}</strong> avg likes</span>
+                    <span><strong>{formatInteger(Math.round(card.averageComments))}</strong> avg comments</span>
                     <span className="text-[var(--success)]"><strong>{card.viralPosts}</strong> viral</span>
                     <span className="text-[var(--danger)]"><strong>{card.underperformPosts}</strong> underperform</span>
                   </div>

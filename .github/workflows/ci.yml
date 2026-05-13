@@ -1,0 +1,101 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            dashboard-react/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install dashboard-react dependencies
+        run: npm ci
+        working-directory: dashboard-react
+
+      - name: Build dashboard (TypeScript + Vite)
+        run: npm run build
+        # Fails pipeline on TypeScript/Vite errors (exit non-zero)
+        # Requirements: 10.4
+
+      - name: Run tests
+        run: npm test
+        # Runs all tests as merge prerequisite
+        # Requirements: 10.5, 12.6
+
+      - name: Secret leakage check
+        run: npm run check:secrets
+        # Requirements: 5.6, 5.7
+
+      - name: Schema-doc sync check
+        run: npm run check:schema-doc
+
+      - name: Warn if deprecated dashboard/js/ modified
+        if: github.event_name == 'pull_request'
+        run: |
+          # Check if any files in dashboard/js/ were modified in this PR
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.sha }} -- 'dashboard/js/' || true)
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "::warning::⚠️ Files in dashboard/js/ were modified. This folder is DEPRECATED. Please make changes in dashboard-react/ instead."
+            echo ""
+            echo "Modified deprecated files:"
+            echo "$CHANGED_FILES"
+          fi
+        # Requirements: 1.7
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            dashboard-react/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install dashboard-react dependencies
+        run: npm ci
+        working-directory: dashboard-react
+
+      - name: Build for production
+        run: npm run build
+
+      - name: Secret leakage check (pre-deploy gate)
+        run: npm run check:secrets
+        # Block production deploy until secret leakage check passes clean
+        # Requirements: 5.9
+
+      - name: Deploy to production
+        run: npm run deploy:prod --prefix dashboard-react
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

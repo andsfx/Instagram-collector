@@ -15,6 +15,8 @@ import {
   resolveHeadToHeadPreset,
 } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
+import { downsampleData } from '../data/downsample'
+import { formatInteger } from '../utils/formatters'
 import { chartAxisColor, chartGridColor, chartTooltipStyle } from './chart-theme'
 import { SectionCard } from './ui'
 
@@ -119,7 +121,7 @@ export function HeadToHead({
           <div className="grid gap-2 border-t border-slate-200/70 pt-4 dark:border-white/10">
             <div className="flex items-center justify-between text-[0.82rem] text-text-soft">
               <span>Distribusi kemenangan per metrik</span>
-              <span>Gap followers: {view.gapFollowers.toLocaleString('id-ID')}</span>
+              <span>Gap followers: {formatInteger(view.gapFollowers)}</span>
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-[color:color-mix(in_srgb,var(--panel-muted)_78%,transparent)]" aria-label="Distribusi kemenangan per metrik">
               <div className="flex h-full w-full">
@@ -167,7 +169,7 @@ export function HeadToHead({
           <div className="w-full overflow-hidden">
             <div className="h-[320px] min-w-0">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={view.trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                <LineChart data={downsampleData(view.trendData, 90, view.accountA)} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                   <XAxis dataKey="date" stroke={chartAxisColor} fontSize={12} />
                   <YAxis stroke={chartAxisColor} fontSize={12} />

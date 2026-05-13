@@ -20,6 +20,8 @@ import {
   YAxis,
 } from 'recharts'
 import type { QuickVisualData } from '../data/selectors'
+import { downsampleData } from '../data/downsample'
+import { formatInteger } from '../utils/formatters'
 import { chartAxisColor, chartGridColor, chartItemStyle, chartLabelStyle, chartLegendStyle, chartTooltipStyle } from './chart-theme'
 import { EmptyState, SectionCard } from './ui'
 
@@ -32,6 +34,8 @@ function ChartCard({ title, children, wide }: { title: string; children: React.R
   )
 }
 
+const MAX_CHART_POINTS = 90
+
 export function QuickVisual({ data }: { data: QuickVisualData }) {
   if (!data.followerTrend.length || !data.series.length) {
     return (
@@ -40,6 +44,13 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
       </SectionCard>
     )
   }
+
+  // Downsample time-series data when exceeding threshold
+  const firstSeriesKey = data.series[0]?.key
+  const followerTrend = downsampleData(data.followerTrend, MAX_CHART_POINTS, firstSeriesKey)
+  const engagementTrend = downsampleData(data.engagementTrend, MAX_CHART_POINTS, firstSeriesKey)
+  const projectionTrend = downsampleData(data.projectionTrend, MAX_CHART_POINTS, firstSeriesKey ? `${firstSeriesKey}_actual` : undefined)
+
   return (
     <SectionCard eyebrow="Charts" title="Visual analytics">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -48,7 +59,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
           <div className="h-[260px] w-full overflow-x-auto">
             <div className="h-full min-w-[480px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data.followerTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+                <LineChart data={followerTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                   <XAxis dataKey="date" stroke={chartAxisColor} fontSize={11} />
                   <YAxis stroke={chartAxisColor} fontSize={11} />
@@ -90,7 +101,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
                     <Cell key={e.account} fill={e.fill} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v: number) => v.toLocaleString('id-ID')} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} />
+                <Tooltip formatter={(v: number) => formatInteger(v)} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} />
                 <Legend wrapperStyle={chartLegendStyle} />
               </PieChart>
             </ResponsiveContainer>
@@ -121,7 +132,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
           <div className="h-[260px] w-full overflow-x-auto">
             <div className="h-full min-w-[480px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data.engagementTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+                <LineChart data={engagementTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                   <XAxis dataKey="date" stroke={chartAxisColor} fontSize={11} />
                   <YAxis stroke={chartAxisColor} fontSize={11} />
@@ -141,7 +152,7 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
           <div className="h-[280px] w-full overflow-x-auto">
             <div className="h-full min-w-[480px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data.projectionTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+                <AreaChart data={projectionTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                   <XAxis dataKey="date" stroke={chartAxisColor} fontSize={11} />
                   <YAxis stroke={chartAxisColor} fontSize={11} />

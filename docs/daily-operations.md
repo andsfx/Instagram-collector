@@ -230,3 +230,87 @@ Checklist harian dianggap sukses jika:
 - [ ] row baru masuk ke `Engagement`
 - [ ] row baru masuk ke `Content Breakdown`
 - [ ] tidak ada data rusak yang tertulis
+
+---
+
+## D. Audit & Quality Checks
+
+Section ini mendokumentasikan cara menjalankan audit checks yang memverifikasi integritas sistem.
+
+### 1. Jalankan Test Suite
+
+```powershell
+cd dashboard-react
+npm test
+```
+
+Checklist:
+- [ ] Semua unit tests pass
+- [ ] Semua property-based tests pass
+- [ ] Total waktu < 120 detik
+
+### 2. Jalankan Secret Leakage Check
+
+Memindai build artifacts dan `dashboard/data.json` untuk pola secret (JWT, Apify key, Supabase service role URL).
+
+```powershell
+npm run check:secrets
+```
+
+Checklist:
+- [ ] Tidak ada kecocokan pola secret ditemukan
+- [ ] Exit code 0
+
+### 3. Jalankan Schema-Doc Sync Check
+
+Memverifikasi bahwa `docs/dashboard-data-schema.md` sinkron dengan schema kode di `dashboard-react/src/data/schema.ts`.
+
+```powershell
+npm run check:schema-doc
+```
+
+Checklist:
+- [ ] Dokumentasi sinkron dengan schema kode
+- [ ] Exit code 0
+
+### 4. Jalankan Build Pipeline
+
+Memastikan TypeScript dan Vite build berhasil tanpa error.
+
+```powershell
+npm run build
+```
+
+Checklist:
+- [ ] Tidak ada TypeScript error
+- [ ] Tidak ada Vite build error
+- [ ] Bundle size < 250KB gzip
+- [ ] Exit code 0
+
+### 5. Jalankan Full CI Locally (Semua Checks)
+
+Untuk menjalankan semua checks sekaligus (sama seperti CI):
+
+```powershell
+npm run build
+npm test
+npm run check:secrets
+npm run check:schema-doc
+```
+
+### 6. Regenerasi Audit Report
+
+Jika ada perubahan signifikan pada sistem, update `docs/audit-report.md`:
+- Review temuan dan update status (`done` / `in-progress` / `open`)
+- Tambahkan temuan baru jika ditemukan
+- Update severity jika konteks berubah
+- Pastikan setiap temuan tetap terpetakan ke Requirement ID
+
+### Kapan Menjalankan Audit Checks
+
+| Trigger | Checks yang Dijalankan |
+|---------|----------------------|
+| Sebelum push ke main | Semua (build, test, secrets, schema-doc) |
+| Setelah update schema | `check:schema-doc` + update `docs/dashboard-data-schema.md` |
+| Setelah update dependencies | `check:secrets` + full test suite |
+| Weekly review | Full CI + review `docs/audit-report.md` |

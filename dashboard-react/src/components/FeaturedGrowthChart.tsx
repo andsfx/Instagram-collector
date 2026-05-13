@@ -1,4 +1,5 @@
 import type { QuickVisualData } from '../data/selectors'
+import { formatInteger } from '../utils/formatters'
 import { EmptyState } from './ui'
 
 export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
@@ -33,17 +34,17 @@ export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
           <div className="relative">
             <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Total Followers</div>
             <div className="mt-0.5 font-display text-[clamp(1.5rem,4vw,2.5rem)] font-extrabold tracking-tight text-[var(--text)]">
-              {totalFollowers.toLocaleString('id-ID')}
+              {formatInteger(totalFollowers)}
             </div>
             <span className={`text-xs font-bold ${totalDelta >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
-              {totalDelta >= 0 ? '+' : ''}{totalDelta.toLocaleString('id-ID')} <span className="font-normal text-[var(--text-soft)]">/ {data.followerTrend.length}d</span>
+              {totalDelta >= 0 ? '+' : ''}{formatInteger(totalDelta)} <span className="font-normal text-[var(--text-soft)]">/ {data.followerTrend.length}d</span>
             </span>
           </div>
         </div>
         <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)]">
           <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Top Mover</div>
           <div className="mt-0.5 font-display text-sm font-extrabold text-[var(--text)] truncate">{leadMover ? `@${leadMover.account}` : '-'}</div>
-          <span className="text-xs font-bold text-[var(--success)]">{leadMover ? `+${leadMover.delta.toLocaleString('id-ID')}` : '-'}</span>
+          <span className="text-xs font-bold text-[var(--success)]">{leadMover ? `+${formatInteger(leadMover.delta)}` : '-'}</span>
         </div>
         <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)]">
           <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Tracked</div>
@@ -66,9 +67,9 @@ export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
                   <span className="truncate text-xs font-bold text-[var(--text)]">@{m.account}</span>
                 </div>
                 <div className="flex shrink-0 items-center gap-2 text-right">
-                  <span className="text-xs font-extrabold text-[var(--text)]">{m.end.toLocaleString('id-ID')}</span>
+                  <span className="text-xs font-extrabold text-[var(--text)]">{formatInteger(m.end)}</span>
                   <span className={`text-[10px] font-bold ${m.delta > 0 ? 'text-[var(--success)]' : m.delta < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-soft)]'}`}>
-                    {m.delta > 0 ? '+' : ''}{m.delta.toLocaleString('id-ID')}
+                    {m.delta > 0 ? '+' : ''}{formatInteger(m.delta)}
                   </span>
                 </div>
               </div>

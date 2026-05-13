@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -40,5 +41,27 @@ export default defineConfig({
   plugins: [react(), dashboardDataPlugin()],
   server: {
     host: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Keep the small downsample utility in the main bundle
+          if (id.includes('downsample')) {
+            return undefined
+          }
+          // Group recharts and its dependencies into a dedicated chunk
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-') || id.includes('node_modules/victory-vendor')) {
+            return 'recharts'
+          }
+        },
+      },
+    },
+  },
+  test: {
+    globals: false,
+    environment: 'node',
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'api/**/*.test.ts'],
+    testTimeout: 30_000,
   },
 })

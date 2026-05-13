@@ -1,5 +1,6 @@
 import { getContentHighlights } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
+import { formatEngagementRate } from '../utils/formatters'
 import { EmptyState, SectionCard } from './ui'
 
 export function ContentBreakdownPresentation({ data }: { data: DashboardRecord }) {
@@ -34,7 +35,7 @@ export function ContentBreakdownPresentation({ data }: { data: DashboardRecord }
         <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)]">
           <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">ER tertinggi</div>
           <div className="mt-1 font-display text-lg font-extrabold text-[var(--text)]">{highlights.topErAccount ? `@${highlights.topErAccount}` : '-'}</div>
-          <div className="text-xs text-[var(--text-muted)]">{highlights.topErAccount ? `${highlights.topErValue.toFixed(2)}%` : '-'}</div>
+          <div className="text-xs text-[var(--text-muted)]">{highlights.topErAccount ? formatEngagementRate(highlights.topErValue) : '-'}</div>
         </div>
         <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)]">
           <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Best post</div>

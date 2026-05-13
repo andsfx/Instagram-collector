@@ -57,6 +57,38 @@ Deploy production from this folder:
 npm run deploy:prod
 ```
 
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DASHBOARD_DATA_URL` | No | `https://raw.githubusercontent.com/andsfx/Instagram-collector/main/dashboard/data.json` | URL of the upstream dashboard data JSON. The API fetches from this URL first, then falls back to other sources if unavailable. Set this in Vercel project settings to point to a custom data source. |
+| `VERCEL_GIT_COMMIT_SHA` | No (auto-set by Vercel) | — | Automatically provided by Vercel on each deployment. Used to set the `X-Dashboard-Commit` response header on API responses for deployment traceability. |
+
+### Setting Environment Variables
+
+In Vercel:
+1. Go to your project → Settings → Environment Variables
+2. Add `DASHBOARD_DATA_URL` with the URL of your data source
+3. `VERCEL_GIT_COMMIT_SHA` is automatically injected by Vercel — no manual setup needed
+
+Locally (for development):
+```bash
+# Create a .env.local file in dashboard-react/
+DASHBOARD_DATA_URL=https://raw.githubusercontent.com/andsfx/Instagram-collector/main/dashboard/data.json
+```
+
+### Response Headers
+
+The `/api/dashboard-data` endpoint sets the following headers on every response:
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Content-Type-Options` | `nosniff` | Prevent MIME-type sniffing |
+| `X-Frame-Options` | `DENY` | Prevent clickjacking |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Limit referrer leakage |
+| `X-Dashboard-Commit` | `<commit SHA>` | Identifies which deployment served the response (from `VERCEL_GIT_COMMIT_SHA`) |
+| `Cache-Control` | `public, s-maxage=60, stale-while-revalidate=300` | Edge caching for successful responses |
+
 ## Runtime Data Strategy
 
 This app does not bundle `dashboard/data.json` into the client anymore.
@@ -142,4 +174,5 @@ Consider one of these follow-up strategies:
 
 - `src/` contains the React app
 - `api/dashboard-data.ts` is the production runtime endpoint for Vercel
-- `vercel.json` contains deployment-specific headers
+- `api/health.ts` is the health check endpoint
+- `vercel.json` is the **single production Vercel configuration** for this project (the legacy `dashboard/vercel.json` has been emptied)

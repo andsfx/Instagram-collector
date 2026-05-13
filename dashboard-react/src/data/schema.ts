@@ -1,5 +1,35 @@
 import { z } from 'zod'
 
+// ---------------------------------------------------------------------------
+// Version Support
+// ---------------------------------------------------------------------------
+
+/** Supported schema versions. Payloads with other versions are rejected. */
+export const SUPPORTED_VERSIONS = [2] as const
+
+// ---------------------------------------------------------------------------
+// Interfaces for Parse Results
+// ---------------------------------------------------------------------------
+
+/** A validation error with dot-path location and human-readable reason */
+export interface ValidationError {
+  /** Dot-path notation to the failing field, e.g. "content_breakdown.metmalbekasi.carousel" */
+  path: string
+  /** Human-readable description of why validation failed */
+  message: string
+  /** Machine-readable error code (e.g. "unrecognized_keys", "invalid_type") */
+  code: string
+}
+
+/** Discriminated union result from parsePayload */
+export type ParseResult<T> =
+  | { success: true; data: T }
+  | { success: false; errors: ValidationError[] }
+
+// ---------------------------------------------------------------------------
+// Sub-schemas
+// ---------------------------------------------------------------------------
+
 const metricSchema = z.object({
   followers: z.number().nullable(),
   following: z.number().nullable(),
@@ -9,10 +39,45 @@ const metricSchema = z.object({
   engagement_rate: z.number().nullable(),
 }).passthrough()
 
+/**
+ * Strict content breakdown schema for a single account.
+ * Only normalized field names are accepted:
+ * - `carousels` (NOT `carousel`)
+ * - `images` (NOT `image`)
+ * - `videos` (NOT `video`)
+ * - `unknown` for unrecognized post types
+ */
+const strictContentBreakdownAccountSchema = z.object({
+  reels: z.number().optional(),
+  carousels: z.number().optional(),
+  images: z.number().optional(),
+  videos: z.number().optional(),
+  unknown: z.number().optional(),
+  total_posts_analyzed: z.number().optional(),
+  posts: z.number().optional(),
+  followers: z.number().optional(),
+  bestPost: z.object({
+    url: z.string().optional(),
+    type: z.string().optional(),
+    interactions: z.number().optional(),
+    comments: z.number().optional(),
+    timestamp: z.string().optional(),
+    id: z.string().optional(),
+    caption: z.string().optional(),
+  }).optional(),
+}).strict()
+
+// ---------------------------------------------------------------------------
+// Dashboard Schema v2 (Strict)
+// ---------------------------------------------------------------------------
+
 export const dashboardSchema = z.object({
   generated_at: z.string(),
   generated_at_wib: z.string(),
-  version: z.number(),
+  version: z.number().refine(
+    (v) => (SUPPORTED_VERSIONS as readonly number[]).includes(v),
+    { message: `Unsupported version. Supported versions: ${SUPPORTED_VERSIONS.join(', ')}` },
+  ),
   sources: z.object({
     stats: z.string(),
     engagement: z.string(),
@@ -31,37 +96,7 @@ export const dashboardSchema = z.object({
     by_engagement_rate: z.array(z.object({ rank: z.number(), account: z.string(), engagement_rate: z.number() })),
   }),
   history: z.array(z.object({ date: z.string() }).passthrough()),
-  // Optional real-world fields that may appear in the data source
-  // Keep them optional to allow backward compatibility with older payloads
-  content_breakdown: z.record(z.object({
-    posts: z.number().optional(),
-    total_posts_analyzed: z.number().optional(),
-    reels: z.number().optional(),
-    carousel: z.number().optional(),
-    carousels: z.number().optional(),
-    image: z.number().optional(),
-    images: z.number().optional(),
-    video: z.number().optional(),
-    videos: z.number().optional(),
-    followers: z.number().optional(),
-    follower_count: z.number().optional(),
-    best_post_url: z.string().optional(),
-    best_post_type: z.string().optional(),
-    best_post_likes: z.number().optional(),
-    best_post_comments: z.number().optional(),
-    best_post_timestamp: z.string().optional(),
-    best_post_id: z.string().optional(),
-    best_post_caption: z.string().optional(),
-    bestPost: z.object({
-      url: z.string().optional(),
-      type: z.string().optional(),
-      interactions: z.number().optional(),
-      comments: z.number().optional(),
-      timestamp: z.string().optional(),
-      id: z.string().optional(),
-      caption: z.string().optional(),
-    }).optional(),
-  }).passthrough()).optional(),
+  content_breakdown: z.record(strictContentBreakdownAccountSchema).optional(),
   post_insights: z.record(z.object({
     followers: z.number().optional(),
     posts: z.array(z.object({
@@ -102,3 +137,39 @@ export const dashboardSchema = z.object({
 })
 
 export type DashboardApi = z.infer<typeof dashboardSchema>
+
+// ---------------------------------------------------------------------------
+// Payload Parser
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a Zod issue path array to dot-path notation string.
+ * e.g. ["content_breakdown", "metmalbekasi", "carousel"] → "content_breakdown.metmalbekasi.carousel"
+ */
+function formatPath(path: (string | number)[]): string {
+  if (path.length === 0) return '(root)'
+  return path.map((segment) => String(segment)).join('.')
+}
+
+/**
+ * Parse and validate a raw JSON payload against the strict v2 dashboard schema.
+ *
+ * Returns a discriminated union:
+ * - On success: `{ success: true, data: DashboardApi }`
+ * - On failure: `{ success: false, errors: ValidationError[] }` with dot-path error reporting
+ */
+export function parsePayload(payload: unknown): ParseResult<DashboardApi> {
+  const result = dashboardSchema.safeParse(payload)
+
+  if (result.success) {
+    return { success: true, data: result.data }
+  }
+
+  const errors: ValidationError[] = result.error.issues.map((issue) => ({
+    path: formatPath(issue.path),
+    message: issue.message,
+    code: issue.code,
+  }))
+
+  return { success: false, errors }
+}

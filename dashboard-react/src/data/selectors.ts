@@ -1,11 +1,33 @@
 import type { DashboardRecord, MetricEntry, PostInsightPost, UiAccountSummary } from './types'
+import { getAccountColor } from '../components/chart-theme'
+import {
+  formatInteger as _formatInteger,
+  formatCompact as _formatCompact,
+  formatDate,
+  formatDateTime,
+  formatEngagementRate,
+  formatPercent,
+  formatShortDate,
+  formatWeekday,
+} from '../utils/formatters'
 
+/**
+ * @deprecated Use `formatInteger()` function from `../utils/formatters` instead.
+ * Kept as Intl.NumberFormat instance for backward compatibility with `.format()` call sites.
+ */
 export const formatCompact = new Intl.NumberFormat('id-ID', {
   notation: 'compact',
   maximumFractionDigits: 1,
 })
 
+/**
+ * @deprecated Use `formatInteger()` function from `../utils/formatters` instead.
+ * Kept as Intl.NumberFormat instance for backward compatibility with `.format()` call sites.
+ */
 export const formatInteger = new Intl.NumberFormat('id-ID')
+
+// Re-export unified formatters for new consumers
+export { _formatInteger as fmtInteger, _formatCompact as fmtCompact, formatDate, formatDateTime, formatEngagementRate, formatPercent, formatShortDate, formatWeekday }
 
 const JAKARTA_DAY_FORMATTER = new Intl.DateTimeFormat('en-US', {
   timeZone: 'Asia/Jakarta',
@@ -19,22 +41,11 @@ const JAKARTA_HOUR_FORMATTER = new Intl.DateTimeFormat('en-US', {
 })
 
 function formatDateLabel(value: string) {
-  const date = new Date(value)
-  return date.toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+  return formatDate(value)
 }
 
 function formatDateTimeLabel(value: string) {
-  const date = new Date(value)
-  return date.toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return formatDateTime(value)
 }
 
 function metricFor(record: DashboardRecord, account: string): MetricEntry {
@@ -181,8 +192,6 @@ export interface QuickVisualData {
   engagementTrend: Array<Record<string, number | string | null>>
 }
 
-const SERIES_COLORS = ['#E1306C', '#833AB4', '#405DE6', '#F77737', '#5B51D8']
-
 const H2H_METRICS = {
   followers: { label: 'Followers' },
   engagement: { label: 'Engagement Rate' },
@@ -244,7 +253,7 @@ export function getQuickVisualData(data: DashboardRecord): QuickVisualData {
   const followerShare = data.accounts.map((account, index) => ({
     account: `@${account}`,
     followers: metricFor(data, account).followers ?? 0,
-    fill: SERIES_COLORS[index % SERIES_COLORS.length],
+    fill: getAccountColor(index),
   }))
 
   const accountMetrics = data.accounts.map((account) => ({
@@ -331,7 +340,7 @@ export function getQuickVisualData(data: DashboardRecord): QuickVisualData {
     for (let offset = 1; offset <= projectionDays; offset += 1) {
       const labelDate = new Date(data.latestDate)
       labelDate.setDate(labelDate.getDate() + offset)
-      const formattedDate = labelDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
+      const formattedDate = formatShortDate(labelDate.toISOString())
       const projectedValue = Math.round((slope * (lastIndex + offset)) + intercept)
       const rowIndex = projectionTrend.findIndex((row) => row.date === formattedDate)
 
@@ -397,7 +406,7 @@ export function getQuickVisualData(data: DashboardRecord): QuickVisualData {
     })),
     series: data.accounts.map((account, index) => ({
       key: account,
-      color: SERIES_COLORS[index % SERIES_COLORS.length],
+      color: getAccountColor(index),
     })),
     followerShare,
     radarComparison,
@@ -450,10 +459,7 @@ export function getLatestPost(posts: PostInsightPost[] | undefined) {
 
 export function formatPostDate(value?: string) {
   if (!value) return '-'
-  return new Date(value).toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-  })
+  return formatShortDate(value)
 }
 
 export interface HeadToHeadData {
@@ -986,12 +992,11 @@ export function getDailyMetricsView(data: DashboardRecord, selectedAccount?: str
   const accountHistory = history.map((row, index) => {
     const previous = index > 0 ? history[index - 1]?.values[account] : null
     const current = row.values[account]
-    const date = new Date(row.date)
 
     return {
       date: row.date,
-      dayLabel: date.toLocaleDateString('id-ID', { weekday: 'long' }),
-      fullDateLabel: date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
+      dayLabel: formatWeekday(row.date),
+      fullDateLabel: formatDate(row.date),
       followers: current?.followers ?? 0,
       following: current?.following ?? 0,
       posts: current?.posts ?? 0,

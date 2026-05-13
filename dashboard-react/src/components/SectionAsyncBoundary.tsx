@@ -1,6 +1,15 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { ErrorState, LoadingState } from './ui'
 
+/**
+ * Extract HTTP status code from error message if present.
+ * Matches patterns like "(404)" or "(502)" in error messages.
+ */
+function extractHttpCode(message: string): number | undefined {
+  const match = message.match(/\((\d{3})\)/)
+  return match ? Number(match[1]) : undefined
+}
+
 class AsyncErrorBoundary extends Component<
   {
     onReset: () => void
@@ -8,32 +17,37 @@ class AsyncErrorBoundary extends Component<
     fallbackDescription: string
     children: ReactNode
   },
-  { hasError: boolean; message: string }
+  { hasError: boolean; message: string; httpCode?: number }
 > {
-  state = {
+  state: { hasError: boolean; message: string; httpCode?: number } = {
     hasError: false,
     message: '',
+    httpCode: undefined,
   }
 
   static getDerivedStateFromError(error: Error) {
+    const httpCode = extractHttpCode(error.message)
     return {
       hasError: true,
       message: error.message,
+      httpCode,
     }
   }
 
-  componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {}
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('[dashboard.error]', error, errorInfo)
+  }
 
   render() {
     if (this.state.hasError) {
       return (
         <section className="panel panel-section section-card">
-          <ErrorState title={this.props.fallbackTitle} description={this.state.message || this.props.fallbackDescription} />
-          <div>
-            <button type="button" className="retry-button" onClick={this.props.onReset}>
-              Coba muat ulang section
-            </button>
-          </div>
+          <ErrorState
+            title={this.props.fallbackTitle}
+            message={this.state.message || this.props.fallbackDescription}
+            httpCode={this.state.httpCode}
+            onRetry={this.props.onReset}
+          />
         </section>
       )
     }

@@ -31,9 +31,9 @@ export function FreshnessPanel({ freshness }: { freshness: FreshnessSummary }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2 border-t border-slate-200/80 pt-5 dark:border-white/10">
-        <span className="inline-flex items-center rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold text-brand">Sumber: {freshness.sourceLabel}</span>
-        <span className="inline-flex items-center rounded-full bg-success-soft px-3 py-1 text-xs font-semibold text-success">Payload tervalidasi zod</span>
-        <span className="inline-flex items-center rounded-full bg-warning-soft px-3 py-1 text-xs font-semibold text-warning">Data saat ini dibundle ketika build</span>
+        <span className="inline-flex items-center rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold text-brand" role="status" aria-label={`Data source: ${freshness.sourceLabel}`}>Sumber: {freshness.sourceLabel}</span>
+        <span className="inline-flex items-center rounded-full bg-success-soft px-3 py-1 text-xs font-semibold text-success" role="status" aria-label="Validation status: payload validated with zod">Payload tervalidasi zod</span>
+        <span className="inline-flex items-center rounded-full bg-warning-soft px-3 py-1 text-xs font-semibold text-warning" role="status" aria-label="Data bundling: data is bundled at build time">Data saat ini dibundle ketika build</span>
       </div>
     </SectionCard>
   )

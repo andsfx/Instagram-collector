@@ -1,5 +1,5 @@
 import type { UiAccountSummary } from '../data/types'
-import { formatCompact } from '../data/selectors'
+import { formatCompact, formatEngagementRate, formatPercent } from '../utils/formatters'
 import { SectionCard } from './ui'
 
 const CARD_ACCENTS = [
@@ -39,31 +39,31 @@ export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[]
               </div>
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-soft)]">Followers</div>
               <div className="font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
-                {formatCompact.format(acc.followers)}
+                {formatCompact(acc.followers)}
               </div>
               <div className="mt-2 flex gap-1.5">
                 <span className={`inline-flex items-center rounded-[var(--radius-pill)] px-2 py-0.5 text-[10px] font-bold ${acc.change1d > 0 ? 'bg-[var(--success-soft)] text-[var(--success)]' : acc.change1d < 0 ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--panel-muted)] text-[var(--text-soft)]'}`}>
-                  {acc.change1d >= 0 ? '+' : ''}{formatCompact.format(acc.change1d)}
+                  {acc.change1d >= 0 ? '+' : ''}{formatCompact(acc.change1d)}
                 </span>
                 <span className={`inline-flex items-center rounded-[var(--radius-pill)] px-2 py-0.5 text-[10px] font-bold ${acc.change7dPct > 0 ? 'bg-[var(--success-soft)] text-[var(--success)]' : acc.change7dPct < 0 ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--panel-muted)] text-[var(--text-soft)]'}`}>
-                  7d {acc.change7dPct >= 0 ? '+' : ''}{acc.change7dPct.toFixed(2)}%
+                  7d {acc.change7dPct >= 0 ? '+' : ''}{formatPercent(acc.change7dPct)}
                 </span>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
-                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact.format(acc.following)}</div>
+                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact(acc.following)}</div>
                   <div className="text-[10px] text-[var(--text-soft)]">Following</div>
                 </div>
                 <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
-                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact.format(acc.posts)}</div>
+                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact(acc.posts)}</div>
                   <div className="text-[10px] text-[var(--text-soft)]">Posts</div>
                 </div>
                 <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
-                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact.format(acc.avgLikes)}</div>
+                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact(acc.avgLikes)}</div>
                   <div className="text-[10px] text-[var(--text-soft)]">Avg Likes</div>
                 </div>
                 <div className="rounded-[var(--radius-sm)] bg-[var(--ig-gradient-soft)] p-2 text-center">
-                  <div className="bg-[image:var(--ig-gradient)] bg-clip-text text-sm font-extrabold text-transparent">{acc.engagementRate.toFixed(2)}%</div>
+                  <div className="bg-[image:var(--ig-gradient)] bg-clip-text text-sm font-extrabold text-transparent">{formatEngagementRate(acc.engagementRate)}</div>
                   <div className="text-[10px] text-[var(--text-soft)]">ER</div>
                 </div>
               </div>

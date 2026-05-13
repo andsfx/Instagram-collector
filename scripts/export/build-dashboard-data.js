@@ -1,6 +1,110 @@
 const fs = require('fs');
 const path = require('path');
 const { supabase } = require('../lib/supabase');
+const { z } = require('zod');
+
+// ---------------------------------------------------------------------------
+// Schema Validation (mirrors dashboard-react/src/data/schema.ts)
+// ---------------------------------------------------------------------------
+
+const SUPPORTED_VERSIONS = [2];
+
+const metricSchemaLocal = z.object({
+  followers: z.number().nullable(),
+  following: z.number().nullable(),
+  posts: z.number().nullable(),
+  avg_likes: z.number().nullable(),
+  avg_comments: z.number().nullable(),
+  engagement_rate: z.number().nullable(),
+}).passthrough();
+
+const strictContentBreakdownAccountSchemaLocal = z.object({
+  reels: z.number().optional(),
+  carousels: z.number().optional(),
+  images: z.number().optional(),
+  videos: z.number().optional(),
+  unknown: z.number().optional(),
+  total_posts_analyzed: z.number().optional(),
+  posts: z.number().optional(),
+  followers: z.number().optional(),
+  bestPost: z.object({
+    url: z.string().optional(),
+    type: z.string().optional(),
+    interactions: z.number().optional(),
+    comments: z.number().optional(),
+    timestamp: z.string().optional(),
+    id: z.string().optional(),
+    caption: z.string().optional(),
+  }).optional(),
+}).strict();
+
+const dashboardSchemaLocal = z.object({
+  generated_at: z.string(),
+  generated_at_wib: z.string(),
+  version: z.number().refine(
+    (v) => SUPPORTED_VERSIONS.includes(v),
+    { message: `Unsupported version. Supported versions: ${SUPPORTED_VERSIONS.join(', ')}` },
+  ),
+  sources: z.object({
+    stats: z.string(),
+    engagement: z.string(),
+  }),
+  accounts: z.array(z.string()),
+  latest: z.object({
+    date: z.string(),
+  }).catchall(metricSchemaLocal),
+  growth: z.record(z.object({
+    followers_change_1d: z.number(),
+    followers_change_7d: z.number(),
+    pct_change_7d: z.number(),
+  })),
+  rankings: z.object({
+    by_followers: z.array(z.object({ rank: z.number(), account: z.string(), followers: z.number() })),
+    by_engagement_rate: z.array(z.object({ rank: z.number(), account: z.string(), engagement_rate: z.number() })),
+  }),
+  history: z.array(z.object({ date: z.string() }).passthrough()),
+  content_breakdown: z.record(strictContentBreakdownAccountSchemaLocal).optional(),
+  post_insights: z.record(z.object({
+    followers: z.number().optional(),
+    posts: z.array(z.object({}).passthrough()).optional(),
+    top_interactions: z.array(z.object({}).passthrough()).optional(),
+    average_likes: z.number().optional(),
+    average_comments: z.number().optional(),
+    average_post_er: z.number().optional(),
+    dominant_type: z.string().optional(),
+    top_hashtags: z.array(z.string()).optional(),
+    campaign_terms: z.array(z.string()).optional(),
+    viral_posts: z.number().optional(),
+    underperform_posts: z.number().optional(),
+  }).passthrough()).optional(),
+  presentation_report: z.object({
+    executiveSummary: z.object({
+      kpis: z.array(z.object({ key: z.string(), label: z.string(), account: z.string().nullable(), value: z.string() })),
+      bullets: z.array(z.string()),
+    }),
+  }),
+  meta: z.object({
+    brand_account: z.string().nullable().optional(),
+    history_days: z.number().optional(),
+  }).optional(),
+});
+
+/**
+ * Validate payload against schema kanonik.
+ * Returns { success: true, data } or { success: false, errors: [...] }
+ */
+function validatePayload(payload) {
+  const result = dashboardSchemaLocal.safeParse(payload);
+  if (result.success) {
+    return { success: true, data: result.data };
+  }
+  const errors = result.error.issues.map((issue) => ({
+    path: issue.path.length ? issue.path.join('.') : '(root)',
+    message: issue.message,
+    code: issue.code,
+  }));
+  return { success: false, errors };
+}
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -726,6 +830,38 @@ async function main() {
 const now = new Date();
   const generatedAt = now.toISOString();
   const assetVersion = toAssetVersion(generatedAt);
+
+  // Ensure all enabled accounts produce entries (handle failed accounts)
+  for (const accountCfg of accountsCfg) {
+    const username = accountCfg.username;
+    if (!latest[username]) {
+      console.warn(`[WARN] Account "${username}" has no data from pipeline — including with null engagement fields`);
+      latest[username] = {
+        followers: accountCfg.followers || null,
+        following: null,
+        posts: null,
+        avg_likes: null,
+        avg_comments: null,
+        engagement_rate: null,
+        ff_ratio: null,
+        verified: !!accountCfg.verified,
+        sources: { stats: 'socialblade', engagement: 'apify' },
+      };
+    }
+    if (!growth[username]) {
+      growth[username] = { followers_change_1d: 0, followers_change_7d: 0, pct_change_7d: 0, anomaly_detected: false, notes: [] };
+    }
+  }
+
+  // Ensure accounts list includes all enabled accounts
+  const accountsSet = new Set(accounts);
+  for (const accountCfg of accountsCfg) {
+    if (!accountsSet.has(accountCfg.username)) {
+      accounts.push(accountCfg.username);
+      accountsSet.add(accountCfg.username);
+    }
+  }
+
   const output = {
     generated_at: generatedAt,
     generated_at_wib: formatWib(generatedAt),
@@ -747,9 +883,25 @@ const now = new Date();
 
   output.presentation_report = buildPresentationReport(output);
 
-  const outPath = path.join(repoRoot, 'dashboard', 'data.json');
-  ensureDir(path.dirname(outPath));
-  fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
+  // --- Schema validation pre-write ---
+  const validation = validatePayload(output);
+  if (!validation.success) {
+    console.error('[ERROR] Dashboard payload failed schema validation. Previous payload preserved.');
+    for (const err of validation.errors) {
+      console.error(`  - ${err.path}: ${err.message} (${err.code})`);
+    }
+    process.exit(1);
+  }
+
+  // Write to new canonical location: data/dashboard-snapshot.json
+  const snapshotPath = path.join(repoRoot, 'data', 'dashboard-snapshot.json');
+  ensureDir(path.dirname(snapshotPath));
+  fs.writeFileSync(snapshotPath, JSON.stringify(output, null, 2));
+
+  // Also write to legacy location for backward compatibility during migration
+  const legacyOutPath = path.join(repoRoot, 'dashboard', 'data.json');
+  ensureDir(path.dirname(legacyOutPath));
+  fs.writeFileSync(legacyOutPath, JSON.stringify(output, null, 2));
 
   // Cache in Supabase for the API endpoint
   // DISABLED: PostgREST body size limit (~64KB) rejects large payloads (PGRST102)
@@ -766,7 +918,7 @@ const now = new Date();
   // }
 
   const assetUpdate = updateHtmlAssetVersion(repoRoot, assetVersion);
-  console.log(JSON.stringify({ outPath, generated_at: output.generated_at, history_days: output.meta.history_days, accounts, asset_version: assetVersion, index_html_updated: assetUpdate.updated }, null, 2));
+  console.log(JSON.stringify({ outPath: snapshotPath, legacyOutPath, generated_at: output.generated_at, history_days: output.meta.history_days, accounts, asset_version: assetVersion, index_html_updated: assetUpdate.updated, schema_valid: true }, null, 2));
 }
 
 main().catch((err) => {

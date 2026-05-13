@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { type RankingSortKey, type SortDirection, formatInteger, getRankingTableRows, sortRankingRows } from '../data/selectors'
+import { type RankingSortKey, type SortDirection, getRankingTableRows, sortRankingRows } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
+import { formatEngagementRate, formatInteger, formatPercent } from '../utils/formatters'
 import { SectionCard } from './ui'
 
 const SORT_LABELS: Array<{ key: RankingSortKey; label: string }> = [
@@ -109,7 +110,7 @@ export function RankingGrowthPresentation({
                 {topFollowerRows.slice(0, 3).map((row) => (
                   <li key={row.account} className="flex items-baseline justify-between gap-3">
                     <span className="font-semibold text-slate-900 dark:text-white">#{row.rank} @{row.account}</span>
-                    <span className="text-[0.9rem] text-slate-600 dark:text-slate-300">{formatInteger.format(row.followers)}</span>
+                    <span className="text-[0.9rem] text-slate-600 dark:text-slate-300">{formatInteger(row.followers)}</span>
                   </li>
                 ))}
               </ol>
@@ -121,7 +122,7 @@ export function RankingGrowthPresentation({
                 {topEngagementRows.slice(0, 3).map((row) => (
                   <li key={row.account} className="flex items-baseline justify-between gap-3">
                     <span className="font-semibold text-slate-900 dark:text-white">#{row.rank} @{row.account}</span>
-                    <span className="text-[0.9rem] text-slate-600 dark:text-slate-300">{row.engagementRate.toFixed(2)}%</span>
+                    <span className="text-[0.9rem] text-slate-600 dark:text-slate-300">{formatEngagementRate(row.engagementRate)}</span>
                   </li>
                 ))}
               </ol>
@@ -136,9 +137,9 @@ export function RankingGrowthPresentation({
               <li key={row.account} className="grid gap-1 border-b border-slate-200/70 pb-3 last:border-b-0 last:pb-0 dark:border-white/10">
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="font-semibold text-slate-900 dark:text-white">@{row.account}</span>
-                  <span className="text-[0.9rem] font-semibold text-[var(--brand)]">{row.pct_change_7d.toFixed(2)}%</span>
+                  <span className="text-[0.9rem] font-semibold text-[var(--brand)]">{formatPercent(row.pct_change_7d)}</span>
                 </div>
-                <span className="text-[0.88rem] text-slate-600 dark:text-slate-300">{formatInteger.format(row.followers_change_7d)} followers dalam 7 hari.</span>
+                <span className="text-[0.88rem] text-slate-600 dark:text-slate-300">{formatInteger(row.followers_change_7d)} followers dalam 7 hari.</span>
               </li>
             ))}
           </ol>
@@ -176,7 +177,7 @@ export function RankingGrowthPresentation({
                   {topFollowerRows.map((row, index) => (
                     <li key={row.account} className={`flex items-baseline justify-between gap-3 border-b border-[color:color-mix(in_srgb,var(--border)_80%,transparent)] pb-3 ${index === topFollowerRows.length - 1 ? 'border-b-0 pb-0' : ''}`}>
                       <span className="font-semibold text-text">#{row.rank} @{row.account}</span>
-                      <span className="text-[0.9rem] text-text-muted">{formatInteger.format(row.followers)} followers</span>
+                      <span className="text-[0.9rem] text-text-muted">{formatInteger(row.followers)} followers</span>
                     </li>
                   ))}
                 </ol>
@@ -191,7 +192,7 @@ export function RankingGrowthPresentation({
                   {topEngagementRows.map((row, index) => (
                     <li key={row.account} className={`flex items-baseline justify-between gap-3 border-b border-[color:color-mix(in_srgb,var(--border)_80%,transparent)] pb-3 ${index === topEngagementRows.length - 1 ? 'border-b-0 pb-0' : ''}`}>
                       <span className="font-semibold text-text">#{row.rank} @{row.account}</span>
-                      <span className="text-[0.9rem] text-text-muted">{row.engagementRate.toFixed(2)}% ER</span>
+                      <span className="text-[0.9rem] text-text-muted">{formatEngagementRate(row.engagementRate)} ER</span>
                     </li>
                   ))}
                 </ol>
@@ -210,9 +211,9 @@ export function RankingGrowthPresentation({
                 <li key={row.account} className="grid gap-1.5 rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_86%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-4 py-3">
                   <div className="flex items-baseline justify-between gap-3">
                     <span className="font-semibold text-text">@{row.account}</span>
-                    <span className="text-[0.9rem] font-semibold text-brand">{row.pct_change_7d.toFixed(2)}%</span>
+                    <span className="text-[0.9rem] font-semibold text-brand">{formatPercent(row.pct_change_7d)}</span>
                   </div>
-                  <span className="text-[0.88rem] text-text-muted">{formatInteger.format(row.followers_change_7d)} followers dalam 7 hari.</span>
+                  <span className="text-[0.88rem] text-text-muted">{formatInteger(row.followers_change_7d)} followers dalam 7 hari.</span>
                 </li>
               ))}
             </ol>
@@ -258,15 +259,15 @@ export function RankingGrowthPresentation({
                   <tr key={row.account} className="transition-colors hover:bg-[color:color-mix(in_srgb,var(--brand-soft)_28%,transparent)]">
                     <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">#{row.rank}</td>
                     <td className="border-b border-border px-[12px] py-3 text-[0.92rem] font-semibold text-text">@{row.account}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger.format(row.followers)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger.format(row.following)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger.format(row.posts)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger.format(Math.round(row.avgLikes))}</td>
+                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(row.followers)}</td>
+                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(row.following)}</td>
+                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(row.posts)}</td>
+                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(Math.round(row.avgLikes))}</td>
                     <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{row.avgComments.toFixed(2)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{row.engagementRate.toFixed(2)}%</td>
+                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatEngagementRate(row.engagementRate)}</td>
                     <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{row.verified ? 'Ya' : 'Tidak'}</td>
                     <td className={`border-b border-border px-[12px] py-3 text-[0.92rem] ${row.gapVsBrand >= 0 ? 'text-success' : 'text-danger'}`}>
-                      {row.gapVsBrand >= 0 ? '+' : ''}{formatInteger.format(row.gapVsBrand)}
+                      {row.gapVsBrand >= 0 ? '+' : ''}{formatInteger(row.gapVsBrand)}
                     </td>
                   </tr>
                 ))}

@@ -1,14 +1,15 @@
 import { useMemo } from 'react'
-import { formatInteger, getDailyMetricsView } from '../data/selectors'
+import { getDailyMetricsView } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
+import { formatInteger } from '../utils/formatters'
 import { EmptyState, SectionCard } from './ui'
 
 const RANGE_OPTIONS = [7, 14, 30]
 
 function renderDelta(value: number, isBaseline: boolean) {
   if (isBaseline) return <span style={{ color: 'var(--text-muted)' }}>--</span>
-  if (value > 0) return <span style={{ color: 'var(--success)' }}>+{formatInteger.format(value)}</span>
-  if (value < 0) return <span style={{ color: 'var(--danger)' }}>{formatInteger.format(value)}</span>
+  if (value > 0) return <span style={{ color: 'var(--success)' }}>+{formatInteger(value)}</span>
+  if (value < 0) return <span style={{ color: 'var(--danger)' }}>{formatInteger(value)}</span>
   return <span style={{ color: 'var(--text-muted)' }}>--</span>
 }
 
@@ -91,11 +92,11 @@ export function DailyMetrics({
                     </div>
                   </td>
                   <td className="border-b border-[var(--border)] px-4 py-3">{renderDelta(row.deltaFollowers, row.isBaseline)}</td>
-                  <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger.format(row.followers)}</td>
+                  <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger(row.followers)}</td>
                   <td className="border-b border-[var(--border)] px-4 py-3">{renderDelta(row.deltaFollowing, row.isBaseline)}</td>
-                  <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger.format(row.following)}</td>
+                  <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger(row.following)}</td>
                   <td className="border-b border-[var(--border)] px-4 py-3">{renderDelta(row.deltaPosts, row.isBaseline)}</td>
-                  <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger.format(row.posts)}</td>
+                  <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger(row.posts)}</td>
                 </tr>
               ))}
               {view.summaryRows.map((row) => (
@@ -123,10 +124,10 @@ export function DailyMetrics({
                 <div className="text-xs text-[var(--text-muted)]">{row.dayLabel}</div>
               </div>
               <div className="grid gap-2 text-sm">
-                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Followers</span><strong className="text-[var(--text)]">{formatInteger.format(row.followers)}</strong></div>
-                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Perubahan followers</span><strong className="text-[var(--text)]">{row.isBaseline ? '--' : `${row.deltaFollowers >= 0 ? '+' : ''}${formatInteger.format(row.deltaFollowers)}`}</strong></div>
-                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Following</span><strong className="text-[var(--text)]">{formatInteger.format(row.following)}</strong></div>
-                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Posts</span><strong className="text-[var(--text)]">{formatInteger.format(row.posts)}</strong></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Followers</span><strong className="text-[var(--text)]">{formatInteger(row.followers)}</strong></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Perubahan followers</span><strong className="text-[var(--text)]">{row.isBaseline ? '--' : `${row.deltaFollowers >= 0 ? '+' : ''}${formatInteger(row.deltaFollowers)}`}</strong></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Following</span><strong className="text-[var(--text)]">{formatInteger(row.following)}</strong></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Posts</span><strong className="text-[var(--text)]">{formatInteger(row.posts)}</strong></div>
               </div>
             </div>
           ))}
