@@ -9,8 +9,8 @@
     "test": "vitest run",
     "test:property": "vitest run --testNamePattern \"Property\"",
     "preview": "vite preview",
-    "deploy:preview": "npx vercel --target preview",
-    "deploy:prod": "npx vercel --prod"
+    "deploy:preview": "npx vercel --target preview --yes",
+    "deploy:prod": "npx vercel --prod --yes"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
