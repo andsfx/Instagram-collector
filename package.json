@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm --prefix ./dashboard-react test",
-    "build": "npm --prefix ./dashboard-react run build",
+    "build": "npm --prefix ./dashboard-react install && npm --prefix ./dashboard-react run build",
     "check:secrets": "node ./scripts/ci/check-secrets.js",
     "check:schema-doc": "node ./scripts/ci/check-schema-doc-sync.js"
   },
