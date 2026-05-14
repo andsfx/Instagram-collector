@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const LIVE_DATA_URL = process.env.DASHBOARD_URL || 'https://instagram-tracker-dashboard.vercel.app/data.json';
+const LIVE_DATA_URL = process.env.DASHBOARD_URL || 'https://instagram-tracker-dashboard.vercel.app/api/dashboard-data';
 const REQUIRED_ACCOUNTS = [
   'metmalbekasi',
   'grandmetropolitan',

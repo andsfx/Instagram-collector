@@ -36,7 +36,7 @@ const strictContentBreakdownAccountSchemaLocal = z.object({
     id: z.string().optional(),
     caption: z.string().optional(),
   }).optional(),
-}).strict();
+}).passthrough();
 
 const dashboardSchemaLocal = z.object({
   generated_at: z.string(),
