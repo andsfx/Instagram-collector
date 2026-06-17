@@ -248,6 +248,26 @@ function main() {
           if (attempt > 1) {
             console.log(`\n>>> push attempt ${attempt}/${maxPushAttempts}`);
           }
+          // Post-merge safety: validate dashboard/data.json parses before push
+          const dataJsonPath = path.join(repoRoot, 'dashboard', 'data.json');
+          if (fs.existsSync(dataJsonPath)) {
+            try {
+              const dj = JSON.parse(fs.readFileSync(dataJsonPath, 'utf8'));
+              if (!dj || typeof dj !== 'object' || !dj.generated_at) {
+                throw new Error('missing required field: generated_at');
+              }
+              if (attempt > 1) {
+                console.log('>>> data.json validation OK (parsed, generated_at present)');
+              }
+            } catch (parseErr) {
+              // data.json corrupt — abort rebase if in progress, then fail hard
+              try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}
+              const err = new Error(`dashboard/data.json invalid JSON after rebase: ${parseErr.message}`);
+              err.stage = 'git';
+              err.code = 'GIT_DATA_JSON_CORRUPT';
+              throw err;
+            }
+          }
           run('git', ['push', 'origin', 'HEAD:main'], { cwd: repoRoot, env: pushEnv });
           summary.git.pushed = true;
           break;
@@ -294,16 +314,37 @@ function main() {
                   try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}
                   pullError.stage = 'git';
                   pullError.code = 'GIT_DATASET_INVALID_JSON';
+                  pullError.message = `Apify dataset ${f} is invalid JSON after taking theirs version. Aborted rebase. Manual fix: cd ~/Instagram-collector && git rebase --abort; check origin/main for valid ${f} and merge manually.`;
+                  throw pullError;
+                }
+                execFileSync('git', ['add', f], { cwd: repoRoot });
+              }
+              execFileSync('git', ['-c', 'core.editor=true', 'rebase', '--continue'], { cwd: repoRoot });
+            } else if (conflictFiles.split('\n').every(f => f && /\.json$/.test(f))) {
+              // Generic JSON file conflict (non-dataset, e.g. dashboard/data.json): take theirs + JSON validate
+              console.log('\n>>> auto-resolving generic JSON conflict (accept theirs + validate)');
+              const conflicted = conflictFiles.split('\n').filter(Boolean);
+              for (const f of conflicted) {
+                execFileSync('git', ['checkout', '--theirs', f], { cwd: repoRoot });
+                try {
+                  JSON.parse(fs.readFileSync(path.join(repoRoot, f), 'utf8'));
+                } catch (parseErr) {
+                  console.error(`\n>>> FATAL: ${f} still invalid JSON after theirs checkout — aborting rebase`);
+                  try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}
+                  pullError.stage = 'git';
+                  pullError.code = 'GIT_JSON_INVALID_AFTER_THEIRS';
+                  pullError.message = `${f} is invalid JSON after taking theirs version. Aborted rebase. Manual fix: cd ~/Instagram-collector && git rebase --abort; check origin/main for valid ${f} and merge manually.`;
                   throw pullError;
                 }
                 execFileSync('git', ['add', f], { cwd: repoRoot });
               }
               execFileSync('git', ['-c', 'core.editor=true', 'rebase', '--continue'], { cwd: repoRoot });
             } else {
-              // Can't auto-resolve, abort rebase and fail
+              // Non-JSON or mixed conflict: conservative abort (safer than silent overwrite)
               try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}
               pullError.stage = 'git';
               pullError.code = 'GIT_PULL_REBASE_CONFLICT';
+              pullError.message = `Unresolvable rebase conflict on non-JSON or mixed files: ${conflictFiles.replace(/\n/g, ', ')}. Manual fix: cd ~/Instagram-collector && git rebase --abort; resolve ${conflictFiles.split('\n')[0]} manually.`;
               throw pullError;
             }
           }
