@@ -280,6 +280,25 @@ function main() {
               fs.writeFileSync(indexPath, indexHtml);
               execFileSync('git', ['add', 'dashboard/index.html'], { cwd: repoRoot });
               execFileSync('git', ['-c', 'core.editor=true', 'rebase', '--continue'], { cwd: repoRoot });
+            } else if (/^incoming\/apify\/datasets\/.*\.json$/.test(conflictFiles) || conflictFiles.split('\n').every(f => /^incoming\/apify\/datasets\/.*\.json$/.test(f))) {
+              // Apify dataset JSON conflict: accept theirs, validate, then continue
+              console.log('\n>>> auto-resolving Apify dataset conflict (accept theirs + JSON validate)');
+              const conflicted = conflictFiles.split('\n').filter(Boolean);
+              for (const f of conflicted) {
+                execFileSync('git', ['checkout', '--theirs', f], { cwd: repoRoot });
+                // Validate JSON after checkout
+                try {
+                  JSON.parse(fs.readFileSync(path.join(repoRoot, f), 'utf8'));
+                } catch (parseErr) {
+                  console.error(`\n>>> FATAL: ${f} still invalid JSON after theirs checkout — aborting rebase`);
+                  try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}
+                  pullError.stage = 'git';
+                  pullError.code = 'GIT_DATASET_INVALID_JSON';
+                  throw pullError;
+                }
+                execFileSync('git', ['add', f], { cwd: repoRoot });
+              }
+              execFileSync('git', ['-c', 'core.editor=true', 'rebase', '--continue'], { cwd: repoRoot });
             } else {
               // Can't auto-resolve, abort rebase and fail
               try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}

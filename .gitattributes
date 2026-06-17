@@ -1,0 +1,2 @@
+# Apify dataset files: use union merge (combine unique lines, no conflicts)
+incoming/apify/datasets/*.json merge=union
