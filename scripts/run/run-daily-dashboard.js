@@ -160,6 +160,39 @@ function githubPushEnv() {
 
 function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
+  const lockPath = path.join(repoRoot, '.cron-lock.daily-dashboard');
+  const lockPid = process.pid.toString();
+
+  // Flock-style guard: prevent double-fire race condition
+  if (fs.existsSync(lockPath)) {
+    try {
+      const stalePid = fs.readFileSync(lockPath, 'utf8').trim();
+      // Check if stale process is still alive
+      try { process.kill(parseInt(stalePid, 10), 0); } catch (_) {
+        // Process dead — safe to reclaim lock
+        console.log(`\n>>> removing stale cron lock (pid ${stalePid} no longer running)`);
+        fs.unlinkSync(lockPath);
+      }
+      if (fs.existsSync(lockPath)) {
+        // Lock still held by live process — bail silently, don't double-run
+        console.error(`\n>>> another instance (pid ${stalePid}) still running — skipping this run`);
+        process.exit(0);
+      }
+    } catch (_) { /* ignore lock read errors, proceed */ }
+  }
+  fs.writeFileSync(lockPath, lockPid);
+
+  // Cleanup lock on exit
+  function cleanupLock() {
+    try {
+      const current = fs.readFileSync(lockPath, 'utf8').trim();
+      if (current === lockPid) fs.unlinkSync(lockPath);
+    } catch (_) {}
+  }
+  process.on('exit', cleanupLock);
+  process.on('SIGINT', () => { cleanupLock(); process.exit(130); });
+  process.on('SIGTERM', () => { cleanupLock(); process.exit(143); });
+
   loadEnvFile(path.join(repoRoot, '.env.daily-dashboard'));
   loadEnvFile(path.join(repoRoot, '.env'));
 
@@ -248,21 +281,34 @@ function main() {
           if (attempt > 1) {
             console.log(`\n>>> push attempt ${attempt}/${maxPushAttempts}`);
           }
-          // Post-merge safety: validate dashboard/data.json parses before push
+          // Post-merge safety: validate dashboard/data.json parses + has expected shape
           const dataJsonPath = path.join(repoRoot, 'dashboard', 'data.json');
           if (fs.existsSync(dataJsonPath)) {
             try {
               const dj = JSON.parse(fs.readFileSync(dataJsonPath, 'utf8'));
-              if (!dj || typeof dj !== 'object' || !dj.generated_at) {
-                throw new Error('missing required field: generated_at');
+              const missing = [];
+              if (!dj || typeof dj !== 'object') throw new Error('root is not an object');
+              if (!dj.generated_at) missing.push('generated_at');
+              if (!Array.isArray(dj.accounts) || dj.accounts.length === 0) missing.push('accounts[]');
+              if (!dj.latest || typeof dj.latest !== 'object') missing.push('latest');
+              // Check all accounts have follower data in latest
+              if (dj.latest && Array.isArray(dj.accounts)) {
+                for (const acct of dj.accounts) {
+                  if (!dj.latest[acct] || typeof dj.latest[acct].followers !== 'number') {
+                    missing.push(`latest.${acct}.followers`);
+                  }
+                }
+              }
+              if (missing.length) {
+                throw new Error(`missing or invalid: ${missing.join(', ')}`);
               }
               if (attempt > 1) {
-                console.log('>>> data.json validation OK (parsed, generated_at present)');
+                console.log(`>>> data.json validation OK (${dj.accounts.length} accounts, generated_at=${dj.generated_at})`);
               }
             } catch (parseErr) {
               // data.json corrupt — abort rebase if in progress, then fail hard
               try { execFileSync('git', ['rebase', '--abort'], { cwd: repoRoot }); } catch (_) {}
-              const err = new Error(`dashboard/data.json invalid JSON after rebase: ${parseErr.message}`);
+              const err = new Error(`dashboard/data.json failed validation: ${parseErr.message}`);
               err.stage = 'git';
               err.code = 'GIT_DATA_JSON_CORRUPT';
               throw err;
