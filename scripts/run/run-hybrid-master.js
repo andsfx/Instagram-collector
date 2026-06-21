@@ -8,13 +8,15 @@ function readJson(filePath) {
 
 function run(cmd, args, options = {}) {
   const label = [cmd, ...args].join(' ');
-  console.log(`\n>>> ${label}`);
+  const timeout = options.timeout || 120000; // default 2 min per step
+  console.log(`\n>>> ${label} (timeout: ${timeout / 1000}s)`);
   const out = execFileSync(cmd, args, {
     cwd: options.cwd,
     env: { ...process.env, ...(options.env || {}) },
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
-    maxBuffer: 10 * 1024 * 1024
+    maxBuffer: 10 * 1024 * 1024,
+    timeout
   });
   if (out && out.trim()) console.log(out.trim());
   return out;
