@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-27T08:23:57.143Z",
-  "generated_at_wib": "2026-06-27T15:23:57+07:00",
+  "generated_at": "2026-06-27T09:03:54.292Z",
+  "generated_at_wib": "2026-06-27T16:03:54+07:00",
   "version": 2,
   "sources": {
     "stats": "socialblade",
@@ -4312,6 +4312,54 @@
       }
     },
     {
+      "date": "2026-06-26",
+      "metmalbekasi": {
+        "followers": 100523,
+        "following": 271,
+        "posts": 16911,
+        "avg_likes": 78.33,
+        "avg_comments": 9.08,
+        "engagement_rate": 0.09,
+        "anomaly": false
+      },
+      "grandmetropolitan": {
+        "followers": 97660,
+        "following": 275,
+        "posts": 11878,
+        "avg_likes": 114.25,
+        "avg_comments": 2.25,
+        "engagement_rate": 0.12,
+        "anomaly": false
+      },
+      "metmalcileungsi": {
+        "followers": 83446,
+        "following": 2143,
+        "posts": 18738,
+        "avg_likes": 168.08,
+        "avg_comments": 4.42,
+        "engagement_rate": 0.22,
+        "anomaly": false
+      },
+      "summareconmal.bekasi": {
+        "followers": 337246,
+        "following": 801,
+        "posts": 16373,
+        "avg_likes": 383.83,
+        "avg_comments": 221,
+        "engagement_rate": 0.12,
+        "anomaly": false
+      },
+      "pakuwonmallbekasi": {
+        "followers": 73207,
+        "following": 232,
+        "posts": 1840,
+        "avg_likes": 143.08,
+        "avg_comments": 9.58,
+        "engagement_rate": 0.21,
+        "anomaly": false
+      }
+    },
+    {
       "date": "2026-06-27",
       "metmalbekasi": {
         "followers": 100509,
@@ -4362,37 +4410,37 @@
   ],
   "growth": {
     "metmalbekasi": {
-      "followers_change_1d": -28,
-      "followers_change_7d": 545,
-      "pct_change_7d": 0.55,
+      "followers_change_1d": -14,
+      "followers_change_7d": -214,
+      "pct_change_7d": -0.21,
       "anomaly_detected": false,
       "notes": []
     },
     "grandmetropolitan": {
-      "followers_change_1d": 8,
-      "followers_change_7d": 513,
+      "followers_change_1d": 4,
+      "followers_change_7d": 512,
       "pct_change_7d": 0.53,
       "anomaly_detected": false,
       "notes": []
     },
     "metmalcileungsi": {
-      "followers_change_1d": 21,
-      "followers_change_7d": 75,
-      "pct_change_7d": 0.09,
+      "followers_change_1d": 11,
+      "followers_change_7d": 70,
+      "pct_change_7d": 0.08,
       "anomaly_detected": false,
       "notes": []
     },
     "summareconmal.bekasi": {
-      "followers_change_1d": 151,
-      "followers_change_7d": 334,
-      "pct_change_7d": 0.1,
+      "followers_change_1d": 76,
+      "followers_change_7d": 276,
+      "pct_change_7d": 0.08,
       "anomaly_detected": false,
       "notes": []
     },
     "pakuwonmallbekasi": {
-      "followers_change_1d": -10,
-      "followers_change_7d": 355,
-      "pct_change_7d": 0.49,
+      "followers_change_1d": -5,
+      "followers_change_7d": 336,
+      "pct_change_7d": 0.46,
       "anomaly_detected": false,
       "notes": []
     }
@@ -5463,10 +5511,10 @@
   },
   "presentation_report": {
     "meta": {
-      "generatedAt": "2026-06-27T08:23:57.143Z",
-      "generatedAtWib": "2026-06-27T15:23:57+07:00",
+      "generatedAt": "2026-06-27T09:03:54.292Z",
+      "generatedAtWib": "2026-06-27T16:03:54+07:00",
       "accountCount": 5,
-      "historyDays": 89,
+      "historyDays": 90,
       "source": [
         "SocialBlade",
         "Apify",
@@ -5478,7 +5526,7 @@
       "title": "Instagram Competitor Performance Report",
       "subtitle": "Laporan ringkas performa kompetitor Instagram",
       "periodLabel": "Update: 27 Jun 2026",
-      "scopeLabel": "5 akun dipantau · 89 hari histori",
+      "scopeLabel": "5 akun dipantau · 90 hari histori",
       "brand": {
         "name": "Metropolitan Mall Bekasi",
         "theme": {
@@ -5505,8 +5553,8 @@
         {
           "key": "fastest_growth",
           "label": "Fastest Growth",
-          "account": "metmalbekasi",
-          "value": "+0.55%"
+          "account": "grandmetropolitan",
+          "value": "+0.53%"
         },
         {
           "key": "top_content_format",
@@ -5544,15 +5592,15 @@
         "account": "metmalbekasi",
         "followers": 100509,
         "followersLabel": "100.5K",
-        "growth": 0.55,
-        "growthLabel": "+0.55%",
+        "growth": -0.21,
+        "growthLabel": "-0.21%",
         "engagementRate": 0.12,
         "engagementRateLabel": "0.12%",
         "avgPostEr": 0.1165,
         "avgPostErLabel": "0.12%",
         "dominantType": "carousel",
         "viralPosts": 4,
-        "positioningTag": "Challenger"
+        "positioningTag": "Watchlist"
       },
       {
         "account": "grandmetropolitan",
@@ -5566,14 +5614,14 @@
         "avgPostErLabel": "0.03%",
         "dominantType": "carousel",
         "viralPosts": 4,
-        "positioningTag": "Watchlist"
+        "positioningTag": "Challenger"
       },
       {
         "account": "metmalcileungsi",
         "followers": 83457,
         "followersLabel": "83.5K",
-        "growth": 0.09,
-        "growthLabel": "+0.09%",
+        "growth": 0.08,
+        "growthLabel": "+0.08%",
         "engagementRate": 0.12,
         "engagementRateLabel": "0.12%",
         "avgPostEr": 0.1224,
@@ -5586,8 +5634,8 @@
         "account": "summareconmal.bekasi",
         "followers": 337322,
         "followersLabel": "337.3K",
-        "growth": 0.1,
-        "growthLabel": "+0.10%",
+        "growth": 0.08,
+        "growthLabel": "+0.08%",
         "engagementRate": 0.17,
         "engagementRateLabel": "0.17%",
         "avgPostEr": 0.1667,
@@ -5600,8 +5648,8 @@
         "account": "pakuwonmallbekasi",
         "followers": 73202,
         "followersLabel": "73.2K",
-        "growth": 0.49,
-        "growthLabel": "+0.49%",
+        "growth": 0.46,
+        "growthLabel": "+0.46%",
         "engagementRate": 0.21,
         "engagementRateLabel": "0.21%",
         "avgPostEr": 0.2085,
@@ -5641,41 +5689,41 @@
       ],
       "growthRanking": [
         {
-          "account": "metmalbekasi",
-          "value": 0.55,
-          "label": "+0.55%"
-        },
-        {
           "account": "grandmetropolitan",
           "value": 0.53,
           "label": "+0.53%"
         },
         {
           "account": "pakuwonmallbekasi",
-          "value": 0.49,
-          "label": "+0.49%"
-        },
-        {
-          "account": "summareconmal.bekasi",
-          "value": 0.1,
-          "label": "+0.10%"
+          "value": 0.46,
+          "label": "+0.46%"
         },
         {
           "account": "metmalcileungsi",
-          "value": 0.09,
-          "label": "+0.09%"
+          "value": 0.08,
+          "label": "+0.08%"
+        },
+        {
+          "account": "summareconmal.bekasi",
+          "value": 0.08,
+          "label": "+0.08%"
+        },
+        {
+          "account": "metmalbekasi",
+          "value": -0.21,
+          "label": "-0.21%"
         }
       ],
       "roles": [
         {
           "account": "metmalbekasi",
-          "role": "Challenger",
-          "reason": "Mencatat pertumbuhan paling cepat dan berpotensi meningkatkan tekanan kompetitif."
+          "role": "Watchlist",
+          "reason": "Layak dipantau lebih dekat karena menunjukkan sinyal performa yang menonjol atau belum stabil."
         },
         {
           "account": "grandmetropolitan",
-          "role": "Watchlist",
-          "reason": "Layak dipantau lebih dekat karena menunjukkan sinyal performa yang menonjol atau belum stabil."
+          "role": "Challenger",
+          "reason": "Mencatat pertumbuhan paling cepat dan berpotensi meningkatkan tekanan kompetitif."
         },
         {
           "account": "metmalcileungsi",
@@ -5698,15 +5746,15 @@
           "account": "metmalbekasi",
           "followers": 100509,
           "followersLabel": "100.5K",
-          "growth": 0.55,
-          "growthLabel": "+0.55%",
+          "growth": -0.21,
+          "growthLabel": "-0.21%",
           "engagementRate": 0.12,
           "engagementRateLabel": "0.12%",
           "avgPostEr": 0.1165,
           "avgPostErLabel": "0.12%",
           "dominantType": "carousel",
           "viralPosts": 4,
-          "positioningTag": "Challenger"
+          "positioningTag": "Watchlist"
         },
         {
           "account": "grandmetropolitan",
@@ -5720,14 +5768,14 @@
           "avgPostErLabel": "0.03%",
           "dominantType": "carousel",
           "viralPosts": 4,
-          "positioningTag": "Watchlist"
+          "positioningTag": "Challenger"
         },
         {
           "account": "metmalcileungsi",
           "followers": 83457,
           "followersLabel": "83.5K",
-          "growth": 0.09,
-          "growthLabel": "+0.09%",
+          "growth": 0.08,
+          "growthLabel": "+0.08%",
           "engagementRate": 0.12,
           "engagementRateLabel": "0.12%",
           "avgPostEr": 0.1224,
@@ -5740,8 +5788,8 @@
           "account": "summareconmal.bekasi",
           "followers": 337322,
           "followersLabel": "337.3K",
-          "growth": 0.1,
-          "growthLabel": "+0.10%",
+          "growth": 0.08,
+          "growthLabel": "+0.08%",
           "engagementRate": 0.17,
           "engagementRateLabel": "0.17%",
           "avgPostEr": 0.1667,
@@ -5754,8 +5802,8 @@
           "account": "pakuwonmallbekasi",
           "followers": 73202,
           "followersLabel": "73.2K",
-          "growth": 0.49,
-          "growthLabel": "+0.49%",
+          "growth": 0.46,
+          "growthLabel": "+0.46%",
           "engagementRate": 0.21,
           "engagementRateLabel": "0.21%",
           "avgPostEr": 0.2085,
@@ -6079,7 +6127,7 @@
       },
       {
         "title": "Ada akun yang perlu dipantau dari sisi pertumbuhan",
-        "detail": "@metmalbekasi mencatat pertumbuhan tercepat di periode ini."
+        "detail": "@grandmetropolitan mencatat pertumbuhan tercepat di periode ini."
       },
       {
         "title": "Ada format konten yang terlihat paling efektif",
@@ -6100,13 +6148,13 @@
         "Pastikan campaign yang sering diulang juga punya hook interaksi yang kuat."
       ],
       "watchlist": [
-        "Pantau @metmalbekasi karena pertumbuhannya paling cepat.",
+        "Pantau @grandmetropolitan karena pertumbuhannya paling cepat.",
         "Pantau pola konten @metmalbekasi karena punya post viral terbanyak."
       ]
     }
   },
   "meta": {
     "brand_account": "metmalbekasi",
-    "history_days": 89
+    "history_days": 90
   }
 }
