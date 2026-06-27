@@ -88,10 +88,24 @@ function main() {
     summary.followerHistory = { status: 'error', reason: error.message };
   }
 
-  // 3) Run Apify batch
+  // 3) Run Apify batch (capture output even on partial failure — exit code 2 = some accounts failed)
   try {
-    const out = run('node', [path.join(repoRoot, 'scripts', 'apify', 'run-apify-batch.js')], { cwd: repoRoot });
-    summary.apifyBatch = extractTrailingJson(out) || { status: 'unknown' };
+    let out = '';
+    try {
+      out = run('node', [path.join(repoRoot, 'scripts', 'apify', 'run-apify-batch.js')], { cwd: repoRoot });
+    } catch (e) {
+      out = (e.stdout || '');
+      const processed = extractTrailingJson(out);
+      if (processed && (processed.processed || 0) > 0) {
+        console.warn('[WARN] Apify batch partial: ' + processed.processed + ' ok, ' + processed.errors + ' failed');
+        summary.apifyBatch = processed;
+      } else {
+        summary.apifyBatch = { status: 'error', reason: e.message };
+      }
+    }
+    if (!summary.apifyBatch) {
+      summary.apifyBatch = extractTrailingJson(out) || { status: 'unknown' };
+    }
   } catch (error) {
     summary.apifyBatch = { status: 'error', reason: error.message };
   }

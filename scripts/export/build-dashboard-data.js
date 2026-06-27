@@ -675,6 +675,18 @@ function buildPresentationReport(data) {
   };
 }
 
+
+function loadLocalMetrics(repoRoot, username) {
+  const metricsPath = path.join(repoRoot, 'data', 'processed', 'metrics', username + '-metrics.json');
+  const mergedPath = path.join(repoRoot, 'data', 'processed', 'merged', username + '.json');
+  if (!fs.existsSync(metricsPath) || !fs.existsSync(mergedPath)) return null;
+  try {
+    const metrics = JSON.parse(fs.readFileSync(metricsPath, 'utf8'));
+    const merged = JSON.parse(fs.readFileSync(mergedPath, 'utf8'));
+    return { metrics, merged };
+  } catch (_) { return null; }
+}
+
 async function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   const accountsCfg = readJson(path.join(repoRoot, 'config', 'accounts.json')).filter((a) => a.enabled);
@@ -768,6 +780,16 @@ async function main() {
       verified: !!accountCfg.verified,
       sources: { stats: 'socialblade', engagement: 'apify' },
     };
+    // Fallback: if engagement is null from Supabase, use local metrics file
+    if (latest[username].avg_likes == null) {
+      const localMetrics = loadLocalMetrics(repoRoot, username);
+      if (localMetrics && localMetrics.metrics) {
+        latest[username].avg_likes = localMetrics.metrics.avg_likes ?? null;
+        latest[username].avg_comments = localMetrics.metrics.avg_comments ?? null;
+        latest[username].engagement_rate = localMetrics.metrics.engagement_rate ?? null;
+        console.warn('[FALLBACK] ' + username + ': using local metrics file (Supabase engagement null)');
+      }
+    }
     growth[username] = computeGrowth(history, username);
     latestAccounts.push({ username, ...latest[username] });
   }

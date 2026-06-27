@@ -106,7 +106,14 @@ function assertHybridSummaryHealthy(summary) {
     failures.push(`Follower History: ${summary.followerHistory.reason || 'unknown error'}`);
   }
   if (summary?.apifyBatch?.status === 'error') {
-    failures.push(`Apify batch: ${summary.apifyBatch.reason || 'unknown error'}`);
+    // Allow partial failures — only abort if ALL accounts failed
+    const processed = summary.apifyBatch.processed || 0;
+    const errors = summary.apifyBatch.errors || 0;
+    if (processed > 0 && errors > 0) {
+      console.warn('[WARN] Apify partial: ' + processed + ' ok, ' + errors + ' failed — continuing pipeline');
+    } else {
+      failures.push('Apify batch: ' + (summary.apifyBatch.reason || 'unknown error'));
+    }
   }
   if (summary?.sheetSync?.status === 'error') {
     failures.push(`Sheet sync: ${summary.sheetSync.reason || 'unknown error'}`);
