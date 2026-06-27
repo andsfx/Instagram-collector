@@ -62,7 +62,7 @@ function getRun(runId) {
 
 async function waitForRunCompletion(runId, username, options) {
   options = options || {};
-  const maxAttempts = options.maxAttempts || 12;
+  const maxAttempts = options.maxAttempts || 30;
   const delayMs = options.delayMs || 10000;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -86,7 +86,9 @@ async function waitForRunCompletion(runId, username, options) {
     }
 
     if (attempt < maxAttempts) {
-      await sleep(delayMs);
+      const backoff = Math.min(delayMs * Math.pow(2, attempt - 1), 60000);
+      console.error('[' + username + '] Poll ' + attempt + '/' + maxAttempts + ' - status=' + status + ' - retry in ' + (backoff/1000) + 's');
+      await sleep(backoff);
     }
   }
 
@@ -111,7 +113,7 @@ async function callApifyRun(username, resultsLimit) {
   const out = runCmd('curl', [
     '-sS',
     '-X', 'POST',
-    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?waitForFinish=180`,
+    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?waitForFinish=600`,
     '-H', `Authorization: Bearer ${APIFY_TOKEN}`,
     '-H', 'Content-Type: application/json',
     '--data', JSON.stringify(payload)
@@ -127,7 +129,7 @@ async function callApifyRun(username, resultsLimit) {
 
   if (['READY', 'RUNNING'].includes(status) && data.id) {
     data = await waitForRunCompletion(data.id, username, {
-      maxAttempts: 12,
+      maxAttempts: 30,
       delayMs: 10000
     });
 
