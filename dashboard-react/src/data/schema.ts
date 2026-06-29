@@ -99,9 +99,9 @@ export const dashboardSchema = z.object({
     posts: z.array(z.object({
       id: z.string().optional(),
       url: z.string().optional(),
-      shortcode: z.string().optional(),
-      timestamp: z.string().optional(),
-      published_at: z.string().optional(),
+      shortcode: z.string().nullish(),
+      timestamp: z.string().nullish(),
+      published_at: z.string().nullish(),
       interactions: z.number().optional(),
       likes: z.number().optional(),
       comments: z.number().optional(),

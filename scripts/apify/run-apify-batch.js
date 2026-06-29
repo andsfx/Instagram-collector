@@ -129,7 +129,7 @@ async function callApifyRun(username, resultsLimit) {
 
   if (['READY', 'RUNNING'].includes(status) && data.id) {
     data = await waitForRunCompletion(data.id, username, {
-      maxAttempts: 30,
+      maxAttempts: 50,
       delayMs: 10000
     });
 

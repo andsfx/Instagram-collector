@@ -92,7 +92,7 @@ function main() {
   try {
     let out = '';
     try {
-      out = run('node', [path.join(repoRoot, 'scripts', 'apify', 'run-apify-batch.js')], { cwd: repoRoot });
+      out = run('node', [path.join(repoRoot, 'scripts', 'apify', 'run-apify-batch.js')], { cwd: repoRoot, timeout: 1200000 });
     } catch (e) {
       out = (e.stdout || '');
       const processed = extractTrailingJson(out);
