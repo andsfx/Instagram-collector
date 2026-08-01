@@ -1,35 +1,43 @@
 import type { InsightsData } from '../data/selectors'
-import { SectionCard } from './ui'
 
 export function InsightsPanel({ insights }: { insights: InsightsData }) {
   if (insights.items.length === 0) {
     return (
-      <SectionCard eyebrow="Insights" title="Catatan keputusan">
-        <p className="py-8 text-center text-sm text-[var(--text-muted)]">Insight belum tersedia untuk periode ini.</p>
-      </SectionCard>
+      <section className="border border-[var(--border)] bg-[var(--panel-muted)] p-6">
+        <h2 className="text-lg font-semibold text-[var(--text)]">Catatan keputusan</h2>
+        <p className="mt-4 py-6 text-center text-sm text-[var(--text-muted)]">
+          Insight belum tersedia untuk periode ini.
+        </p>
+      </section>
     )
   }
+
   return (
-    <SectionCard eyebrow="Insights" title="Catatan keputusan">
-      <div className="grid gap-4 md:grid-cols-3">
-        {insights.items.map((item) => (
-          <article
+    <section className="border border-[var(--border)] bg-[var(--panel-muted)] p-6">
+      <h2 className="text-lg font-semibold text-[var(--text)]">Catatan keputusan</h2>
+      <ol className="mt-4">
+        {insights.items.map((item, i) => (
+          <li
             key={item.title}
-            className="grid gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-4 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5"
+            className="border-t border-[var(--border)] py-4 first:border-t-0 first:pt-0"
           >
-            <div className={`inline-flex w-fit items-center gap-1.5 rounded-[var(--radius-pill)] px-3 py-1 text-[10px] font-bold ${
-              item.tone === 'positive' ? 'bg-[var(--success-soft)] text-[var(--success)]'
-              : item.tone === 'warning' ? 'bg-[var(--warning-soft)] text-[var(--warning)]'
-              : item.tone === 'danger' ? 'bg-[var(--danger-soft)] text-[var(--danger)]'
-              : 'bg-[var(--brand-soft)] text-[var(--brand)]'
-            }`}>
-              {item.label}
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 shrink-0 font-display text-sm font-normal text-[var(--brand)]">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div className="min-w-0 grid gap-1">
+                <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
+                  {item.label}
+                </p>
+                <h3 className="text-base font-semibold text-[var(--text)] break-words">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-[var(--text-muted)] break-words">
+                  {item.description}
+                </p>
+              </div>
             </div>
-            <h3 className="font-display text-base font-bold tracking-tight text-[var(--text)] break-words">{item.title}</h3>
-            <p className="text-sm leading-relaxed text-[var(--text-muted)] break-words">{item.description}</p>
-          </article>
+          </li>
         ))}
-      </div>
-    </SectionCard>
+      </ol>
+    </section>
   )
 }

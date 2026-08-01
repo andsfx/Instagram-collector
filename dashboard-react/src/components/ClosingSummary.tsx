@@ -1,5 +1,4 @@
 import type { ExecutiveSummaryData, FreshnessSummary, InsightsData, TodaySummaryData } from '../data/selectors'
-import { SectionCard } from './ui'
 
 export function ClosingSummary({
   summary,
@@ -12,36 +11,48 @@ export function ClosingSummary({
   insights: InsightsData
   freshness: FreshnessSummary
 }) {
+  const lead = summary.kpis[0]
+  const takeaway = insights.items[0]
+
   return (
-    <SectionCard eyebrow="Closing Summary" title="Ringkasan penutup">
-      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)]">
-        <div className="grid gap-5 lg:grid-cols-[1fr_auto]">
-          <div className="grid gap-4">
-            <div className="grid gap-3 sm:grid-cols-3">
-              {summary.kpis.slice(0, 3).map((kpi) => (
-                <div key={kpi.key}>
-                  <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">{kpi.label}</div>
-                  <div className="font-display text-lg font-extrabold tracking-tight text-[var(--text)]">{kpi.value}</div>
-                  <div className="text-xs text-[var(--text-muted)]">{kpi.account ? `@${kpi.account}` : 'Agregat'}</div>
-                </div>
-              ))}
-            </div>
-            <div className="grid gap-2 border-t border-[var(--border)] pt-3">
-              {insights.items.slice(0, 3).map((item, i) => (
-                <div key={item.title} className="flex items-start gap-2 text-sm text-[var(--text-muted)]">
-                  <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[10px] font-bold text-[var(--brand)]">{i + 1}</span>
-                  <span><strong className="text-[var(--text)] break-words">{item.title}</strong> — {item.description}</span>
-                </div>
-              ))}
-            </div>
+    <div className="grid gap-6">
+      {/* Narrative lead */}
+      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Ringkasan penutup</h2>
+        <p className="mt-4 text-lg leading-relaxed text-[var(--text)]">
+          {takeaway ? `${takeaway.title} — ${takeaway.description}` : 'Tidak ada ringkasan yang tersedia untuk hari ini.'}
+        </p>
+
+        {/* Closing figure */}
+        {lead ? (
+          <div className="mt-6 border-t border-[var(--border)] pt-4">
+            <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+              {lead.label}{lead.account ? ` · @${lead.account}` : ''}
+            </p>
+            <p className="mt-1 font-display text-[clamp(1.8rem,3.5vw,2.6rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
+              {lead.value}
+            </p>
           </div>
-          <div className="border-t border-[var(--border)] pt-3 text-xs text-[var(--text-soft)] lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
-            <div className="font-bold">Ref: {today.referenceDate}</div>
-            <div className="mt-1">Generated {freshness.generatedAtLabel}</div>
-            <div>Latest: {freshness.latestDateLabel}</div>
+        ) : null}
+      </section>
+
+      {/* Supporting paragraphs */}
+      {insights.items.length > 1 && (
+        <section className="border border-[var(--border)] bg-[var(--panel-muted)] p-6">
+          <div className="grid">
+            {insights.items.slice(1, 4).map((item, i) => (
+              <p key={item.title} className={`text-sm leading-relaxed text-[var(--text-muted)] ${i === 0 ? '' : 'border-t border-[var(--border)] pt-4'} ${i === 0 ? 'pb-4' : ''}`}>
+                <strong className="font-semibold text-[var(--text)] break-words">{item.title}</strong> — {item.description}
+              </p>
+            ))}
           </div>
-        </div>
-      </div>
-    </SectionCard>
+        </section>
+      )}
+
+      {/* Reference line */}
+      <p className="text-xs text-[var(--text-soft)]">
+        Ref: {today.referenceDate} · Generated {freshness.generatedAtLabel} · Latest: {freshness.latestDateLabel}
+      </p>
+    </div>
   )
 }

@@ -1,26 +1,49 @@
 import type { TodaySummaryData } from '../data/selectors'
-import { SectionCard } from './ui'
 
 export function TodaySummary({ today }: { today: TodaySummaryData }) {
+  const [primary, ...rest] = today.items
+
   return (
-    <SectionCard eyebrow="Update Hari Ini" title={today.title}>
-      <div className="rounded-[var(--radius-lg)] border border-[rgba(131,58,180,0.16)] bg-gradient-to-br from-[rgba(64,93,230,0.05)] to-[rgba(225,48,108,0.06)] p-5 shadow-[var(--shadow-sm)]">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Ringkasan Hari Ini</div>
-          <span className="rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1 text-[10px] font-bold text-[var(--text-muted)]">
-            {today.referenceDate}
-          </span>
+    <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-lg font-semibold text-[var(--text)]">{today.title}</h2>
+        <span className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
+          {today.referenceDate}
+        </span>
+      </div>
+
+      {primary && (
+        <div className="mt-6 border-b border-[var(--border)] pb-6">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+            {primary.label}
+          </p>
+          <p className="font-display text-[clamp(2rem,4vw,3rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
+            {primary.value}
+          </p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">{primary.detail}</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {today.items.map((item) => (
-            <article key={item.label} className="border-t border-[var(--border)] pt-3 first:border-t-0 first:pt-0 md:border-l md:border-t-0 md:pl-4 md:pt-0 md:first:border-l-0 md:first:pl-0">
-              <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">{item.label}</div>
-              <div className="mt-1 font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">{item.value}</div>
-              <div className="mt-0.5 text-xs text-[var(--text-muted)] break-words">{item.detail}</div>
-            </article>
+      )}
+
+      {rest.length > 0 && (
+        <div className="mt-2">
+          {rest.map((item) => (
+            <div
+              key={item.label}
+              className="flex flex-col gap-1 border-t border-[var(--border)] py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+            >
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
+                  {item.label}
+                </p>
+                <p className="mt-0.5 text-sm text-[var(--text-muted)]">{item.detail}</p>
+              </div>
+              <p className="shrink-0 font-display text-xl font-normal tracking-tight text-[var(--text)]">
+                {item.value}
+              </p>
+            </div>
           ))}
         </div>
-      </div>
-    </SectionCard>
+      )}
+    </section>
   )
 }

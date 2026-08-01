@@ -1,76 +1,74 @@
 import type { UiAccountSummary } from '../data/types'
 import { formatCompact, formatEngagementRate, formatPercent } from '../utils/formatters'
-import { SectionCard } from './ui'
-
-const CARD_ACCENTS = [
-  'before:bg-[image:var(--account-brand)]',
-  'before:bg-[image:var(--account-comp-1)]',
-  'before:bg-[image:var(--account-comp-2)]',
-  'before:bg-[image:var(--account-comp-3)]',
-  'before:bg-[image:var(--account-comp-4)]',
-]
 
 export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[] }) {
   if (accounts.length === 0) {
     return (
-      <SectionCard eyebrow="Overview Akun" title="Perbandingan cepat tiap akun">
-        <p className="py-8 text-center text-sm text-[var(--text-muted)]">Belum ada akun yang bisa ditampilkan.</p>
-      </SectionCard>
+      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Perbandingan cepat tiap akun</h2>
+        <p className="mt-4 py-6 text-center text-sm text-[var(--text-muted)]">Belum ada akun yang bisa ditampilkan.</p>
+      </section>
     )
   }
+
   return (
-    <SectionCard eyebrow="Overview Akun" title="Perbandingan cepat tiap akun">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-6">
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {accounts.map((acc, index) => {
-          const accentClass = CARD_ACCENTS[index % CARD_ACCENTS.length]
           const isBrand = index === 0
+          const isMuted = index % 2 === 1
           return (
-            <article
+            <section
               key={acc.key}
-              className={`relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-lg)] hover:-translate-y-0.5 before:absolute before:inset-x-0 before:top-0 before:h-1 before:rounded-t-[var(--radius-lg)] ${accentClass} ${isBrand ? 'bg-gradient-to-b from-[rgba(225,48,108,0.03)] to-[var(--panel)]' : ''}`}
+              className={`border border-[var(--border)] p-5 ${isMuted ? 'bg-[var(--panel-muted)]' : 'bg-[var(--panel)]'}`}
             >
-              <div className="mb-3 flex items-center justify-between">
-                <span className="font-display text-sm font-bold text-[var(--text)] truncate">{acc.name}</span>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="truncate text-base font-semibold text-[var(--text)]">{acc.name}</h3>
                 {isBrand ? (
-                  <span className="rounded-[var(--radius-pill)] bg-[image:var(--ig-gradient)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">Brand</span>
+                  <span className="rounded-[var(--radius-sm)] bg-[var(--brand-soft)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--brand)]">Brand</span>
                 ) : (
-                  <span className="rounded-[var(--radius-pill)] bg-[var(--panel-muted)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--text-soft)]">Competitor</span>
+                  <span className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-soft)]">Competitor</span>
                 )}
               </div>
-              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-soft)]">Followers</div>
-              <div className="font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
-                {formatCompact(acc.followers)}
+
+              <div className="mt-4">
+                <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">Followers</p>
+                <p className="mt-1 font-display text-[clamp(1.8rem,2.5vw,2.4rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
+                  {formatCompact(acc.followers)}
+                </p>
               </div>
-              <div className="mt-2 flex gap-1.5">
-                <span className={`inline-flex items-center rounded-[var(--radius-pill)] px-2 py-0.5 text-[10px] font-bold ${acc.change1d > 0 ? 'bg-[var(--success-soft)] text-[var(--success)]' : acc.change1d < 0 ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--panel-muted)] text-[var(--text-soft)]'}`}>
-                  {acc.change1d >= 0 ? '+' : ''}{formatCompact(acc.change1d)}
-                </span>
-                <span className={`inline-flex items-center rounded-[var(--radius-pill)] px-2 py-0.5 text-[10px] font-bold ${acc.change7dPct > 0 ? 'bg-[var(--success-soft)] text-[var(--success)]' : acc.change7dPct < 0 ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--panel-muted)] text-[var(--text-soft)]'}`}>
-                  7d {acc.change7dPct >= 0 ? '+' : ''}{formatPercent(acc.change7dPct)}
-                </span>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <p className={`text-sm ${acc.change1d >= 0 ? 'text-[var(--success)]' : acc.change1d < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
+                  {acc.change1d >= 0 ? '+' : ''}{formatCompact(acc.change1d)} <span className="text-xs text-[var(--text-soft)]">1d</span>
+                </p>
+                <p className={`text-sm ${acc.change7dPct >= 0 ? 'text-[var(--success)]' : acc.change7dPct < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
+                  {acc.change7dPct >= 0 ? '+' : ''}{formatPercent(acc.change7dPct)} <span className="text-xs text-[var(--text-soft)]">7d</span>
+                </p>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
-                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact(acc.following)}</div>
-                  <div className="text-[10px] text-[var(--text-soft)]">Following</div>
-                </div>
-                <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
-                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact(acc.posts)}</div>
-                  <div className="text-[10px] text-[var(--text-soft)]">Posts</div>
-                </div>
-                <div className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] p-2 text-center">
-                  <div className="text-sm font-bold text-[var(--text)]">{formatCompact(acc.avgLikes)}</div>
-                  <div className="text-[10px] text-[var(--text-soft)]">Avg Likes</div>
-                </div>
-                <div className="rounded-[var(--radius-sm)] bg-[var(--ig-gradient-soft)] p-2 text-center">
-                  <div className="bg-[image:var(--ig-gradient)] bg-clip-text text-sm font-extrabold text-transparent">{formatEngagementRate(acc.engagementRate)}</div>
-                  <div className="text-[10px] text-[var(--text-soft)]">ER</div>
-                </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2 border-t border-[var(--border)] pt-3">
+                <p className="flex items-baseline justify-between gap-2 text-sm">
+                  <span className="text-xs text-[var(--text-soft)]">Following</span>
+                  <span className="font-semibold text-[var(--text)]">{formatCompact(acc.following)}</span>
+                </p>
+                <p className="flex items-baseline justify-between gap-2 text-sm">
+                  <span className="text-xs text-[var(--text-soft)]">Posts</span>
+                  <span className="font-semibold text-[var(--text)]">{formatCompact(acc.posts)}</span>
+                </p>
+                <p className="flex items-baseline justify-between gap-2 text-sm">
+                  <span className="text-xs text-[var(--text-soft)]">Avg Likes</span>
+                  <span className="font-semibold text-[var(--text)]">{formatCompact(acc.avgLikes)}</span>
+                </p>
+                <p className="flex items-baseline justify-between gap-2 text-sm">
+                  <span className="text-xs text-[var(--text-soft)]">ER</span>
+                  <span className="font-semibold text-[var(--text)]">{formatEngagementRate(acc.engagementRate)}</span>
+                </p>
               </div>
-            </article>
+            </section>
           )
         })}
       </div>
-    </SectionCard>
+    </div>
   )
 }

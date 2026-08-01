@@ -32,11 +32,11 @@
 .retry-button {
   min-height: 40px;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--brand-soft);
   color: var(--brand);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .loader,
@@ -48,6 +48,6 @@
 
 .error-panel {
   color: var(--danger);
-  border-color: rgba(196, 56, 78, 0.2);
-  background: rgba(255, 245, 246, 0.95);
+  border-color: color-mix(in srgb, var(--danger) 20%, var(--border));
+  background: color-mix(in srgb, var(--danger) 8%, var(--panel-muted));
 }

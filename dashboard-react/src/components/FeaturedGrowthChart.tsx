@@ -1,5 +1,5 @@
 import type { QuickVisualData } from '../data/selectors'
-import { formatInteger } from '../utils/formatters'
+import { formatInteger, formatPercent } from '../utils/formatters'
 import { EmptyState } from './ui'
 
 export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
@@ -21,65 +21,88 @@ export function FeaturedGrowthChart({ data }: { data: QuickVisualData }) {
     .sort((left, right) => right.end - left.end)
 
   const totalFollowers = movers.reduce((sum, m) => sum + m.end, 0)
+  const totalStart = movers.reduce((sum, m) => sum + (m.end - m.delta), 0)
   const totalDelta = movers.reduce((sum, m) => sum + m.delta, 0)
+  const totalPct = totalStart > 0 ? (totalDelta / totalStart) * 100 : 0
   const maxFollowers = movers[0]?.end ?? 1
-  const leadMover = [...movers].sort((a, b) => b.delta - a.delta)[0]
+  const windowDays = data.followerTrend.length
+
+  const deltaSign = totalDelta >= 0 ? '+' : ''
+  const leadValue = `${deltaSign}${formatInteger(totalDelta)}`
 
   return (
-    <div className="grid gap-3">
-      {/* KPI Strip - 2 col mobile, 4 col desktop */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
-        <div className="relative overflow-hidden rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)] col-span-2 lg:col-span-2">
-          <div className="absolute inset-0 bg-[image:var(--ig-gradient-soft)] opacity-50" />
-          <div className="relative">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Total Followers</div>
-            <div className="mt-0.5 font-display text-[clamp(1.5rem,4vw,2.5rem)] font-extrabold tracking-tight text-[var(--text)]">
-              {formatInteger(totalFollowers)}
-            </div>
-            <span className={`text-xs font-bold ${totalDelta >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
-              {totalDelta >= 0 ? '+' : ''}{formatInteger(totalDelta)} <span className="font-normal text-[var(--text-soft)]">/ {data.followerTrend.length}d</span>
-            </span>
-          </div>
-        </div>
-        <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)]">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Top Mover</div>
-          <div className="mt-0.5 font-display text-sm font-extrabold text-[var(--text)] truncate">{leadMover ? `@${leadMover.account}` : '-'}</div>
-          <span className="text-xs font-bold text-[var(--success)]">{leadMover ? `+${formatInteger(leadMover.delta)}` : '-'}</span>
-        </div>
-        <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)]">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Tracked</div>
-          <div className="mt-0.5 font-display text-sm font-extrabold text-[var(--text)]">{data.series.length} akun</div>
-          <span className="text-xs text-[var(--text-soft)]">{data.followerTrend.length}d window</span>
-        </div>
+    <div className="grid gap-6">
+      {/* Stat-Led lead — 7d followers change */}
+      <div className="border-b border-[var(--border)] pb-6">
+        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+          Followers change · {windowDays}d
+        </p>
+        <p className="font-display text-[clamp(2.5rem,6vw,4.5rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
+          {leadValue}
+        </p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          {totalPct >= 0 ? '+' : ''}
+          {formatPercent(totalPct)} · {formatInteger(totalFollowers)} total followers · {data.series.length}{' '}
+          akun
+        </p>
       </div>
 
-      {/* Bar Chart - responsive with values on bars */}
-      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-sm)] sm:p-4">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Follower Ranking</div>
-        <div className="grid gap-2">
+      {/* Chart figure panel */}
+      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
+        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+          Follower Ranking
+        </p>
+        <div className="mt-4 grid gap-3">
           {movers.map((m, i) => (
-            <div key={m.account} className="grid gap-1">
+            <div key={m.account} className="grid gap-1.5">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ backgroundColor: m.color }}>
-                    {i + 1}
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="font-display text-sm font-normal text-[var(--text-muted)]">
+                    {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span className="truncate text-xs font-bold text-[var(--text)]">@{m.account}</span>
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-[var(--radius-sm)]"
+                    style={{ backgroundColor: m.color }}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate text-sm font-semibold text-[var(--text)]">
+                    @{m.account}
+                  </span>
                 </div>
-                <div className="flex shrink-0 items-center gap-2 text-right">
-                  <span className="text-xs font-extrabold text-[var(--text)]">{formatInteger(m.end)}</span>
-                  <span className={`text-[10px] font-bold ${m.delta > 0 ? 'text-[var(--success)]' : m.delta < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-soft)]'}`}>
-                    {m.delta > 0 ? '+' : ''}{formatInteger(m.delta)}
+                <div className="flex shrink-0 items-baseline gap-2 text-right">
+                  <span className="font-display text-base font-normal text-[var(--text)]">
+                    {formatInteger(m.end)}
+                  </span>
+                  <span
+                    className={`text-xs ${
+                      m.delta > 0
+                        ? 'text-[var(--success)]'
+                        : m.delta < 0
+                          ? 'text-[var(--danger)]'
+                          : 'text-[var(--text-muted)]'
+                    }`}
+                  >
+                    {m.delta > 0 ? '+' : ''}
+                    {formatInteger(m.delta)}
                   </span>
                 </div>
               </div>
-              <div className="h-3 overflow-hidden rounded-full bg-[var(--panel-muted)]">
-                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(m.end / maxFollowers) * 100}%`, backgroundColor: m.color }} />
+              <div className="h-2 overflow-hidden rounded-[var(--radius-sm)] bg-[var(--panel-muted)]">
+                <div
+                  className="h-full rounded-[var(--radius-sm)]"
+                  style={{
+                    width: `${(m.end / maxFollowers) * 100}%`,
+                    backgroundColor: m.color,
+                  }}
+                />
               </div>
             </div>
           ))}
         </div>
-      </div>
+        <p className="mt-4 text-sm text-[var(--text-muted)]">
+          Peringkat followers lintas akun pada window {windowDays} hari. Warna series data-only.
+        </p>
+      </section>
     </div>
   )
 }

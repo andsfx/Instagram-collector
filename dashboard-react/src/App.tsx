@@ -3,7 +3,7 @@ import { FreshnessPanel } from './components/FreshnessPanel'
 import { ExecutiveSummary } from './components/ExecutiveSummary'
 import { TodaySummary } from './components/TodaySummary'
 import { useDashboardData } from './hooks/useDashboardData'
-import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeadToHeadDefaults, getHeroMeta, getHeroSummary, getInsightsData, getQuickVisualData, getTodaySummary, getSummaryStrip } from './data/selectors'
+import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeadToHeadDefaults, getInsightsData, getQuickVisualData, getTodaySummary, getSummaryStrip } from './data/selectors'
 import { AccountOverviewGrid } from './components/AccountOverviewGrid'
 import { RankingGrowthPresentation } from './components/RankingGrowthPresentation'
 import { ContentBreakdownPresentation } from './components/ContentBreakdownPresentation'
@@ -17,17 +17,16 @@ import { SectionAsyncBoundary } from './components/SectionAsyncBoundary'
 import { SummaryStrip } from './components/SummaryStrip'
 import { ClosingSummary } from './components/ClosingSummary'
 import { GrowthSkeleton, HeadToHeadSkeleton, HeatmapSkeleton, ChartSuiteSkeleton, DashboardSkeleton } from './components/SkeletonFallbacks'
-import type { RefreshStatus } from './components/RefreshIndicator'
 import type { HeadToHeadMetric } from './data/selectors'
 
 const SECTIONS: SectionNavItem[] = [
-  { id: 'section-summary', label: 'Summary', description: 'Ringkasan eksekutif performa hari ini dan insight utama.' },
-  { id: 'section-growth', label: 'Growth', description: 'Pantau tren pertumbuhan followers dan engagement semua akun.' },
-  { id: 'section-content', label: 'Content', description: 'Analisis jenis konten, frekuensi posting, dan snapshot postingan terbaru.' },
-  { id: 'section-comparison', label: 'Comparison', description: 'Bandingkan performa antar akun secara head-to-head dan ranking.' },
-  { id: 'section-charts', label: 'Charts', description: 'Visualisasi metrik lengkap dalam berbagai format chart interaktif.' },
-  { id: 'section-pattern', label: 'Pattern', description: 'Temukan pola waktu posting dan metrik harian tiap akun.' },
-  { id: 'section-recap', label: 'Recap', description: 'Rekap menyeluruh dan status kesegaran data yang dikumpulkan.' },
+  { id: 'section-summary', label: 'Summary' },
+  { id: 'section-growth', label: 'Growth' },
+  { id: 'section-content', label: 'Content' },
+  { id: 'section-comparison', label: 'Comparison' },
+  { id: 'section-charts', label: 'Charts' },
+  { id: 'section-pattern', label: 'Pattern' },
+  { id: 'section-recap', label: 'Recap' },
 ]
 
 const QuickVisual = lazy(async () => {
@@ -48,7 +47,7 @@ const Heatmap = lazy(async () => {
 })
 
 export default function App() {
-  const { data, error, loading, isLoading, isRefreshing, retry } = useDashboardData()
+  const { data, error, loading, retry } = useDashboardData()
   const { theme, toggleTheme } = useTheme()
   const [asyncResetKey, setAsyncResetKey] = useState(0)
   const [activeSection, setActiveSection] = useState('section-summary')
@@ -83,8 +82,6 @@ export default function App() {
   const accountSummaries = useMemo(() => data ? getAccountSummaries(data) : [], [data])
   const insights = useMemo(() => data ? getInsightsData(data) : null, [data])
   const summaryStrip = useMemo(() => data ? getSummaryStrip(data) : [], [data])
-  const heroMeta = useMemo(() => data ? getHeroMeta(data) : [], [data])
-  const heroSummary = useMemo(() => data ? getHeroSummary(data) : undefined, [data])
 
   function retryAsyncSection() {
     setAsyncResetKey((current) => current + 1)
@@ -94,24 +91,12 @@ export default function App() {
     setActiveSection(id)
   }, [])
 
-  const handleRefresh = useCallback(() => {
-    retry()
-  }, [retry])
-
-  const refreshStatus: RefreshStatus = isRefreshing ? 'loading' : error ? 'cached' : 'live'
-  const refreshDisabled = isLoading || isRefreshing
-
-  const activeItem = SECTIONS.find((s) => s.id === activeSection)
-
   if (loading) {
     return (
-      <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-        <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} refreshStatus="loading" refreshDisabled activeSection={activeSection} onSectionChange={handleSectionChange} />
-        <main className="lg:ml-[220px] flex-1 overflow-x-hidden pt-[60px] lg:pt-0 max-w-full">
-          <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:px-8">
-            <div className="h-4 w-48 skeleton rounded" />
-          </header>
-          <div className="mx-auto w-full max-w-[1080px] px-6 lg:px-8">
+      <div className="min-h-screen bg-[var(--bg)]">
+        <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} activeSection={activeSection} onSectionChange={handleSectionChange} />
+        <main className="pt-[56px] min-h-screen lg:pt-[120px]">
+          <div className="mx-auto w-full max-w-[1080px] px-6 py-8 lg:px-8">
             <DashboardSkeleton />
           </div>
         </main>
@@ -125,9 +110,9 @@ export default function App() {
     const httpCode = httpCodeMatch ? Number(httpCodeMatch[1]) : undefined
 
     return (
-      <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-        <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} refreshStatus="cached" activeSection={activeSection} onSectionChange={handleSectionChange} />
-        <main className="lg:ml-[220px] flex min-h-screen flex-1 items-center justify-center overflow-x-hidden px-6 py-16 pt-[60px] lg:pt-16 max-w-full">
+      <div className="min-h-screen bg-[var(--bg)]">
+        <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} activeSection={activeSection} onSectionChange={handleSectionChange} />
+        <main className="pt-[56px] flex min-h-screen items-center justify-center px-6 py-16 lg:pt-[120px]">
           <div className="grid gap-4 text-center">
             <ErrorState
               title="Data dashboard tidak tersedia"
@@ -143,150 +128,123 @@ export default function App() {
 
   const shell = 'mx-auto w-full max-w-[1080px] px-6 lg:px-8'
   const sectionClass = (sectionId: string, background = '') => [
-    activeSection === sectionId ? 'flex-1 overflow-y-auto' : 'hidden',
+    activeSection === sectionId ? 'block' : 'hidden',
     background,
-    'py-8',
   ].filter(Boolean).join(' ')
   const h2hAccountAValue = h2hAccountA || headToHeadDefaults.accountA
   const h2hAccountBValue = h2hAccountB || headToHeadDefaults.accountB
   const dmSelectedAccountValue = dmSelectedAccount || data.accounts[0] || ''
 
   return (
-    <div className="flex min-h-screen overflow-x-hidden bg-[var(--bg)]">
-      <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} refreshStatus={refreshStatus} onRefresh={handleRefresh} refreshDisabled={refreshDisabled} activeSection={activeSection} onSectionChange={handleSectionChange} />
+    <div className="min-h-screen bg-[var(--bg)]">
+      <SectionNav items={SECTIONS} theme={theme} onToggleTheme={toggleTheme} activeSection={activeSection} onSectionChange={handleSectionChange} />
 
-      <main id="dashboard-main" tabIndex={-1} className="lg:ml-[220px] flex-1 overflow-hidden h-screen pt-[60px] lg:pt-0 max-w-full flex flex-col">
+      <main id="dashboard-main" tabIndex={-1} className="pt-[56px] lg:pt-[120px]">
         <a
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-[68px] focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-[var(--ig-purple)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg lg:focus:left-[240px] lg:focus:top-4"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-[64px] focus:z-50 focus:rounded-[var(--radius-sm)] focus:border focus:border-[var(--border-strong)] focus:bg-[var(--panel)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[var(--text)] focus:shadow-sm lg:focus:top-[128px]"
           href="#dashboard-main"
           onClick={(e) => {
             e.preventDefault()
             const main = document.getElementById('dashboard-main')
             if (main) {
               main.focus()
-              main.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              main.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
             }
           }}
         >
           Lewati navigasi
         </a>
 
-        <header className="sticky top-0 z-20 hidden items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-6 py-3 shadow-[var(--shadow-sm)] lg:flex lg:px-8 shrink-0">
-          <div className="flex items-center gap-3">
-            <h1 className="text-base font-bold text-[var(--text)]">{heroSummary?.title ?? 'Dashboard Performa Instagram'}</h1>
-            <span className="hidden text-sm text-[var(--text-soft)] sm:inline">{heroSummary?.subtitle ?? ''}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            {heroMeta.slice(0, 3).map((item) => (
-              <div key={item.label} className="hidden items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel-muted)] px-2.5 py-1 text-[10px] font-bold text-[var(--text-muted)] lg:inline-flex cursor-default select-none">
-                <span className="uppercase tracking-wide text-[var(--text-soft)]">{item.label}</span>
-                <span className="text-[var(--text)]">{item.value}</span>
-              </div>
-            ))}
-            <button type="button" className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--brand)] bg-[var(--brand-soft)] px-3 py-1.5 text-[11px] font-bold text-[var(--brand)] transition hover:bg-[var(--brand)] hover:text-white disabled:cursor-not-allowed disabled:opacity-55" onClick={handleRefresh} disabled={refreshDisabled} aria-disabled={refreshDisabled} aria-label="Refresh dashboard data">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
-              Refresh Data
-            </button>
-          </div>
-        </header>
+        <div>
+          {/* Growth */}
+          <section key="section-growth" id="section-growth" className={sectionClass('section-growth')}>
+            <div className={`${shell} py-8 space-y-6`}>
+              <SectionAsyncBoundary resetKey={asyncResetKey + 3} onReset={retryAsyncSection} loadingTitle="Memuat growth" loadingDescription="Data sedang disiapkan." errorTitle="Gagal memuat" errorDescription="Chunk gagal dimuat.">
+                <Suspense fallback={<GrowthSkeleton />}>
+                  <FeaturedGrowthChart data={quickVisual} />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
 
-        {activeItem && (
-          <div className="border-b border-[var(--border)] bg-[var(--panel)] px-6 py-4 lg:px-8">
-            <h2 className="text-lg font-bold text-[var(--text)]">{activeItem.label}</h2>
-            {activeItem.description && (
-              <p className="mt-1 text-sm text-[var(--text-muted)]">{activeItem.description}</p>
-            )}
-          </div>
-        )}
+          {/* Summary */}
+          <section key="section-summary" id="section-summary" className={sectionClass('section-summary', 'bg-[var(--panel-muted)]')}>
+            <div className={`${shell} py-8 space-y-6`}>
+              <ExecutiveSummary summary={executive} />
+              <TodaySummary today={today} />
+              <SummaryStrip items={summaryStrip} />
+              <InsightsPanel insights={insights} />
+            </div>
+          </section>
 
-        {/* Growth */}
-        <section key="section-growth" id="section-growth" className={sectionClass('section-growth')}>
-          <div className={`${shell} space-y-6`}>
-            <SectionAsyncBoundary resetKey={asyncResetKey + 3} onReset={retryAsyncSection} loadingTitle="Memuat growth" loadingDescription="Data sedang disiapkan." errorTitle="Gagal memuat" errorDescription="Chunk gagal dimuat.">
-              <Suspense fallback={<GrowthSkeleton />}>
-                <FeaturedGrowthChart data={quickVisual} />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
+          {/* Content */}
+          <section key="section-content" id="section-content" className={sectionClass('section-content')}>
+            <div className={`${shell} py-8 space-y-6`}>
+              <ContentBreakdownPresentation data={data} />
+              <PostSnapshot data={data} />
+            </div>
+          </section>
 
-        {/* Summary */}
-        <section key="section-summary" id="section-summary" className={sectionClass('section-summary', 'bg-[var(--panel-muted)]')}>
-          <div className={`${shell} space-y-6`}>
-            <ExecutiveSummary summary={executive} />
-            <TodaySummary today={today} />
-            <SummaryStrip items={summaryStrip} />
-            <InsightsPanel insights={insights} />
-          </div>
-        </section>
+          {/* Comparison */}
+          <section key="section-comparison" id="section-comparison" className={sectionClass('section-comparison', 'bg-[var(--panel-muted)]')}>
+            <div className={`${shell} py-8 space-y-6`}>
+              <RankingGrowthPresentation data={data} mode="table" />
+              <AccountOverviewGrid accounts={accountSummaries} />
+              <SectionAsyncBoundary resetKey={asyncResetKey} onReset={retryAsyncSection} loadingTitle="Memuat head-to-head" loadingDescription="Perbandingan sedang disiapkan." errorTitle="Gagal memuat head-to-head" errorDescription="Chunk gagal dimuat.">
+                <Suspense fallback={<HeadToHeadSkeleton />}>
+                  <HeadToHead
+                    data={data}
+                    accountA={h2hAccountAValue}
+                    setAccountA={setH2hAccountA}
+                    accountB={h2hAccountBValue}
+                    setAccountB={setH2hAccountB}
+                    metric={h2hMetric}
+                    setMetric={setH2hMetric}
+                    presetValue={h2hPresetValue}
+                    setPresetValue={setH2hPresetValue}
+                  />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
 
-        {/* Content */}
-        <section key="section-content" id="section-content" className={sectionClass('section-content')}>
-          <div className={`${shell} space-y-6`}>
-            <ContentBreakdownPresentation data={data} />
-            <PostSnapshot data={data} />
-          </div>
-        </section>
+          {/* Charts */}
+          <section key="section-charts" id="section-charts" className={sectionClass('section-charts')}>
+            <div className={`${shell} py-8 space-y-6`}>
+              <SectionAsyncBoundary resetKey={asyncResetKey + 2} onReset={retryAsyncSection} loadingTitle="Memuat chart suite" loadingDescription="Visual analytics sedang dimuat." errorTitle="Gagal memuat chart suite" errorDescription="Chunk visual gagal.">
+                <Suspense fallback={<ChartSuiteSkeleton />}>
+                  <QuickVisual data={quickVisual} />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
 
-        {/* Comparison */}
-        <section key="section-comparison" id="section-comparison" className={sectionClass('section-comparison', 'bg-[var(--panel-muted)]')}>
-          <div className={`${shell} space-y-6`}>
-            <RankingGrowthPresentation data={data} mode="table" />
-            <AccountOverviewGrid accounts={accountSummaries} />
-            <SectionAsyncBoundary resetKey={asyncResetKey} onReset={retryAsyncSection} loadingTitle="Memuat head-to-head" loadingDescription="Perbandingan sedang disiapkan." errorTitle="Gagal memuat head-to-head" errorDescription="Chunk gagal dimuat.">
-              <Suspense fallback={<HeadToHeadSkeleton />}>
-                <HeadToHead
-                  data={data}
-                  accountA={h2hAccountAValue}
-                  setAccountA={setH2hAccountA}
-                  accountB={h2hAccountBValue}
-                  setAccountB={setH2hAccountB}
-                  metric={h2hMetric}
-                  setMetric={setH2hMetric}
-                  presetValue={h2hPresetValue}
-                  setPresetValue={setH2hPresetValue}
-                />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
+          {/* Pattern */}
+          <section key="section-pattern" id="section-pattern" className={sectionClass('section-pattern', 'bg-[var(--panel-muted)]')}>
+            <div className={`${shell} py-8 space-y-6`}>
+              <DailyMetrics
+                data={data}
+                selectedAccount={dmSelectedAccountValue}
+                setSelectedAccount={setDmSelectedAccount}
+                rangeDays={dmRangeDays}
+                setRangeDays={setDmRangeDays}
+              />
+              <SectionAsyncBoundary resetKey={asyncResetKey + 1} onReset={retryAsyncSection} loadingTitle="Memuat heatmap" loadingDescription="Agregasi waktu posting." errorTitle="Gagal memuat heatmap" errorDescription="Chunk heatmap gagal.">
+                <Suspense fallback={<HeatmapSkeleton />}>
+                  <Heatmap data={data} />
+                </Suspense>
+              </SectionAsyncBoundary>
+            </div>
+          </section>
 
-        {/* Charts */}
-        <section key="section-charts" id="section-charts" className={sectionClass('section-charts')}>
-          <div className={`${shell} space-y-6`}>
-            <SectionAsyncBoundary resetKey={asyncResetKey + 2} onReset={retryAsyncSection} loadingTitle="Memuat chart suite" loadingDescription="Visual analytics sedang dimuat." errorTitle="Gagal memuat chart suite" errorDescription="Chunk visual gagal.">
-              <Suspense fallback={<ChartSuiteSkeleton />}>
-                <QuickVisual data={quickVisual} />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
-
-        {/* Pattern */}
-        <section key="section-pattern" id="section-pattern" className={sectionClass('section-pattern', 'bg-[var(--panel-muted)]')}>
-          <div className={`${shell} space-y-6`}>
-            <DailyMetrics
-              data={data}
-              selectedAccount={dmSelectedAccountValue}
-              setSelectedAccount={setDmSelectedAccount}
-              rangeDays={dmRangeDays}
-              setRangeDays={setDmRangeDays}
-            />
-            <SectionAsyncBoundary resetKey={asyncResetKey + 1} onReset={retryAsyncSection} loadingTitle="Memuat heatmap" loadingDescription="Agregasi waktu posting." errorTitle="Gagal memuat heatmap" errorDescription="Chunk heatmap gagal.">
-              <Suspense fallback={<HeatmapSkeleton />}>
-                <Heatmap data={data} />
-              </Suspense>
-            </SectionAsyncBoundary>
-          </div>
-        </section>
-
-        {/* Recap */}
-        <section key="section-recap" id="section-recap" className={sectionClass('section-recap')}>
-          <div className={`${shell} space-y-6`}>
-            <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
-            <FreshnessPanel freshness={freshness} />
-          </div>
-        </section>
+          {/* Recap */}
+          <section key="section-recap" id="section-recap" className={sectionClass('section-recap')}>
+            <div className={`${shell} py-8 space-y-6`}>
+              <ClosingSummary summary={executive} today={today} insights={insights} freshness={freshness} />
+              <FreshnessPanel freshness={freshness} />
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   )

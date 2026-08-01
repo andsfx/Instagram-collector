@@ -23,16 +23,6 @@
     width: min(100vw - 20px, 100%);
   }
 
-  .hero-content,
-  .section-nav-content {
-    width: min(100vw - 20px, 100%);
-  }
-
-  .hero,
-  .panel-section {
-    padding: 18px;
-  }
-
   .daily-card,
   .insight-card,
   .comparison-card,
@@ -78,51 +68,6 @@
     gap: 12px;
   }
 
-  .section-nav {
-    padding: 8px 0;
-  }
-
-  .section-nav-content {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-nav-links {
-    margin: 0 -4px;
-    padding: 0 4px 2px;
-  }
-
-  .section-nav-links-desktop {
-    display: none;
-  }
-
-  .section-nav-links-primary {
-    display: flex;
-  }
-
-  .section-nav-more {
-    display: inline-flex;
-    justify-self: end;
-  }
-
-  .section-nav-link,
-  .theme-toggle {
-    min-height: 38px;
-    padding: 9px 12px;
-    font-size: 0.88rem;
-  }
-
-  .theme-toggle {
-    width: auto;
-    justify-self: end;
-  }
-
-  .section-nav-more-select {
-    max-width: 124px;
-  }
-
   .meta-grid,
   .summary-grid,
   .chart-grid,
@@ -135,7 +80,6 @@
     grid-template-columns: 1fr;
   }
 
-  .section-header,
   .split-row {
     flex-direction: column;
   }
@@ -213,16 +157,11 @@
   .heatmap-corner {
     min-height: 52px;
     padding: 8px;
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
   }
 
   .heatmap-header small {
     font-size: 0.68rem;
-  }
-
-  .helper-copy,
-  .section-description {
-    font-size: 0.9rem;
   }
 
   .comparison-head,

@@ -33,7 +33,7 @@ export const chartGridColor = 'var(--chart-grid)'
 export const chartTooltipStyle: React.CSSProperties = {
   backgroundColor: 'var(--chart-tooltip-bg)',
   border: '1px solid var(--chart-tooltip-border)',
-  borderRadius: '12px',
+  borderRadius: 'var(--radius-sm)',
   color: 'var(--text)',
 }
 

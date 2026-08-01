@@ -13,7 +13,7 @@ export const RefreshIndicator = memo(function RefreshIndicator({ status }: { sta
   const config = STATUS_CONFIG[status]
   return (
     <div
-      className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] shadow-[var(--shadow-sm)]"
+      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] shadow-[var(--shadow-sm)]"
       role="status"
       aria-label={`Data status: ${config.label}`}
     >

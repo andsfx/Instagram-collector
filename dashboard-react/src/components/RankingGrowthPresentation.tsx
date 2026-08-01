@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { type RankingSortKey, type SortDirection, getRankingTableRows, sortRankingRows } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
 import { formatEngagementRate, formatInteger, formatPercent } from '../utils/formatters'
-import { SectionCard } from './ui'
 
 const SORT_LABELS: Array<{ key: RankingSortKey; label: string }> = [
   { key: 'rank', label: 'Rank' },
@@ -25,18 +24,18 @@ function nextSortDirection(currentKey: RankingSortKey, activeKey: RankingSortKey
 function SortIndicator({ active, direction }: { active: boolean; direction: SortDirection }) {
   if (!active) {
     return (
-      <svg aria-hidden="true" viewBox="0 0 12 12" className="h-3 w-3 text-text-soft">
+      <svg aria-hidden="true" viewBox="0 0 12 12" className="h-3 w-3 text-[var(--text-soft)]">
         <path d="M3 5 6 2l3 3M9 7 6 10 3 7" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" />
       </svg>
     )
   }
 
   return direction === 'asc' ? (
-    <svg aria-hidden="true" viewBox="0 0 12 12" className="h-3 w-3 text-brand">
+    <svg aria-hidden="true" viewBox="0 0 12 12" className="h-3 w-3 text-[var(--brand)]">
       <path d="M6 2 9 6H3l3-4Z" fill="currentColor" />
     </svg>
   ) : (
-    <svg aria-hidden="true" viewBox="0 0 12 12" className="h-3 w-3 text-brand">
+    <svg aria-hidden="true" viewBox="0 0 12 12" className="h-3 w-3 text-[var(--brand)]">
       <path d="M6 10 3 6h6l-3 4Z" fill="currentColor" />
     </svg>
   )
@@ -59,6 +58,7 @@ export function RankingGrowthPresentation({
     .map(([account, growth]) => ({ account, ...growth }))
     .sort((left, right) => right.pct_change_7d - left.pct_change_7d)
     .slice(0, 5)
+  const leadAccount = topFollowerRows[0]
 
   function handleSort(key: RankingSortKey) {
     const direction = nextSortDirection(key, sortKey, sortDirection)
@@ -73,170 +73,133 @@ export function RankingGrowthPresentation({
 
   const showSummary = mode !== 'table'
   const showDetailedTable = mode !== 'summary'
-  const sectionCopy =
-    mode === 'summary'
-      ? {
-          eyebrow: 'Ranking & Growth',
-          title: 'Posisi audiens dan momentum pertumbuhan',
-          description: undefined,
-        }
-      : mode === 'table'
-        ? {
-            eyebrow: 'Detailed Comparison',
-            title: 'Tabel kompetitor penuh',
-            description: undefined,
-          }
-        : {
-            eyebrow: 'Ranking & Growth',
-            title: 'Posisi audiens dan momentum pertumbuhan',
-            description: undefined,
-          }
 
   if (mode === 'summary') {
     return (
-      <section className="grid gap-6 border-t border-slate-200/80 pt-6 dark:border-white/10 lg:grid-cols-[minmax(0,1.15fr)_minmax(260px,0.85fr)] lg:gap-8">
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <div className="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Leaderboard snapshot</div>
-            <h3 className="font-display text-[clamp(1.3rem,1.12rem+0.48vw,1.85rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 dark:text-white">
-              Leaderboard
-            </h3>
-          </div>
+      <div className="grid gap-6">
+        <section className="grid gap-5 border-t border-[var(--border)] pt-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(260px,0.85fr)] lg:gap-8">
+          <div className="grid gap-4">
+            <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Leaderboard</h2>
+            <div className="grid gap-5 md:grid-cols-2">
+              <div className="grid gap-3">
+                <div className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Peringkat followers</div>
+                <ol className="grid gap-2.5">
+                  {topFollowerRows.slice(0, 3).map((row) => (
+                    <li key={row.account} className="flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-2">
+                      <span className="font-semibold text-[var(--text)]">#{row.rank} @{row.account}</span>
+                      <span className="text-sm text-[var(--text-muted)]">{formatInteger(row.followers)}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="grid gap-3 border-t border-slate-200/80 pt-3 dark:border-white/10">
-              <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Peringkat followers</div>
-              <ol className="grid gap-2.5">
-                {topFollowerRows.slice(0, 3).map((row) => (
-                  <li key={row.account} className="flex items-baseline justify-between gap-3">
-                    <span className="font-semibold text-slate-900 dark:text-white">#{row.rank} @{row.account}</span>
-                    <span className="text-[0.9rem] text-slate-600 dark:text-slate-300">{formatInteger(row.followers)}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            <div className="grid gap-3 border-t border-slate-200/80 pt-3 dark:border-white/10">
-              <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Peringkat engagement</div>
-              <ol className="grid gap-2.5">
-                {topEngagementRows.slice(0, 3).map((row) => (
-                  <li key={row.account} className="flex items-baseline justify-between gap-3">
-                    <span className="font-semibold text-slate-900 dark:text-white">#{row.rank} @{row.account}</span>
-                    <span className="text-[0.9rem] text-slate-600 dark:text-slate-300">{formatEngagementRate(row.engagementRate)}</span>
-                  </li>
-                ))}
-              </ol>
+              <div className="grid gap-3">
+                <div className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Peringkat engagement</div>
+                <ol className="grid gap-2.5">
+                  {topEngagementRows.slice(0, 3).map((row) => (
+                    <li key={row.account} className="flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-2">
+                      <span className="font-semibold text-[var(--text)]">#{row.rank} @{row.account}</span>
+                      <span className="text-sm text-[var(--text-muted)]">{formatEngagementRate(row.engagementRate)}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
           </div>
-        </div>
 
-        <aside className="grid gap-3 border-t border-slate-200/80 pt-3 dark:border-white/10">
-          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Momentum 7 hari</div>
-          <ol className="grid gap-3">
-            {topGrowthRows.slice(0, 3).map((row) => (
-              <li key={row.account} className="grid gap-1 border-b border-slate-200/70 pb-3 last:border-b-0 last:pb-0 dark:border-white/10">
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="font-semibold text-slate-900 dark:text-white">@{row.account}</span>
-                  <span className="text-[0.9rem] font-semibold text-[var(--brand)]">{formatPercent(row.pct_change_7d)}</span>
-                </div>
-                <span className="text-[0.88rem] text-slate-600 dark:text-slate-300">{formatInteger(row.followers_change_7d)} followers dalam 7 hari.</span>
-              </li>
-            ))}
-          </ol>
-        </aside>
-      </section>
+          <aside className="grid gap-3">
+            <div className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Momentum 7 hari</div>
+            <ol className="grid gap-3">
+              {topGrowthRows.slice(0, 3).map((row) => (
+                <li key={row.account} className="grid gap-1 border-t border-[var(--border)] pt-3">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-semibold text-[var(--text)]">@{row.account}</span>
+                    <span className="text-sm font-semibold text-[var(--brand)]">{formatPercent(row.pct_change_7d)}</span>
+                  </div>
+                  <span className="text-sm text-[var(--text-muted)]">{formatInteger(row.followers_change_7d)} followers dalam 7 hari.</span>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        </section>
+      </div>
     )
   }
 
   return (
-    <SectionCard
-      eyebrow={sectionCopy.eyebrow}
-      title={sectionCopy.title}
-      description={sectionCopy.description}
-    >
+    <div className="grid gap-6">
+      {/* Stat-Led lead */}
+      <div className="border-b border-[var(--border)] pb-6">
+        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+          Posisi audiens & momentum{leadAccount ? ` · @${leadAccount.account}` : ''}
+        </p>
+        <p className="font-display text-[clamp(2.5rem,6vw,4.5rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
+          {leadAccount ? formatInteger(leadAccount.followers) : '—'}
+        </p>
+      </div>
+
       {showSummary ? (
-        <div className="grid gap-5 desktop:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-          <article className="grid gap-5 rounded-[28px] border border-[color:color-mix(in_srgb,var(--brand)_18%,var(--border))] bg-[radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--brand-soft-2)_52%,transparent),transparent_36%),linear-gradient(180deg,color-mix(in_srgb,var(--brand-soft)_58%,var(--panel)),var(--panel))] p-6 shadow-panel-md">
-            <div className="grid gap-2">
-              <div className="text-xs font-extrabold uppercase tracking-[0.12em] text-brand">Leaderboard</div>
-              <h3 className="font-display text-[clamp(1.34rem,1.1rem+0.55vw,1.95rem)] font-semibold leading-[1.04] tracking-[-0.03em] text-text">
-                Siapa yang memimpin ukuran audiens dan kualitas perhatian.
-              </h3>
-              <p className="max-w-[48ch] text-[0.95rem] leading-[1.65] text-text-muted">
-                Bagian ini merangkum dua ranking yang paling cepat menjelaskan struktur persaingan sebelum pembaca turun ke tabel lengkap.
-              </p>
-            </div>
+        <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Siapa yang memimpin ukuran audiens dan kualitas perhatian</h2>
+          <p className="mt-2 max-w-[48ch] text-sm leading-relaxed text-[var(--text-muted)]">
+            Bagian ini merangkum dua ranking yang paling cepat menjelaskan struktur persaingan sebelum pembaca turun ke tabel lengkap.
+          </p>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <article className="grid gap-4 rounded-[22px] border border-[color:color-mix(in_srgb,var(--brand)_12%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_88%,transparent)] p-5 shadow-panel-sm">
-                <div className="grid gap-1.5">
-                  <h4 className="font-display text-[clamp(1.08rem,0.98rem+0.35vw,1.35rem)] font-semibold leading-[1.08] text-text">Peringkat followers</h4>
-                  <p className="text-[0.92rem] text-text-muted">Urutan berdasarkan ukuran audiens saat ini.</p>
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <section className="grid gap-4 bg-[var(--panel-muted)] p-5">
+              <h3 className="text-base font-semibold text-[var(--text)]">Peringkat followers</h3>
+              <ol className="grid gap-3">
+                {topFollowerRows.map((row, index) => (
+                  <li key={row.account} className={`flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-3 ${index === 0 ? 'border-t-0 pt-0' : ''}`}>
+                    <span className="font-semibold text-[var(--text)]">#{row.rank} @{row.account}</span>
+                    <span className="text-sm text-[var(--text-muted)]">{formatInteger(row.followers)} followers</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            <section className="grid gap-4 bg-[var(--panel-muted)] p-5">
+              <h3 className="text-base font-semibold text-[var(--text)]">Peringkat engagement</h3>
+              <ol className="grid gap-3">
+                {topEngagementRows.map((row, index) => (
+                  <li key={row.account} className={`flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-3 ${index === 0 ? 'border-t-0 pt-0' : ''}`}>
+                    <span className="font-semibold text-[var(--text)]">#{row.rank} @{row.account}</span>
+                    <span className="text-sm text-[var(--text-muted)]">{formatEngagementRate(row.engagementRate)} ER</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </div>
+        </section>
+      ) : null}
+
+      {showSummary ? (
+        <section className="border border-[var(--border)] bg-[var(--panel-muted)] p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Pertumbuhan 7 hari</h2>
+          <ol className="mt-4 grid gap-3">
+            {topGrowthRows.map((row) => (
+              <li key={row.account} className="flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-3">
+                <div className="grid gap-1">
+                  <span className="font-semibold text-[var(--text)]">@{row.account}</span>
+                  <span className="text-sm text-[var(--text-muted)]">{formatInteger(row.followers_change_7d)} followers dalam 7 hari.</span>
                 </div>
-                <ol className="grid gap-3">
-                  {topFollowerRows.map((row, index) => (
-                    <li key={row.account} className={`flex items-baseline justify-between gap-3 border-b border-[color:color-mix(in_srgb,var(--border)_80%,transparent)] pb-3 ${index === topFollowerRows.length - 1 ? 'border-b-0 pb-0' : ''}`}>
-                      <span className="font-semibold text-text">#{row.rank} @{row.account}</span>
-                      <span className="text-[0.9rem] text-text-muted">{formatInteger(row.followers)} followers</span>
-                    </li>
-                  ))}
-                </ol>
-              </article>
-
-              <article className="grid gap-4 rounded-[22px] border border-[color:color-mix(in_srgb,var(--brand)_12%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_88%,transparent)] p-5 shadow-panel-sm">
-                <div className="grid gap-1.5">
-                  <h4 className="font-display text-[clamp(1.08rem,0.98rem+0.35vw,1.35rem)] font-semibold leading-[1.08] text-text">Peringkat engagement</h4>
-                  <p className="text-[0.92rem] text-text-muted">Akun paling efisien mengubah audiens jadi interaksi.</p>
-                </div>
-                <ol className="grid gap-3">
-                  {topEngagementRows.map((row, index) => (
-                    <li key={row.account} className={`flex items-baseline justify-between gap-3 border-b border-[color:color-mix(in_srgb,var(--border)_80%,transparent)] pb-3 ${index === topEngagementRows.length - 1 ? 'border-b-0 pb-0' : ''}`}>
-                      <span className="font-semibold text-text">#{row.rank} @{row.account}</span>
-                      <span className="text-[0.9rem] text-text-muted">{formatEngagementRate(row.engagementRate)} ER</span>
-                    </li>
-                  ))}
-                </ol>
-              </article>
-            </div>
-          </article>
-
-          <article className="grid gap-4 rounded-[26px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_82%,transparent),color-mix(in_srgb,var(--panel-muted)_86%,transparent))] p-5">
-            <div className="grid gap-1.5">
-              <div className="text-xs font-extrabold uppercase tracking-[0.12em] text-text-soft">Momentum</div>
-              <h3 className="font-display text-[clamp(1.14rem,1rem+0.4vw,1.48rem)] font-semibold leading-[1.08] text-text">Pertumbuhan 7 hari</h3>
-              <p className="text-[0.93rem] text-text-muted">Akun yang paling cepat bertambah selama seminggu terakhir.</p>
-            </div>
-            <ol className="grid gap-3">
-              {topGrowthRows.map((row) => (
-                <li key={row.account} className="grid gap-1.5 rounded-[18px] border border-[color:color-mix(in_srgb,var(--border)_86%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_86%,transparent)] px-4 py-3">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="font-semibold text-text">@{row.account}</span>
-                    <span className="text-[0.9rem] font-semibold text-brand">{formatPercent(row.pct_change_7d)}</span>
-                  </div>
-                  <span className="text-[0.88rem] text-text-muted">{formatInteger(row.followers_change_7d)} followers dalam 7 hari.</span>
-                </li>
-              ))}
-            </ol>
-          </article>
-        </div>
+                <span className="shrink-0 text-sm font-semibold text-[var(--brand)]">{formatPercent(row.pct_change_7d)}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
       ) : null}
 
       {showDetailedTable ? (
-        <article className="grid gap-4 rounded-[28px] border border-[color:color-mix(in_srgb,var(--border)_88%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--panel)_94%,transparent),color-mix(in_srgb,var(--panel-muted)_72%,transparent))] p-5 shadow-panel-sm">
-          <div className="flex flex-col gap-3 desktop:flex-row desktop:items-end desktop:justify-between">
-            <div className="grid gap-1.5">
-              <div className="text-xs font-extrabold uppercase tracking-[0.12em] text-text-soft">Detailed table</div>
-              <h3 className="font-display text-[clamp(1.14rem,1rem+0.42vw,1.5rem)] font-semibold leading-[1.08] text-text">Tabel kompetitor penuh</h3>
-              <p className="max-w-[62ch] text-[0.95rem] text-text-muted">
-                Klik header kolom untuk mengurutkan.
-              </p>
-            </div>
-            <div className="inline-flex w-fit rounded-full border border-[color:color-mix(in_srgb,var(--brand)_14%,var(--border))] bg-[color:color-mix(in_srgb,var(--panel)_82%,transparent)] px-3 py-1.5 text-xs font-bold text-brand">
-              Klik header tabel untuk mengurutkan
+        <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="grid gap-1">
+              <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Tabel kompetitor penuh</h2>
+              <p className="text-sm text-[var(--text-muted)]">Klik header kolom untuk mengurutkan.</p>
             </div>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-[22px] border border-[color:color-mix(in_srgb,var(--border)_86%,transparent)] bg-[color:color-mix(in_srgb,var(--panel)_90%,transparent)]">
+          <div className="mt-4 w-full overflow-x-auto">
             <table className="w-full min-w-[640px] border-collapse">
               <thead>
                 <tr>
@@ -244,7 +207,7 @@ export function RankingGrowthPresentation({
                     <th
                       key={column.key}
                       aria-sort={getAriaSort(column.key)}
-                      className="border-b border-border bg-[color:color-mix(in_srgb,var(--panel-muted)_88%,var(--panel))] px-[12px] py-3.5 text-left text-[0.78rem] font-extrabold uppercase tracking-[0.08em] text-text-soft"
+                      className="border-b border-[var(--border)] px-3 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]"
                     >
                       <button type="button" className="inline-flex items-center gap-1.5 bg-transparent p-0 text-inherit" onClick={() => handleSort(column.key)}>
                         <span>{column.label}</span>
@@ -257,16 +220,16 @@ export function RankingGrowthPresentation({
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.account} className="transition-colors hover:bg-[color:color-mix(in_srgb,var(--brand-soft)_28%,transparent)]">
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">#{row.rank}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] font-semibold text-text">@{row.account}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(row.followers)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(row.following)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(row.posts)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatInteger(Math.round(row.avgLikes))}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{row.avgComments.toFixed(2)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{formatEngagementRate(row.engagementRate)}</td>
-                    <td className="border-b border-border px-[12px] py-3 text-[0.92rem] text-text">{row.verified ? 'Ya' : 'Tidak'}</td>
-                    <td className={`border-b border-border px-[12px] py-3 text-[0.92rem] ${row.gapVsBrand >= 0 ? 'text-success' : 'text-danger'}`}>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">#{row.rank}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm font-semibold text-[var(--text)]">@{row.account}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">{formatInteger(row.followers)}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">{formatInteger(row.following)}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">{formatInteger(row.posts)}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">{formatInteger(Math.round(row.avgLikes))}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">{row.avgComments.toFixed(2)}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">{formatEngagementRate(row.engagementRate)}</td>
+                    <td className="border-b border-[var(--border)] px-3 py-3 text-sm text-[var(--text)]">{row.verified ? 'Ya' : 'Tidak'}</td>
+                    <td className={`border-b border-[var(--border)] px-3 py-3 text-sm ${row.gapVsBrand >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
                       {row.gapVsBrand >= 0 ? '+' : ''}{formatInteger(row.gapVsBrand)}
                     </td>
                   </tr>
@@ -274,8 +237,8 @@ export function RankingGrowthPresentation({
               </tbody>
             </table>
           </div>
-        </article>
+        </section>
       ) : null}
-    </SectionCard>
+    </div>
   )
 }

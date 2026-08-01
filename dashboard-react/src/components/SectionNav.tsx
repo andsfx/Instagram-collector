@@ -1,6 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import FocusTrap from 'focus-trap-react'
-import { RefreshIndicator, type RefreshStatus } from './RefreshIndicator'
 
 export interface SectionNavItem {
   id: string
@@ -22,18 +21,12 @@ function SectionNavBase({
   items,
   theme,
   onToggleTheme,
-  refreshStatus,
-  onRefresh,
-  refreshDisabled = false,
   activeSection,
   onSectionChange,
 }: {
   items: SectionNavItem[]
   theme: 'light' | 'dark'
   onToggleTheme: () => void
-  refreshStatus: RefreshStatus
-  onRefresh?: () => void
-  refreshDisabled?: boolean
   activeSection: string
   onSectionChange: (id: string) => void
 }) {
@@ -67,19 +60,17 @@ function SectionNavBase({
   }
 
   const handleNavKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const container = event.currentTarget.parentElement
+    const container = event.currentTarget.closest('[role="tablist"]')
     const buttons = container?.querySelectorAll<HTMLButtonElement>('button[data-nav-item]')
     if (!buttons || buttons.length === 0) return
 
     let targetIndex: number | null = null
 
     switch (event.key) {
-      case 'ArrowDown':
       case 'ArrowRight':
         event.preventDefault()
         targetIndex = (index + 1) % buttons.length
         break
-      case 'ArrowUp':
       case 'ArrowLeft':
         event.preventDefault()
         targetIndex = (index - 1 + buttons.length) % buttons.length
@@ -99,48 +90,72 @@ function SectionNavBase({
     }
   }, [])
 
-  const sidebarContent = (
+  const issueDate = new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date())
+
+  const tabContent = (
+    <div className="flex items-center gap-1" role="tablist" aria-label="Dashboard sections">
+      {items.map((item, index) => {
+        const iconPath = SECTION_ICONS[item.id] || 'M4 6h16M4 12h16M4 18h16'
+        const isActive = activeSection === item.id
+        return (
+          <button
+            key={item.id}
+            type="button"
+            data-nav-item
+            role="tab"
+            tabIndex={isActive ? 0 : -1}
+            onClick={() => handleNavClick(item.id)}
+            onKeyDown={(e) => handleNavKeyDown(e, index)}
+            aria-label={`Navigasi ke ${item.label}`}
+            aria-selected={isActive}
+            aria-current={isActive ? 'location' : undefined}
+            className={`section-tab ${isActive ? 'is-active' : ''}`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden="true">
+              <path d={iconPath} />
+            </svg>
+            <span className="hidden sm:inline">{item.label}</span>
+            <span className="section-tab-underline" aria-hidden="true" />
+          </button>
+        )
+      })}
+    </div>
+  )
+
+  const drawerContent = (
     <>
       <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[image:var(--ig-gradient)]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
-          </div>
-          <div className="grid">
-            <span className="text-sm font-bold text-[var(--text)]">IG Dashboard</span>
-            <span className="text-[10px] text-[var(--text-soft)]">Competitor Intel</span>
-          </div>
+        <div className="grid">
+          <span className="drawer-section-title">IG Dashboard</span>
+          <span className="mobile-masthead-issue">EDISI · {issueDate} WIB</span>
         </div>
-        <button type="button" className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)] lg:hidden" onClick={() => setMobileOpen(false)} aria-label="Close menu">
+        <button type="button" className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(false)} aria-label="Tutup menu">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3">
-        <div className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--text-soft)]">Sections</div>
-        <div className="grid gap-0.5" role="tablist" aria-label="Dashboard sections">
+        <div className="flex flex-col gap-0.5">
           {items.map((item, index) => {
             const iconPath = SECTION_ICONS[item.id] || 'M4 6h16M4 12h16M4 18h16'
+            const isActive = activeSection === item.id
             return (
               <button
                 key={item.id}
                 type="button"
                 data-nav-item
-                role="tab"
-                tabIndex={activeSection === item.id ? 0 : -1}
                 onClick={() => handleNavClick(item.id)}
                 onKeyDown={(e) => handleNavKeyDown(e, index)}
                 aria-label={`Navigasi ke ${item.label}`}
-                aria-selected={activeSection === item.id}
-                title={item.label}
-                className={`flex w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-left text-[13px] font-medium transition-all ${
-                  activeSection === item.id
-                    ? 'bg-[var(--brand-soft)] text-[var(--brand)] font-semibold shadow-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--panel-muted)]'
-                }`}
-                aria-current={activeSection === item.id ? 'location' : undefined}
+                aria-current={isActive ? 'location' : undefined}
+                className={`drawer-item ${isActive ? 'is-active' : ''}`}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-70" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden="true">
                   <path d={iconPath} />
                 </svg>
                 {item.label}
@@ -150,44 +165,58 @@ function SectionNavBase({
         </div>
       </div>
 
-      <div className="grid gap-2 border-t border-[var(--border)] px-3 py-3">
-        <div className="flex items-center justify-between gap-2">
-          <RefreshIndicator status={refreshStatus} />
-          <button type="button" className="inline-flex h-7 items-center rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-2 text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)] transition hover:text-[var(--text)] hover:border-[var(--border-strong)]" onClick={onToggleTheme} aria-label="Toggle dark mode" aria-pressed={theme === 'dark'}>
-            {theme === 'dark' ? 'Light' : 'Dark'}
-          </button>
-        </div>
-        {onRefresh && (
-          <button type="button" className="flex w-full items-center justify-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] transition hover:text-[var(--text)] hover:border-[var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-55" onClick={onRefresh} disabled={refreshDisabled} aria-disabled={refreshDisabled}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
-            Refresh
-          </button>
-        )}
+      <div className="border-t border-[var(--border)] px-3 py-3">
+        <button
+          type="button"
+          className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-soft)] transition hover:text-[var(--text)] hover:border-[var(--border-strong)]"
+          onClick={onToggleTheme}
+          aria-label="Toggle dark mode"
+          aria-pressed={theme === 'dark'}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            {theme === 'dark'
+              ? <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+              : <><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></>
+            }
+          </svg>
+          {theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
+        </button>
       </div>
     </>
   )
 
   return (
     <>
-      {/* Mobile top bar with hamburger */}
-      <div className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between border-b border-[var(--border)] bg-[var(--panel)] px-4 py-3 shadow-[var(--shadow-sm)] lg:hidden">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] bg-[image:var(--ig-gradient)]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
-          </div>
-          <span className="text-sm font-bold text-[var(--text)]">IG Dashboard</span>
+      {/* Desktop N6 masthead (lg+) */}
+      <header className="newsprint-masthead hidden lg:block">
+        <div className="issue-row">
+          <span>EDISI · {issueDate} WIB</span>
+          <span className="hidden xl:inline">BRIEF HARIAN · METMALBEKASI</span>
         </div>
-        <div className="flex items-center gap-2">
-          {onRefresh && (
-            <button type="button" className="flex h-11 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--brand)] bg-[var(--brand-soft)] px-3 text-[11px] font-bold text-[var(--brand)] transition hover:bg-[var(--brand)] hover:text-white disabled:cursor-not-allowed disabled:opacity-55" onClick={onRefresh} disabled={refreshDisabled} aria-disabled={refreshDisabled} aria-label="Refresh data">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"/></svg>
-              <span className="hidden sm:inline">Refresh</span>
-            </button>
-          )}
-          <button ref={hamburgerRef} type="button" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen} aria-controls="mobile-nav-drawer">
+        <div className="wordmark-row">
+          <span className="wordmark">IG Dashboard</span>
+        </div>
+        <div className="newsprint-double-rule" aria-hidden="true" />
+        <div className="section-row">{tabContent}</div>
+      </header>
+
+      {/* Mobile collapsed masthead (<lg) */}
+      <div className="mobile-masthead lg:hidden">
+        <div className="grid gap-0.5">
+          <span className="mobile-masthead-wordmark">IG Dashboard</span>
+          <span className="mobile-masthead-issue">EDISI · {issueDate} WIB</span>
+        </div>
+        <button
+          ref={hamburgerRef}
+          type="button"
+          className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--text)]"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Buka menu"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav-drawer"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-          </button>
-        </div>
+        </button>
       </div>
 
       {/* Mobile overlay */}
@@ -195,16 +224,16 @@ function SectionNavBase({
         <div className="fixed inset-0 z-50 bg-black/40 lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
 
-      {/* Sidebar - desktop: fixed, mobile: slide-in drawer */}
+      {/* Mobile drawer */}
       <FocusTrap active={mobileOpen}>
         <nav
           id="mobile-nav-drawer"
-          className={`fixed left-0 top-0 z-50 flex h-screen w-[220px] flex-col border-r border-[var(--border)] bg-[var(--panel)] transition-transform duration-300 ${
-            mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          className={`fixed left-0 top-0 z-50 flex h-screen w-[260px] flex-col border-r border-[var(--border)] bg-[var(--panel)] transition-transform duration-[var(--dur-short)] ${
+            mobileOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
-          aria-label="Section navigation"
+          aria-label="Navigasi section"
         >
-          {sidebarContent}
+          {drawerContent}
         </nav>
       </FocusTrap>
     </>

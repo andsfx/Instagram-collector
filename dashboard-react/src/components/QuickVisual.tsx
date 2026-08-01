@@ -23,14 +23,15 @@ import type { QuickVisualData } from '../data/selectors'
 import { downsampleData } from '../data/downsample'
 import { formatInteger } from '../utils/formatters'
 import { chartAxisColor, chartGridColor, chartItemStyle, chartLabelStyle, chartLegendStyle, chartTooltipStyle } from './chart-theme'
-import { EmptyState, SectionCard } from './ui'
+import { EmptyState } from './ui'
 
-function ChartCard({ title, children, wide }: { title: string; children: React.ReactNode; wide?: boolean }) {
+function FigurePanel({ title, caption, children, muted }: { title: string; caption?: string; children: React.ReactNode; muted?: boolean }) {
   return (
-    <div className={`rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-4 shadow-[var(--shadow-sm)] ${wide ? 'sm:col-span-2' : ''}`}>
-      <div className="mb-3 text-[11px] font-bold uppercase tracking-wide text-[var(--text-soft)]">{title}</div>
-      {children}
-    </div>
+    <section className={`border border-[var(--border)] p-5 ${muted ? 'bg-[var(--panel-muted)]' : 'bg-[var(--panel)]'}`}>
+      <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">{title}</p>
+      <div className="mt-3">{children}</div>
+      {caption ? <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">{caption}</p> : null}
+    </section>
   )
 }
 
@@ -39,9 +40,10 @@ const MAX_CHART_POINTS = 90
 export function QuickVisual({ data }: { data: QuickVisualData }) {
   if (!data.followerTrend.length || !data.series.length) {
     return (
-      <SectionCard eyebrow="Charts" title="Visual analytics">
+      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Visual analytics</h2>
         <EmptyState>Belum ada data chart yang tersedia.</EmptyState>
-      </SectionCard>
+      </section>
     )
   }
 
@@ -51,11 +53,25 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
   const engagementTrend = downsampleData(data.engagementTrend, MAX_CHART_POINTS, firstSeriesKey)
   const projectionTrend = downsampleData(data.projectionTrend, MAX_CHART_POINTS, firstSeriesKey ? `${firstSeriesKey}_actual` : undefined)
 
+  const lastTrendPoint = followerTrend[followerTrend.length - 1]
+  const leadValue = lastTrendPoint?.[firstSeriesKey]
+  const leadAccount = firstSeriesKey
+
   return (
-    <SectionCard eyebrow="Charts" title="Visual analytics">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-6">
+      {/* Stat-Led lead */}
+      <div className="border-b border-[var(--border)] pb-6">
+        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+          Tren pengikut{leadAccount ? ` · @${leadAccount}` : ''}
+        </p>
+        <p className="font-display text-[clamp(2.5rem,6vw,4.5rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
+          {typeof leadValue === 'number' ? formatInteger(leadValue) : '—'}
+        </p>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
         {/* Follower Trend */}
-        <ChartCard title="Follower Trend (10d)" wide>
+        <FigurePanel title="Follower Trend (10d)" caption="Perkembangan jumlah pengikut 10 hari terakhir lintas akun terpantau.">
           <div className="h-[260px] w-full overflow-x-auto">
             <div className="h-full min-w-[480px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -72,10 +88,10 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
               </ResponsiveContainer>
             </div>
           </div>
-        </ChartCard>
+        </FigurePanel>
 
         {/* ER Ranking Bar */}
-        <ChartCard title="Engagement Rate Ranking">
+        <FigurePanel title="Engagement Rate Ranking" caption="Urutan akun berdasarkan engagement rate terbaru." muted>
           <div className="h-[240px] w-full overflow-x-auto">
             <div className="h-full min-w-[320px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -89,10 +105,10 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
               </ResponsiveContainer>
             </div>
           </div>
-        </ChartCard>
+        </FigurePanel>
 
         {/* Follower Share Pie */}
-        <ChartCard title="Follower Share">
+        <FigurePanel title="Follower Share" caption="Porsi jumlah pengikut setiap akun terhadap total.">
           <div className="h-[240px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -106,10 +122,10 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </ChartCard>
+        </FigurePanel>
 
         {/* Radar Comparison */}
-        <ChartCard title="Radar Comparison">
+        <FigurePanel title="Radar Comparison" caption="Profil metrik antar akun dalam satu bidang perbandingan." muted>
           <div className="h-[240px] w-full overflow-x-auto">
             <div className="h-full min-w-[320px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -125,10 +141,10 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
               </ResponsiveContainer>
             </div>
           </div>
-        </ChartCard>
+        </FigurePanel>
 
         {/* Engagement Trend */}
-        <ChartCard title="Engagement Rate Trend" wide>
+        <FigurePanel title="Engagement Rate Trend" caption="Perubahan engagement rate harian pada jendela terpantau.">
           <div className="h-[260px] w-full overflow-x-auto">
             <div className="h-full min-w-[480px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -145,10 +161,10 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
               </ResponsiveContainer>
             </div>
           </div>
-        </ChartCard>
+        </FigurePanel>
 
         {/* Projection */}
-        <ChartCard title="Follower Projection (30d)" wide>
+        <FigurePanel title="Follower Projection (30d)" caption={data.projectionNote} muted>
           <div className="h-[280px] w-full overflow-x-auto">
             <div className="h-full min-w-[480px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -168,9 +184,8 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
               </ResponsiveContainer>
             </div>
           </div>
-          {data.projectionNote ? <div className="mt-2 text-[11px] text-[var(--text-soft)]">{data.projectionNote}</div> : null}
-        </ChartCard>
+        </FigurePanel>
       </div>
-    </SectionCard>
+    </div>
   )
 }

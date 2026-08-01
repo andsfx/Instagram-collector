@@ -5,6 +5,14 @@ Pipeline utama repo ini sekarang adalah **hybrid workflow**:
 - **SocialBlade + Scrapling** → untuk `followers`, `following`, `posts_count`
 - **Apify** → untuk post-level data, `Engagement`, dan `Content Breakdown`
 
+## Documentation
+
+| Resource | Description |
+|----------|-------------|
+| [CONTEXT.md](./CONTEXT.md) | Shared vocabulary and glossary for the project |
+| [ADR 001](./docs/adr/001-system-of-record-supabase.md) | Supabase is System of Record decision |
+| [Domain System Spec](./.kiro/specs/domain-system/) | Product requirements, design, and implementation tickets (DS-01…DS-11) |
+
 ## Current Recommended Flow
 
 ### Source split
