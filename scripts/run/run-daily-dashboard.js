@@ -258,7 +258,7 @@ function main() {
     const buildOut = run('node', [path.join(repoRoot, 'scripts', 'export', 'build-dashboard-data.js')], { cwd: repoRoot });
     summary.dashboardBuild = extractTrailingJson(buildOut) || { status: 'unknown' };
 
-    const trackedPaths = ['dashboard/data.json', 'data/dashboard-snapshot.json', 'incoming/apify/datasets'];
+    const trackedPaths = ['dashboard/data.json', 'data/dashboard-snapshot.json'];
     summary.git.changed = hasChanges(repoRoot, trackedPaths);
 
     if (summary.git.changed && !skipCommit) {
