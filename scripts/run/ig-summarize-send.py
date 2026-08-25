@@ -10,16 +10,15 @@ Flow:
 """
 import json
 import os
-import subprocess
 import sys
 import time
 import urllib.request
 import urllib.error
 
+
 def llm_summarize(pipeline: dict) -> str:
     """Try 9router combo. Returns '' on any failure."""
     endpoint = "http://127.0.0.1:20128/v1/chat/completions"
-    # 9router is permissive; try common auth keys if any are set
     token = (os.environ.get("ROUTER_API_KEY") or os.environ.get("NINE_ROUTER_KEY")
              or os.environ.get("OPENAI_API_KEY") or "sk-9router-local")
     payload = {
@@ -42,13 +41,41 @@ def llm_summarize(pipeline: dict) -> str:
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
-        body = json.loads(resp.read().decode())
+        raw = resp.read().decode()
+    # 9router sometimes returns SSE stream even when stream=False is set.
+    # Detect and extract the content from SSE `data: {...}` lines.
+    if raw.lstrip().startswith("data:"):
+        content = ""
+        for line in raw.splitlines():
+            if line.startswith("data: ") and '"delta"' in line:
+                try:
+                    chunk = json.loads(line.removeprefix("data: "))
+                    delta = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                    if delta:
+                        content += delta
+                except Exception:
+                    continue
+        if content.strip():
+            return content.strip()
+        # Fallback: try the final line with finish_reason=stop
+        for line in reversed(raw.splitlines()):
+            if line.startswith("data: ") and '"finish_reason":"stop"' in line:
+                try:
+                    body = json.loads(line.removeprefix("data: "))
+                    content = body["choices"][0]["message"]["content"].strip()
+                    return content
+                except Exception:
+                    continue
+        return ""
+    body = json.loads(raw)
     content = body["choices"][0]["message"]["content"].strip()
-    return content
+
 
 def deterministic_summary(p: dict) -> str:
     """Build a summary strictly from the pipeline JSON. Handles both the
-    happy-path summary object and the workflowStatus=error object."""
+    happy-path summary object and the workflowStatus=error object.
+    The summary nests account data inside hybridMaster.socialblade.accounts,
+    apifyBatch inside hybridMaster.apifyBatch, and git at top level."""
     # Pipeline errored - report the failure honestly instead of fake numbers
     if p.get("workflowStatus") == "error":
         msg = str(p.get("message") or "").splitlines()
@@ -61,24 +88,31 @@ def deterministic_summary(p: dict) -> str:
             "- Data lama tetap aman (previous payload preserved)",
         ]
         return "\n".join(lines)
+
+    # Happy path: accounts live in hybridMaster.socialblade.accounts
+    hm = p.get("hybridMaster", {})
+    sb = hm.get("socialblade", {})
+    accounts = sb.get("accounts", [])
     lines = []
-    accounts = p.get("accounts", [])
-    ok = [a for a in accounts if a.get("status") == "processed"]
-    lines.append(f"IG Dashboard {p.get('date', 'hari ini')}: {len(ok)}/{len(accounts)} akun OK")
-    for a in ok:
-        t = a.get("transform", {})
+    lines.append(f"IG Dashboard {p.get('date', 'hari ini')}: {sb.get('processed', len(accounts))} dari {len(accounts)} akun OK")
+    for a in accounts:
+        o = a.get("output", {})
         lines.append(
-            f"- {a.get('username')}: {t.get('followers', '?')} followers, "
-            f"{t.get('posts_analyzed', '?')} posts, avg {t.get('avg_likes', '?')} likes, "
-            f"{t.get('avg_comments', '?')} comments"
+            f"- {a.get('username')}: {o.get('followers', '?')} followers, "
+            f"{o.get('posts_count', '?')} posts"
         )
-    apify = p.get("apifyBatch", {})
-    if isinstance(apify, dict):
-        lines.append(f"Apify: {apify.get('processed', '?')} akun, errors {apify.get('errors', '?')}")
+    apify = hm.get("apifyBatch", {})
+    if isinstance(apify, dict) and apify.get("processed"):
+        lines.append(f"Apify: {apify.get('processed')} akun, errors {apify.get('errors', 0)}")
+    db = p.get("dashboardBuild", {})
+    if isinstance(db, dict) and db.get("history_days"):
+        lines.append(f"Dashboard: {db.get('history_days')} hari, schema: {'OK' if db.get('schema_valid') else 'ERROR'}")
     git = p.get("git", {})
     if isinstance(git, dict) and git.get("commitMessage"):
         lines.append(f"Git: {git.get('commitMessage')} ({'pushed' if git.get('pushed') else 'not pushed'})")
     return "\n".join(lines)
+    return "\n".join(lines)
+
 
 def send_telegram(text: str) -> bool:
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
@@ -88,7 +122,6 @@ def send_telegram(text: str) -> bool:
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = json.dumps({"chat_id": chat, "text": text, "disable_web_page_preview": True}).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
-    # api.telegram.org is intermittently flaky from this VPS - retry 3x/30s
     for attempt in range(3):
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
@@ -101,10 +134,11 @@ def send_telegram(text: str) -> bool:
             time.sleep(30)
     return False
 
+
 def extract_summary(raw: str) -> dict:
-    """run-daily-dashboard.js interleaves '>>> command' progress lines with
-    per-account JSON blobs on stdout, then prints the final summary JSON last.
-    Find the LAST complete JSON object in the stream and parse it."""
+    """run-daily-dashboard.js writes progress lines + per-account JSON blobs
+    to stdout, then prints the final summary JSON last. Find the LAST complete
+    JSON object in the stream."""
     decoder = json.JSONDecoder()
     last = None
     i = 0
@@ -120,6 +154,7 @@ def extract_summary(raw: str) -> dict:
             i = idx + 1
     return last or {}
 
+
 def main() -> int:
     try:
         pipeline = extract_summary(sys.stdin.read())
@@ -133,15 +168,16 @@ def main() -> int:
         llm_text = ""
 
     if llm_text:
-        text = "IG Dashboard (LLM summary)\n\n" + llm_text
+        text = "IG Dashboard (LLM)\n\n" + llm_text
         mode = "llm"
     else:
-        text = "IG Dashboard (summary)\n\n" + deterministic_summary(pipeline)
+        text = "IG Dashboard\n\n" + deterministic_summary(pipeline)
         mode = "fallback"
 
     ok = send_telegram(text)
     print(f"summarize: mode={mode} sent={ok}", file=sys.stderr)
     return 0 if ok else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
