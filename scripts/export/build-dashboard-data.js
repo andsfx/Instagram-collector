@@ -839,8 +839,12 @@ async function main() {
   for (const username of accounts) {
     const rawPosts = loadLatestPostData(repoRoot, username);
     const followers = latest[username] && Number.isFinite(latest[username].followers) ? latest[username].followers : null;
-    if (rawPosts) {
-      post_insights[username] = buildPostInsight(rawPosts, followers);
+    // Build from local file first; when the local file is present but empty
+    // (Apify returned posts: [] for a flaky account), buildPostInsight() returns
+    // null - fall through to the Supabase fallback instead of emitting null.
+    const localInsight = rawPosts ? buildPostInsight(rawPosts, followers) : null;
+    if (localInsight) {
+      post_insights[username] = localInsight;
     } else if (supabasePostsByUser[username] && supabasePostsByUser[username].length) {
       // Fallback: build from Supabase post_insights data
       post_insights[username] = buildPostInsight({ posts: supabasePostsByUser[username] }, followers);
