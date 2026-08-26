@@ -177,8 +177,29 @@ async function main() {
   for (const account of accounts) {
     const username = account.username;
     try {
-      const run = await callApifyRun(username, 12);
-      const items = fetchDatasetItems(run.defaultDatasetId);
+      // Apify occasionally returns SUCCEEDED with an EMPTY dataset (Instagram
+      // flakiness). Retry with backoff to get FRESH posts instead of falling
+      // back to stale data. Never accept an empty dataset silently.
+      let run = null;
+      let items = [];
+      const maxEmptyRetries = 3;
+      const emptyRetryDelayMs = 30000;
+      for (let attempt = 1; attempt <= maxEmptyRetries; attempt++) {
+        run = await callApifyRun(username, 12);
+        items = fetchDatasetItems(run.defaultDatasetId);
+        if (items.length > 0) break;
+        if (attempt < maxEmptyRetries) {
+          console.error(`[${username}] empty dataset (attempt ${attempt}/${maxEmptyRetries}) - retry in ${emptyRetryDelayMs / 1000}s`);
+          await sleep(emptyRetryDelayMs);
+        }
+      }
+      // Still empty after all retries: DO NOT overwrite the previous good
+      // dataset/latest12 file with empty data. Throw so the account is marked
+      // error and yesterday's fresh data is preserved.
+      if (items.length === 0) {
+        throw new Error(`Apify returned an empty dataset for ${username} after ${maxEmptyRetries} retries - keeping previous data`);
+      }
+
       const datasetPath = path.join(datasetsDir, `${username}.json`);
       writeJson(datasetPath, items);
 

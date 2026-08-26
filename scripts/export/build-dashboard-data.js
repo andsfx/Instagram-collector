@@ -809,47 +809,17 @@ async function main() {
     content_breakdown[username] = contentByUser.get(username) || null;
   }
 
-  // Fetch post insights from Supabase as fallback when local files are missing
-  const { data: supabasePostInsights } = await supabase
-    .from('post_insights')
-    .select('*')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: false });
-
-  const supabasePostsByUser = {};
-  if (supabasePostInsights && supabasePostInsights.length) {
-    for (const row of supabasePostInsights) {
-      if (!row.username) continue;
-      if (!supabasePostsByUser[row.username]) supabasePostsByUser[row.username] = [];
-      supabasePostsByUser[row.username].push({
-        shortcode: row.shortcode,
-        url: row.url,
-        type: row.post_type,
-        likes: Number(row.likes || 0),
-        comments: Number(row.comments || 0),
-        published_at: row.published_at,
-        caption_snippet: row.caption_snippet,
-      });
-    }
-  }
-
   const post_insights = {};
   for (const username of accounts) {
     const rawPosts = loadLatestPostData(repoRoot, username);
     const followers = latest[username] && Number.isFinite(latest[username].followers) ? latest[username].followers : null;
-    // Build from local file first; when the local file is present but empty
-    // (Apify returned posts: [] for a flaky account), buildPostInsight() returns
-    // null - fall through to the Supabase fallback instead of emitting null.
+    // Only emit post_insights for accounts with FRESH local data. When Apify
+    // returned an empty dataset (flaky), retry logic upstream already tried to
+    // recover; if it still failed, omit the account instead of serving stale
+    // Supabase data or a null that breaks the schema.
     const localInsight = rawPosts ? buildPostInsight(rawPosts, followers) : null;
     if (localInsight) {
       post_insights[username] = localInsight;
-    } else if (supabasePostsByUser[username] && supabasePostsByUser[username].length) {
-      // Fallback: build from Supabase post_insights data
-      post_insights[username] = buildPostInsight({ posts: supabasePostsByUser[username] }, followers);
-    } else {
-      post_insights[username] = null;
     }
   }
 
