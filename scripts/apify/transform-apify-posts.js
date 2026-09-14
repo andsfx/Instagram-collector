@@ -29,10 +29,14 @@ function er(avgLikes, avgComments, followers) {
   return Number((((avgLikes + avgComments) / followers) * 100).toFixed(2));
 }
 
-function normalizeType(type) {
-  const t = String(type || '').toLowerCase();
+function normalizeType(item) {
+  // Apify: Reels surface as type 'Video' + productType 'clips'. Reels must be
+  // resolved before the generic 'video' branch or they are miscounted as video
+  // and content_breakdown.reels is always 0.
+  const productType = String(item.productType || '').toLowerCase();
+  if (productType === 'clips') return 'reels';
+  const t = String(item.type || '').toLowerCase();
   if (t.includes('sidecar') || t.includes('carousel')) return 'carousel';
-  if (t.includes('reel')) return 'reels';
   if (t.includes('video')) return 'video';
   return 'image';
 }
@@ -50,7 +54,7 @@ function buildRawPosts(username, items) {
     posts: items.map((item) => ({
       shortcode: item.shortCode || null,
       url: item.url || null,
-      type: normalizeType(item.type),
+      type: normalizeType(item),
       caption: item.caption || null,
       likes: typeof item.likesCount === 'number' ? item.likesCount : null,
       comments: typeof item.commentsCount === 'number' ? item.commentsCount : null,
@@ -204,4 +208,6 @@ function main() {
   }, null, 2));
 }
 
-main();
+module.exports = { normalizeType, buildRawPosts, buildMetrics, buildMerged };
+
+if (require.main === module) main();

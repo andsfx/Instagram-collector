@@ -386,7 +386,8 @@ function computeGrowth(history, username) {
   }
   const latest = history[history.length - 1]?.[username]?.followers || 0;
   const prev = history[history.length - 2]?.[username]?.followers || 0;
-  const idx7 = Math.max(0, history.length - 7);
+  // 7 days back = length-8 (latest is length-1); a 7-observation window spans 6 days.
+  const idx7 = Math.max(0, history.length - 8);
   const weekBase = history[idx7]?.[username]?.followers || prev || 0;
   const change1d = latest - prev;
   const change7d = latest - weekBase;
