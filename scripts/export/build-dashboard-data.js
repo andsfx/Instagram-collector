@@ -688,6 +688,24 @@ function loadLocalMetrics(repoRoot, username) {
   } catch (_) { return null; }
 }
 
+// PostgREST caps a single response at 1000 rows by default. With a multi-account
+// window that exceeds 1000 rows, a single query silently returns only the first
+// page (the oldest rows when ordered ascending), truncating the newest days.
+// `makeQuery` must return a FRESH query builder each call (filters + order applied).
+const SUPABASE_PAGE_SIZE = 1000;
+async function fetchAllPages(makeQuery, label) {
+  const all = [];
+  for (let from = 0; ; from += SUPABASE_PAGE_SIZE) {
+    const { data, error } = await makeQuery().range(from, from + SUPABASE_PAGE_SIZE - 1);
+    if (error) throw new Error(`Failed to fetch ${label}: ${error.message}`);
+    const rows = data || [];
+    all.push(...rows);
+    if (rows.length < SUPABASE_PAGE_SIZE) break;
+    if (from > 1_000_000) break; // safety valve
+  }
+  return all;
+}
+
 async function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   const accountsCfg = readJson(path.join(repoRoot, 'config', 'accounts.json')).filter((a) => a.enabled);
@@ -708,34 +726,42 @@ async function main() {
   const windowStart = getWindowStartDate(windowEnd, historyDays);
   console.log(`Fetching Supabase data: window ${windowStart} → ${windowEnd} (${historyDays} days), accounts: ${accounts.join(', ')}`);
 
-  // Fetch from Supabase — bounded by date window and account list
-  const { data: followerData, error: fhError } = await supabase
-    .from('follower_history')
-    .select('date, username, followers, following, posts')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: true });
-  if (fhError) throw new Error('Failed to fetch follower_history: ' + fhError.message);
+  // Fetch from Supabase — bounded by date window and account list.
+  // Paginated: a single PostgREST response is capped at 1000 rows, so without
+  // pagination the newest days get silently dropped once the window exceeds it.
+  const followerData = await fetchAllPages(
+    () => supabase
+      .from('follower_history')
+      .select('date, username, followers, following, posts')
+      .gte('date', windowStart)
+      .lte('date', windowEnd)
+      .in('username', accounts)
+      .order('date', { ascending: true }),
+    'follower_history'
+  );
 
-  const { data: engagementData, error: engError } = await supabase
-    .from('engagement')
-    .select('*')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: true });
-  if (engError) throw new Error('Failed to fetch engagement: ' + engError.message);
+  const engagementData = await fetchAllPages(
+    () => supabase
+      .from('engagement')
+      .select('*')
+      .gte('date', windowStart)
+      .lte('date', windowEnd)
+      .in('username', accounts)
+      .order('date', { ascending: true }),
+    'engagement'
+  );
 
   // content_breakdown: latest row per account — fetch recent window, builder keeps first-seen per username
-  const { data: contentData, error: cbError } = await supabase
-    .from('content_breakdown')
-    .select('*')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: false });
-  if (cbError) throw new Error('Failed to fetch content_breakdown: ' + cbError.message);
+  const contentData = await fetchAllPages(
+    () => supabase
+      .from('content_breakdown')
+      .select('*')
+      .gte('date', windowStart)
+      .lte('date', windowEnd)
+      .in('username', accounts)
+      .order('date', { ascending: false }),
+    'content_breakdown'
+  );
 
   const historyBase = buildFollowerHistoryFromSupabase(followerData || [], accounts);
   const engagementByDate = buildEngagementFromSupabase(engagementData || []);
