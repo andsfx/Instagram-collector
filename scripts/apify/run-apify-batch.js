@@ -21,6 +21,17 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
 loadEnvFile(path.join(REPO_ROOT, '.env.daily-dashboard'));
 loadEnvFile(path.join(REPO_ROOT, '.env'));
 
+// --- Egress workaround: ISP blackhole (since 2026-10-20) ---
+// api.apify.com is unroutable DIRECT from this VPS (TCP 443 times out, both A records).
+// WARP proxy on 127.0.0.1:40000 reaches it. curl calls below inherit process.env,
+// so setting it here scopes the proxy to the Apify batch only (SocialBlade/Sheets untouched).
+if (!process.env.APIFY_HTTPS_PROXY) process.env.APIFY_HTTPS_PROXY = 'http://127.0.0.1:40000';
+if (!process.env.HTTPS_PROXY) {
+  process.env.HTTPS_PROXY = process.env.APIFY_HTTPS_PROXY;
+  process.env.https_proxy = process.env.APIFY_HTTPS_PROXY;
+}
+if (!process.env.NO_PROXY) process.env.NO_PROXY = 'localhost,127.0.0.1';
+
 const ACTOR_ID = process.env.APIFY_ACTOR_ID || 'apify~instagram-scraper';
 const TOKEN_STATE_FILE = path.join(REPO_ROOT, 'data', '.apify-active-token');
 

@@ -122,9 +122,18 @@ def send_telegram(text: str) -> bool:
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = json.dumps({"chat_id": chat, "text": text, "disable_web_page_preview": True}).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
+    # api.telegram.org is unreachable DIRECT from this VPS (ISP blackhole since 2026-10-20);
+    # route through the same proxy the gateway uses.
+    proxy = os.environ.get("TELEGRAM_PROXY", "").strip()
+    if proxy:
+        opener = urllib.request.build_opener(
+            urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+        )
+    else:
+        opener = urllib.request.build_opener()
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with opener.open(req, timeout=30) as resp:
                 data = json.loads(resp.read().decode())
             if data.get("ok"):
                 return True
