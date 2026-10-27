@@ -93,14 +93,29 @@ def deterministic_summary(p: dict) -> str:
     hm = p.get("hybridMaster", {})
     sb = hm.get("socialblade", {})
     accounts = sb.get("accounts", [])
+
+    def has_followers(a):
+        v = (a.get("output") or {}).get("followers")
+        return isinstance(v, (int, float)) and v > 0
+
+    real_ok = [a for a in accounts if has_followers(a)]
+    missing = [a for a in accounts if not has_followers(a)]
+
     lines = []
-    lines.append(f"IG Dashboard {p.get('date', 'hari ini')}: {sb.get('processed', len(accounts))} dari {len(accounts)} akun OK")
+    head = f"IG Dashboard {p.get('date', 'hari ini')}: {len(real_ok)} dari {len(accounts)} akun OK"
+    if missing:
+        head += f" | {len(missing)} tanpa data follower"
+    lines.append(head)
     for a in accounts:
         o = a.get("output", {})
-        lines.append(
-            f"- {a.get('username')}: {o.get('followers', '?')} followers, "
-            f"{o.get('posts_count', '?')} posts"
-        )
+        fol = o.get("followers")
+        if isinstance(fol, (int, float)) and fol > 0:
+            lines.append(f"- {a.get('username')}: {fol} followers, {o.get('posts_count', '?')} posts")
+        else:
+            lines.append(f"- {a.get('username')}: TANPA DATA follower (scrape gagal, bukan nol)")
+    if missing and len(missing) == len(accounts):
+        lines.append("Catatan: sumber follower (SocialBlade) menolak request dari IP VPS. "
+                     "Angka tidak diisi; dashboard tidak dapat baris baru untuk hari ini.")
     apify = hm.get("apifyBatch", {})
     if isinstance(apify, dict) and apify.get("processed"):
         lines.append(f"Apify: {apify.get('processed')} akun, errors {apify.get('errors', 0)}")
