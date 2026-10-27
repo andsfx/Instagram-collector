@@ -73,7 +73,7 @@ function main() {
     || (process.platform === 'win32' ? 'python' : '/usr/bin/python3');
   for (const account of accounts) {
     try {
-      const out = run(pythonBin, [path.join(repoRoot, 'scripts', 'socialblade', 'collect-socialblade-stats.py'), account.username], { cwd: repoRoot });
+      const out = run(pythonBin, [path.join(repoRoot, 'scripts', 'socialblade', 'collect-followers.py'), account.username], { cwd: repoRoot });
       summary.socialblade.processed += 1;
       const parsed = extractTrailingJson(out);
       summary.socialblade.accounts.push({ username: account.username, status: 'processed', output: parsed || {} });
