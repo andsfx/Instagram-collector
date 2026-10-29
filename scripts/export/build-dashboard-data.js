@@ -767,12 +767,23 @@ async function main() {
   const engagementByDate = buildEngagementFromSupabase(engagementData || []);
   const contentByUser = buildContentBreakdownFromSupabase(contentData || []);
 
+  const insightsPath = path.join(repoRoot, 'data', 'insights', 'history.json');
+  let insightsByDate = {};
+  if (fs.existsSync(insightsPath)) {
+    try {
+      insightsByDate = JSON.parse(fs.readFileSync(insightsPath, 'utf8'));
+    } catch (error) {
+      console.warn('insights file unreadable, skipping:', error.message);
+    }
+  }
+
   const history = historyBase.map((row) => {
     const date = row.date;
     const out = { date };
     for (const username of accounts) {
       const base = row[username] || {};
       const e = (engagementByDate.get(date) || {})[username] || {};
+      const insight = (insightsByDate[date] || {})[username] || {};
       out[username] = {
         followers: base.followers ?? null,
         following: base.following ?? null,
@@ -780,6 +791,8 @@ async function main() {
         avg_likes: e.avg_likes ?? null,
         avg_comments: e.avg_comments ?? null,
         engagement_rate: e.engagement_rate ?? null,
+        new_followers: insight.new_followers ?? null,
+        reach: insight.reach ?? null,
         anomaly: false,
       };
     }
@@ -803,6 +816,8 @@ async function main() {
       avg_likes: last.avg_likes ?? null,
       avg_comments: last.avg_comments ?? null,
       engagement_rate: last.engagement_rate ?? null,
+      new_followers: last.new_followers ?? null,
+      reach: last.reach ?? null,
       ff_ratio: ratio(last.followers, last.following),
       verified: !!accountCfg.verified,
       sources: { stats: 'socialblade', engagement: 'apify' },

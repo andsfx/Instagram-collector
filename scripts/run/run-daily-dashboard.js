@@ -258,7 +258,7 @@ function main() {
     const buildOut = run('node', [path.join(repoRoot, 'scripts', 'export', 'build-dashboard-data.js')], { cwd: repoRoot });
     summary.dashboardBuild = extractTrailingJson(buildOut) || { status: 'unknown' };
 
-    const trackedPaths = ['dashboard/data.json', 'data/dashboard-snapshot.json'];
+    const trackedPaths = ['dashboard/data.json', 'data/dashboard-snapshot.json', 'data/insights/history.json'];
     summary.git.changed = hasChanges(repoRoot, trackedPaths);
 
     // Guard: kalau scrape follower gagal total, build tetap menulis ulang file

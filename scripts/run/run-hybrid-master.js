@@ -91,6 +91,16 @@ function main() {
     summary.followerHistory = { status: 'error', reason: error.message };
   }
 
+  // 2b) Daily insights (reach + new followers) for accounts connected to the
+  // Instagram Graph. Non-fatal: missing insights must not block the dashboard.
+  try {
+    const out = run(pythonBin, [path.join(repoRoot, 'scripts', 'insights', 'collect-insights.py'), '--days', '7'], { cwd: repoRoot });
+    summary.insights = extractTrailingJson(out) || { status: 'processed' };
+  } catch (error) {
+    summary.insights = { status: 'error', reason: error.message };
+    console.warn('insights stage failed (non-fatal):', error.message);
+  }
+
   // 3) Run Apify batch (capture output even on partial failure — exit code 2 = some accounts failed)
   try {
     let out = '';
