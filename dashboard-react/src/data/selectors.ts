@@ -1,4 +1,4 @@
-import type { DashboardRecord, MetricEntry, PostInsightPost, UiAccountSummary } from './types'
+import type { AccountKey, DashboardRecord, MetricEntry, PostInsightPost, UiAccountSummary } from './types'
 import { getAccountColor } from '../components/chart-theme'
 import {
   formatInteger as _formatInteger,
@@ -1214,5 +1214,62 @@ export function getPostSnapshotView(
       { label: 'Akun dengan ER tertinggi', value: topEr ? `@${topEr.account}` : '-' },
     ],
     cards,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reach & new followers (Instagram Graph insights)
+// ---------------------------------------------------------------------------
+
+export interface ReachSummaryRow {
+  account: AccountKey
+  newFollowers: number | null
+  reach: number | null
+}
+
+export interface ReachSummaryData {
+  date: string | null
+  rows: ReachSummaryRow[]
+  missing: AccountKey[]
+}
+
+/**
+ * Ambil baris history terbaru yang punya nilai reach / new_followers.
+ * Insight Graph mundur satu hari, jadi tanggal terakhir sering masih kosong.
+ */
+export function getReachSummary(data: DashboardRecord): ReachSummaryData {
+  let chosen: { date: string; values: Record<AccountKey, MetricEntry> } | null = null
+  for (let index = data.history.length - 1; index >= 0; index -= 1) {
+    const row = data.history[index]
+    const hasInsight = Object.values(row.values).some(
+      (entry) => entry?.reach != null || entry?.new_followers != null,
+    )
+    if (hasInsight) {
+      chosen = row
+      break
+    }
+  }
+
+  if (!chosen) {
+    return { date: null, rows: [], missing: [...data.accounts] }
+  }
+
+  const all = data.accounts.map((account) => {
+    const entry = chosen.values[account]
+    return {
+      account,
+      newFollowers: entry?.new_followers ?? null,
+      reach: entry?.reach ?? null,
+    }
+  })
+
+  return {
+    date: chosen.date,
+    rows: all
+      .filter((row) => row.reach != null || row.newFollowers != null)
+      .sort((left, right) => (right.reach ?? 0) - (left.reach ?? 0)),
+    missing: all
+      .filter((row) => row.reach == null && row.newFollowers == null)
+      .map((row) => row.account),
   }
 }
