@@ -16,6 +16,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -56,18 +57,29 @@ def fetch_scrapecreators(username: str) -> dict | None:
         log('SCRAPECREATORS_API_KEY missing')
         return None
     query = urllib.parse.urlencode({'handle': username, 'trim': 'true'})
-    req = urllib.request.Request(f'{SC_ENDPOINT}?{query}')
-    req.add_header('x-api-key', key)
-    req.add_header('Accept', 'application/json')
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            body = json.loads(resp.read().decode())
-    except urllib.error.HTTPError as exc:
-        detail = exc.read()[:200].decode(errors='replace')
-        log(f'scrapecreators HTTP {exc.code} for {username}: {detail}')
-        return None
-    except Exception as exc:
-        log(f'scrapecreators call failed for {username}: {exc}')
+
+    # Retry hanya untuk gangguan transport/5xx/429 — respons 200 dengan bentuk
+    # aneh tidak diulang supaya tidak membakar credit.
+    body = None
+    for attempt, delay in enumerate((0, 5, 15), start=1):
+        if delay:
+            time.sleep(delay)
+        req = urllib.request.Request(f'{SC_ENDPOINT}?{query}')
+        req.add_header('x-api-key', key)
+        req.add_header('Accept', 'application/json')
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                body = json.loads(resp.read().decode())
+            break
+        except urllib.error.HTTPError as exc:
+            detail = exc.read()[:200].decode(errors='replace')
+            log(f'scrapecreators HTTP {exc.code} for {username} (attempt {attempt}): {detail}')
+            if exc.code not in (429, 500, 502, 503, 504):
+                return None
+        except Exception as exc:
+            log(f'scrapecreators call failed for {username} (attempt {attempt}): {exc}')
+    if body is None:
+        log(f'scrapecreators gave up for {username}')
         return None
 
     user = (body.get('data') or {}).get('user') if isinstance(body, dict) else None
@@ -181,7 +193,10 @@ def main() -> int:
     }
     out_path.write_text(json.dumps(payload, indent=2), encoding='utf-8')
     print(json.dumps(payload, indent=2))
-    return 2
+    # Exit 0 walau akun ini gagal: satu akun tanpa data tidak boleh menggagalkan
+    # seluruh hari (engagement 4 akun lain sudah terlanjur di-scrape). Summarizer
+    # melaporkan "N dari 5 akun OK" dari nilai followers, bukan dari exit code.
+    return 0
 
 
 if __name__ == '__main__':
