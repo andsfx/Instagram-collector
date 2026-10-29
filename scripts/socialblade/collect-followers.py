@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Collect Instagram follower stats with a fallback chain.
 
-1. SocialBlade scraper (existing script) — free, but blocked by Cloudflare for
-   datacenter IPs since 2026-10-27.
-2. ScrapeCreators public Instagram profile API — paid (~$0.001/profile), called
-   directly over REST with SCRAPECREATORS_API_KEY. No Composio hop.
+1. Instagram Graph API via Composio — only for accounts connected to the
+   Composio Instagram toolkit (metmalbekasi, grandmetropolitan). Free and
+   official: exact followers/following/media counters.
+2. SocialBlade scraper — free, but blocked by Cloudflare for datacenter IPs
+   since 2026-10-27.
+3. ScrapeCreators public Instagram profile API — paid (~1 credit/profile),
+   called directly over REST with SCRAPECREATORS_API_KEY.
 
 Writes data/raw/stats/<username>-stats.json in the schema the rest of the
 pipeline expects (followers, following, posts_count, ok, warnings, source).
@@ -27,6 +30,14 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = REPO_ROOT / 'data' / 'raw' / 'stats'
 SC_ENDPOINT = 'https://api.scrapecreators.com/v1/instagram/profile'
 KEY_NAMES = ('SCRAPECREATORS_API_KEY', 'SCRAPECREATORS_KEY', 'SCRAPECREATORS_API_TOKEN')
+MCP_URL = 'https://connect.composio.dev/mcp'
+MCP_TOOL = 'COMPOSIO_MULTI_EXECUTE_TOOL'
+
+# username -> alias akun Instagram yang tersambung di Composio
+META_ACCOUNTS = {
+    'metmalbekasi': 'metmal',
+    'grandmetropolitan': 'grandmet',
+}
 
 
 def log(msg: str) -> None:
@@ -49,6 +60,98 @@ def load_key() -> str | None:
             if m:
                 return m.group(2).strip().strip('"').strip("'")
     return None
+
+
+def load_composio_key() -> str | None:
+    key = os.environ.get('MCP_COMPOSIO_API_KEY')
+    if key:
+        return key.strip()
+    env_path = Path.home() / '.hermes' / '.env'
+    if not env_path.exists():
+        return None
+    for line in env_path.read_text(encoding='utf-8', errors='ignore').splitlines():
+        m = re.match(r'^\s*MCP_COMPOSIO_API_KEY\s*=\s*(.+?)\s*$', line)
+        if m:
+            return m.group(1).strip().strip('"').strip("'")
+    return None
+
+
+def _mcp_post(payload: dict, key: str, sid: str | None = None, timeout: int = 90):
+    req = urllib.request.Request(MCP_URL, data=json.dumps(payload).encode(), method='POST')
+    req.add_header('Authorization', f'Bearer {key}')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('Accept', 'application/json, text/event-stream')
+    if sid:
+        req.add_header('Mcp-Session-Id', sid)
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        sid = resp.headers.get('Mcp-Session-Id') or sid
+        body = resp.read().decode()
+    events = []
+    for line in body.splitlines():
+        if line.startswith('data: '):
+            try:
+                events.append(json.loads(line[6:]))
+            except json.JSONDecodeError:
+                continue
+    return events, sid
+
+
+def fetch_meta(username: str) -> dict | None:
+    """Instagram Graph API lewat Composio, hanya untuk akun yang tersambung."""
+    alias = META_ACCOUNTS.get(username)
+    if not alias:
+        return None
+    key = load_composio_key()
+    if not key:
+        log('MCP_COMPOSIO_API_KEY missing; skipping Meta Graph')
+        return None
+    try:
+        _, sid = _mcp_post({'jsonrpc': '2.0', 'id': 1, 'method': 'initialize',
+                            'params': {'protocolVersion': '2024-11-05', 'capabilities': {},
+                                       'clientInfo': {'name': 'hermes-cron', 'version': '1.0'}}}, key)
+        _mcp_post({'jsonrpc': '2.0', 'method': 'notifications/initialized'}, key, sid, timeout=30)
+        events, _ = _mcp_post({'jsonrpc': '2.0', 'id': 2, 'method': 'tools/call',
+                               'params': {'name': MCP_TOOL,
+                                          'arguments': {
+                                              'tools': [{
+                                                  'tool_slug': 'INSTAGRAM_GET_USER_INFO',
+                                                  'account': alias,
+                                                  'arguments': {
+                                                      'ig_user_id': 'me',
+                                                      'fields': 'username,followers_count,follows_count,media_count'}}],
+                                              'sync_response_to_workbench': False,
+                                              'thought': 'daily follower count'}}}, key, sid)
+    except Exception as exc:
+        log(f'meta graph call failed for {username} ({alias}): {exc}')
+        return None
+
+    for event in events:
+        if 'error' in event:
+            log(f'meta graph error for {username}: {json.dumps(event["error"])[:200]}')
+            continue
+        for content in (event.get('result') or {}).get('content') or []:
+            text = content.get('text') or ''
+            if '"followers_count"' not in text:
+                continue
+            data = _extract_profile(text)
+            if data:
+                return data
+    return None
+
+
+def _extract_profile(text: str) -> dict | None:
+    def grab(name):
+        m = re.search(r'"' + name + r'"\s*:\s*(\d+)', text)
+        return int(m.group(1)) if m else None
+
+    followers = grab('followers_count')
+    if not followers:
+        return None
+    return {
+        'followers': followers,
+        'following': grab('follows_count'),
+        'posts_count': grab('media_count'),
+    }
 
 
 def fetch_scrapecreators(username: str) -> dict | None:
@@ -148,22 +251,14 @@ def main() -> int:
     good_existing = (existing and existing.get('date') == today
                      and isinstance(existing.get('followers'), int) and existing['followers'] > 0)
 
-    sb = run_socialblade(username)
-    if sb and isinstance(sb.get('followers'), int) and sb['followers'] > 0:
-        out_path.write_text(json.dumps(sb, indent=2), encoding='utf-8')
-        print(json.dumps(sb, indent=2))
-        return 0
-
-    log(f'socialblade gave no followers for {username}; trying scrapecreators')
-    data = fetch_scrapecreators(username)
-    if data and data.get('followers'):
+    def emit(source: str, data: dict) -> int:
         payload = {
-            'date': datetime.now(timezone.utc).date().isoformat(),
+            'date': today,
             'username': username,
             'followers': data['followers'],
-            'following': data['following'],
-            'posts_count': data['posts_count'],
-            'source': 'scrapecreators',
+            'following': data.get('following'),
+            'posts_count': data.get('posts_count'),
+            'source': source,
             'ok': True,
             'warnings': [],
             'url': f'https://www.instagram.com/{username}/',
@@ -171,6 +266,24 @@ def main() -> int:
         out_path.write_text(json.dumps(payload, indent=2), encoding='utf-8')
         print(json.dumps(payload, indent=2))
         return 0
+
+    # 1) Meta Graph resmi, hanya untuk akun yang tersambung di Composio.
+    meta = fetch_meta(username)
+    if meta and meta.get('followers'):
+        return emit('instagram-graph', meta)
+
+    # 2) SocialBlade (gratis, sering diblokir Cloudflare).
+    sb = run_socialblade(username)
+    if sb and isinstance(sb.get('followers'), int) and sb['followers'] > 0:
+        out_path.write_text(json.dumps(sb, indent=2), encoding='utf-8')
+        print(json.dumps(sb, indent=2))
+        return 0
+
+    # 3) ScrapeCreators (berbayar per profil).
+    log(f'socialblade gave no followers for {username}; trying scrapecreators')
+    data = fetch_scrapecreators(username)
+    if data and data.get('followers'):
+        return emit('scrapecreators', data)
 
     # Both sources failed. Jangan timpa angka bagus yang sudah didapat hari ini
     # (misal run pagi sukses, run siang kena blokir).
