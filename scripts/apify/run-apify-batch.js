@@ -4,10 +4,10 @@ const { execFileSync } = require('child_process');
 
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) return;
-  const lines = fs.readFileSync(filePath, 'utf8').split(/\r?\n/);
+  const lines = fs.readFileSync(filePath, 'utf8').split(/\\r?\\n/);
   for (const line of lines) {
-    if (!line || /^\s*#/.test(line)) continue;
-    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!line || /^\\s*#/.test(line)) continue;
+    const m = line.match(/^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*(.*)\\s*$/);
     if (!m) continue;
     let [, key, value] = m;
     if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
@@ -21,8 +21,80 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
 loadEnvFile(path.join(REPO_ROOT, '.env.daily-dashboard'));
 loadEnvFile(path.join(REPO_ROOT, '.env'));
 
-const APIFY_TOKEN = process.env.APIFY_TOKEN;
+// --- Egress workaround: ISP blackhole (since 2026-10-20) ---
+// api.apify.com is unroutable DIRECT from this VPS (TCP 443 times out, both A records).
+// WARP proxy on 127.0.0.1:40000 reaches it. curl calls below inherit process.env,
+// so setting it here scopes the proxy to the Apify batch only (SocialBlade/Sheets untouched).
+if (!process.env.APIFY_HTTPS_PROXY) process.env.APIFY_HTTPS_PROXY = 'http://127.0.0.1:40000';
+if (!process.env.HTTPS_PROXY) {
+  process.env.HTTPS_PROXY = process.env.APIFY_HTTPS_PROXY;
+  process.env.https_proxy = process.env.APIFY_HTTPS_PROXY;
+}
+if (!process.env.NO_PROXY) process.env.NO_PROXY = 'localhost,127.0.0.1';
+
 const ACTOR_ID = process.env.APIFY_ACTOR_ID || 'apify~instagram-scraper';
+const TOKEN_STATE_FILE = path.join(REPO_ROOT, 'data', '.apify-active-token');
+
+// --- Token rotation (auto-rotate on monthly usage limit) ---
+// Supports APIFY_TOKEN (primary) and APIFY_TOKEN_BACKUP (secondary).
+// Persists the active token between runs so we don't keep hitting an exhausted one.
+const ALL_TOKENS = [process.env.APIFY_TOKEN, process.env.APIFY_TOKEN_BACKUP].filter(Boolean);
+let _activeToken = null;
+let _knownExhausted = new Set();
+
+function _resetRunState() {
+  _knownExhausted = new Set();
+}
+
+function _loadActiveToken() {
+  if (_activeToken) return;
+  // try saved state first
+  try {
+    const saved = fs.readFileSync(TOKEN_STATE_FILE, 'utf8').trim();
+    if (ALL_TOKENS.includes(saved)) { _activeToken = saved; return; }
+  } catch (e) { /* ignore */ }
+  _activeToken = ALL_TOKENS[0] || '';
+}
+
+function _saveActiveToken() {
+  try {
+    const dir = path.dirname(TOKEN_STATE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(TOKEN_STATE_FILE, _activeToken, 'utf8');
+  } catch (e) { /* ignore */ }
+}
+
+function getActiveToken() {
+  _loadActiveToken();
+  return _activeToken;
+}
+
+function isHardLimitError(err) {
+  const msg = String((err && err.message) || '');
+  return /monthly usage hard limit|usage limit|limit exceeded|monthly.*lim|quota|429|402|payment.*required/i.test(msg);
+}
+
+function rotateToken() {
+  _loadActiveToken();
+  // exclude current token from candidates (it's exhausted)
+  const candidates = ALL_TOKENS.filter(t => t !== _activeToken && !_knownExhausted.has(t));
+  if (candidates.length === 0) {
+    // fallback: try any other token
+    const others = ALL_TOKENS.filter(t => t !== _activeToken);
+    if (others.length === 0) return false;
+    _activeToken = others[0];
+  } else {
+    _activeToken = candidates[0];
+  }
+  _saveActiveToken();
+  return true;
+}
+
+function markTokenExhausted() {
+  _loadActiveToken();
+  _knownExhausted.add(_activeToken);
+}
+// --- end token rotation ---
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -52,7 +124,7 @@ function loadAccounts(repoRoot) {
 function getRun(runId) {
   const out = runCmd('curl', [
     '-sS',
-    '-H', `Authorization: Bearer ${APIFY_TOKEN}`,
+    '-H', `Authorization: Bearer ${getActiveToken()}`,
     `https://api.apify.com/v2/actor-runs/${runId}`
   ]);
 
@@ -100,8 +172,9 @@ async function waitForRunCompletion(runId, username, options) {
 
 async function callApifyRun(username, resultsLimit) {
   resultsLimit = resultsLimit || 12;
-  if (!APIFY_TOKEN) {
-    throw new Error('APIFY_TOKEN is required');
+  const token = getActiveToken();
+  if (!token) {
+    throw new Error('No Apify token available (both APIFY_TOKEN and APIFY_TOKEN_BACKUP are empty)');
   }
 
   const payload = {
@@ -114,7 +187,7 @@ async function callApifyRun(username, resultsLimit) {
     '-sS',
     '-X', 'POST',
     `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?waitForFinish=600`,
-    '-H', `Authorization: Bearer ${APIFY_TOKEN}`,
+    '-H', `Authorization: Bearer ${token}`,
     '-H', 'Content-Type: application/json',
     '--data', JSON.stringify(payload)
   ]);
@@ -152,7 +225,7 @@ async function callApifyRun(username, resultsLimit) {
 function fetchDatasetItems(datasetId) {
   const out = runCmd('curl', [
     '-sS',
-    '-H', `Authorization: Bearer ${APIFY_TOKEN}`,
+    '-H', `Authorization: Bearer ${getActiveToken()}`,
     `https://api.apify.com/v2/datasets/${datasetId}/items?clean=true`
   ]);
   const items = JSON.parse(out || '[]');
@@ -172,38 +245,72 @@ async function main() {
   const datasetsDir = path.join(outDir, 'datasets');
   ensureDir(datasetsDir);
 
+  _resetRunState();
   const results = [];
 
   for (const account of accounts) {
     const username = account.username;
-    try {
-      const run = await callApifyRun(username, 12);
-      const items = fetchDatasetItems(run.defaultDatasetId);
-      const datasetPath = path.join(datasetsDir, `${username}.json`);
-      writeJson(datasetPath, items);
+    const maxTokenAttempts = ALL_TOKENS.length;
+    let result = null;
 
-      const transformSummary = JSON.parse(runCmd('node', [
-        path.join(repoRoot, 'scripts', 'apify', 'transform-apify-posts.js'),
-        username,
-        datasetPath,
-        String(account.followers)
-      ]));
+    for (let attempt = 0; attempt < maxTokenAttempts; attempt++) {
+      try {
+        // Apify occasionally returns SUCCEEDED with an EMPTY dataset (Instagram
+        // flakiness). Retry with backoff to get FRESH posts instead of falling
+        // back to stale data. Never accept an empty dataset silently.
+        let run = null;
+        let items = [];
+        const maxEmptyRetries = 3;
+        const emptyRetryDelayMs = 30000;
+        for (let emptyRetry = 1; emptyRetry <= maxEmptyRetries; emptyRetry++) {
+          run = await callApifyRun(username, 12);
+          items = fetchDatasetItems(run.defaultDatasetId);
+          if (items.length > 0) break;
+          if (emptyRetry < maxEmptyRetries) {
+            console.error(`[${username}] empty dataset (attempt ${emptyRetry}/${maxEmptyRetries}) - retry in ${emptyRetryDelayMs / 1000}s`);
+            await sleep(emptyRetryDelayMs);
+          }
+        }
+        // Still empty after all retries: DO NOT overwrite the previous good
+        // dataset/latest12 file with empty data. Throw so the account is marked
+        // error and yesterday's fresh data is preserved.
+        if (items.length === 0) {
+          throw new Error(`Apify returned an empty dataset for ${username} after ${maxEmptyRetries} retries - keeping previous data`);
+        }
 
-      results.push({
-        username,
-        status: 'processed',
-        apifyRunId: run.id,
-        datasetId: run.defaultDatasetId,
-        items: items.length,
-        transform: transformSummary
-      });
-    } catch (error) {
-      results.push({
-        username,
-        status: 'error',
-        reason: error.message
-      });
+        const datasetPath = path.join(datasetsDir, `${username}.json`);
+        writeJson(datasetPath, items);
+
+        const transformSummary = JSON.parse(runCmd('node', [
+          path.join(repoRoot, 'scripts', 'apify', 'transform-apify-posts.js'),
+          username,
+          datasetPath,
+          String(account.followers)
+        ]));
+
+        result = {
+          username,
+          status: 'processed',
+          apifyRunId: run.id,
+          datasetId: run.defaultDatasetId,
+          items: items.length,
+          transform: transformSummary
+        };
+        break; // success, exit token retry loop
+      } catch (error) {
+        if (isHardLimitError(error) && attempt + 1 < maxTokenAttempts) {
+          markTokenExhausted();
+          if (rotateToken()) {
+            console.error(`[${username}] token exhausted - rotating, retry ${attempt + 2}/${maxTokenAttempts}`);
+            continue;
+          }
+        }
+        result = { username, status: 'error', reason: error.message };
+        break;
+      }
     }
+
+    results.push(result);
   }
 
   const summary = {

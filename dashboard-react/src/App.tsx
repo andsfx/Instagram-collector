@@ -2,8 +2,9 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react
 import { FreshnessPanel } from './components/FreshnessPanel'
 import { ExecutiveSummary } from './components/ExecutiveSummary'
 import { TodaySummary } from './components/TodaySummary'
+import { ReachCard } from './components/ReachCard'
 import { useDashboardData } from './hooks/useDashboardData'
-import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeadToHeadDefaults, getInsightsData, getQuickVisualData, getTodaySummary, getSummaryStrip } from './data/selectors'
+import { getAccountSummaries, getExecutiveSummary, getFreshnessSummary, getHeadToHeadDefaults, getInsightsData, getQuickVisualData, getReachSummary, getTodaySummary, getSummaryStrip } from './data/selectors'
 import { AccountOverviewGrid } from './components/AccountOverviewGrid'
 import { RankingGrowthPresentation } from './components/RankingGrowthPresentation'
 import { ContentBreakdownPresentation } from './components/ContentBreakdownPresentation'
@@ -78,6 +79,7 @@ export default function App() {
   const freshness = useMemo(() => data ? getFreshnessSummary(data) : null, [data])
   const executive = useMemo(() => data ? getExecutiveSummary(data) : null, [data])
   const today = useMemo(() => data ? getTodaySummary(data) : null, [data])
+  const reach = useMemo(() => data ? getReachSummary(data) : null, [data])
   const quickVisual = useMemo(() => data ? getQuickVisualData(data) : null, [data])
   const accountSummaries = useMemo(() => data ? getAccountSummaries(data) : [], [data])
   const insights = useMemo(() => data ? getInsightsData(data) : null, [data])
@@ -172,6 +174,7 @@ export default function App() {
             <div className={`${shell} py-8 space-y-6`}>
               <ExecutiveSummary summary={executive} />
               <TodaySummary today={today} />
+              {reach ? <ReachCard summary={reach} /> : null}
               <SummaryStrip items={summaryStrip} />
               <InsightsPanel insights={insights} />
             </div>

@@ -386,7 +386,8 @@ function computeGrowth(history, username) {
   }
   const latest = history[history.length - 1]?.[username]?.followers || 0;
   const prev = history[history.length - 2]?.[username]?.followers || 0;
-  const idx7 = Math.max(0, history.length - 7);
+  // 7 days back = length-8 (latest is length-1); a 7-observation window spans 6 days.
+  const idx7 = Math.max(0, history.length - 8);
   const weekBase = history[idx7]?.[username]?.followers || prev || 0;
   const change1d = latest - prev;
   const change7d = latest - weekBase;
@@ -687,6 +688,24 @@ function loadLocalMetrics(repoRoot, username) {
   } catch (_) { return null; }
 }
 
+// PostgREST caps a single response at 1000 rows by default. With a multi-account
+// window that exceeds 1000 rows, a single query silently returns only the first
+// page (the oldest rows when ordered ascending), truncating the newest days.
+// `makeQuery` must return a FRESH query builder each call (filters + order applied).
+const SUPABASE_PAGE_SIZE = 1000;
+async function fetchAllPages(makeQuery, label) {
+  const all = [];
+  for (let from = 0; ; from += SUPABASE_PAGE_SIZE) {
+    const { data, error } = await makeQuery().range(from, from + SUPABASE_PAGE_SIZE - 1);
+    if (error) throw new Error(`Failed to fetch ${label}: ${error.message}`);
+    const rows = data || [];
+    all.push(...rows);
+    if (rows.length < SUPABASE_PAGE_SIZE) break;
+    if (from > 1_000_000) break; // safety valve
+  }
+  return all;
+}
+
 async function main() {
   const repoRoot = path.resolve(__dirname, '..', '..');
   const accountsCfg = readJson(path.join(repoRoot, 'config', 'accounts.json')).filter((a) => a.enabled);
@@ -707,38 +726,56 @@ async function main() {
   const windowStart = getWindowStartDate(windowEnd, historyDays);
   console.log(`Fetching Supabase data: window ${windowStart} → ${windowEnd} (${historyDays} days), accounts: ${accounts.join(', ')}`);
 
-  // Fetch from Supabase — bounded by date window and account list
-  const { data: followerData, error: fhError } = await supabase
-    .from('follower_history')
-    .select('date, username, followers, following, posts')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: true });
-  if (fhError) throw new Error('Failed to fetch follower_history: ' + fhError.message);
+  // Fetch from Supabase — bounded by date window and account list.
+  // Paginated: a single PostgREST response is capped at 1000 rows, so without
+  // pagination the newest days get silently dropped once the window exceeds it.
+  const followerData = await fetchAllPages(
+    () => supabase
+      .from('follower_history')
+      .select('date, username, followers, following, posts')
+      .gte('date', windowStart)
+      .lte('date', windowEnd)
+      .in('username', accounts)
+      .order('date', { ascending: true }),
+    'follower_history'
+  );
 
-  const { data: engagementData, error: engError } = await supabase
-    .from('engagement')
-    .select('*')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: true });
-  if (engError) throw new Error('Failed to fetch engagement: ' + engError.message);
+  const engagementData = await fetchAllPages(
+    () => supabase
+      .from('engagement')
+      .select('*')
+      .gte('date', windowStart)
+      .lte('date', windowEnd)
+      .in('username', accounts)
+      .order('date', { ascending: true }),
+    'engagement'
+  );
 
   // content_breakdown: latest row per account — fetch recent window, builder keeps first-seen per username
-  const { data: contentData, error: cbError } = await supabase
-    .from('content_breakdown')
-    .select('*')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: false });
-  if (cbError) throw new Error('Failed to fetch content_breakdown: ' + cbError.message);
+  const contentData = await fetchAllPages(
+    () => supabase
+      .from('content_breakdown')
+      .select('*')
+      .gte('date', windowStart)
+      .lte('date', windowEnd)
+      .in('username', accounts)
+      .order('date', { ascending: false }),
+    'content_breakdown'
+  );
 
   const historyBase = buildFollowerHistoryFromSupabase(followerData || [], accounts);
   const engagementByDate = buildEngagementFromSupabase(engagementData || []);
   const contentByUser = buildContentBreakdownFromSupabase(contentData || []);
+
+  const insightsPath = path.join(repoRoot, 'data', 'insights', 'history.json');
+  let insightsByDate = {};
+  if (fs.existsSync(insightsPath)) {
+    try {
+      insightsByDate = JSON.parse(fs.readFileSync(insightsPath, 'utf8'));
+    } catch (error) {
+      console.warn('insights file unreadable, skipping:', error.message);
+    }
+  }
 
   const history = historyBase.map((row) => {
     const date = row.date;
@@ -746,6 +783,7 @@ async function main() {
     for (const username of accounts) {
       const base = row[username] || {};
       const e = (engagementByDate.get(date) || {})[username] || {};
+      const insight = (insightsByDate[date] || {})[username] || {};
       out[username] = {
         followers: base.followers ?? null,
         following: base.following ?? null,
@@ -753,6 +791,8 @@ async function main() {
         avg_likes: e.avg_likes ?? null,
         avg_comments: e.avg_comments ?? null,
         engagement_rate: e.engagement_rate ?? null,
+        new_followers: insight.new_followers ?? null,
+        reach: insight.reach ?? null,
         anomaly: false,
       };
     }
@@ -776,6 +816,8 @@ async function main() {
       avg_likes: last.avg_likes ?? null,
       avg_comments: last.avg_comments ?? null,
       engagement_rate: last.engagement_rate ?? null,
+      new_followers: last.new_followers ?? null,
+      reach: last.reach ?? null,
       ff_ratio: ratio(last.followers, last.following),
       verified: !!accountCfg.verified,
       sources: { stats: 'socialblade', engagement: 'apify' },
@@ -809,43 +851,17 @@ async function main() {
     content_breakdown[username] = contentByUser.get(username) || null;
   }
 
-  // Fetch post insights from Supabase as fallback when local files are missing
-  const { data: supabasePostInsights } = await supabase
-    .from('post_insights')
-    .select('*')
-    .gte('date', windowStart)
-    .lte('date', windowEnd)
-    .in('username', accounts)
-    .order('date', { ascending: false });
-
-  const supabasePostsByUser = {};
-  if (supabasePostInsights && supabasePostInsights.length) {
-    for (const row of supabasePostInsights) {
-      if (!row.username) continue;
-      if (!supabasePostsByUser[row.username]) supabasePostsByUser[row.username] = [];
-      supabasePostsByUser[row.username].push({
-        shortcode: row.shortcode,
-        url: row.url,
-        type: row.post_type,
-        likes: Number(row.likes || 0),
-        comments: Number(row.comments || 0),
-        published_at: row.published_at,
-        caption_snippet: row.caption_snippet,
-      });
-    }
-  }
-
   const post_insights = {};
   for (const username of accounts) {
     const rawPosts = loadLatestPostData(repoRoot, username);
     const followers = latest[username] && Number.isFinite(latest[username].followers) ? latest[username].followers : null;
-    if (rawPosts) {
-      post_insights[username] = buildPostInsight(rawPosts, followers);
-    } else if (supabasePostsByUser[username] && supabasePostsByUser[username].length) {
-      // Fallback: build from Supabase post_insights data
-      post_insights[username] = buildPostInsight({ posts: supabasePostsByUser[username] }, followers);
-    } else {
-      post_insights[username] = null;
+    // Only emit post_insights for accounts with FRESH local data. When Apify
+    // returned an empty dataset (flaky), retry logic upstream already tried to
+    // recover; if it still failed, omit the account instead of serving stale
+    // Supabase data or a null that breaks the schema.
+    const localInsight = rawPosts ? buildPostInsight(rawPosts, followers) : null;
+    if (localInsight) {
+      post_insights[username] = localInsight;
     }
   }
 

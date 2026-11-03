@@ -7,6 +7,10 @@ export interface MetricEntry {
   avg_likes: number | null
   avg_comments: number | null
   engagement_rate: number | null
+  /** Follower baru hari itu, hanya untuk akun yang tersambung ke Instagram Graph. */
+  new_followers?: number | null
+  /** Reach harian (akun unik yang melihat konten), hanya untuk akun Graph. */
+  reach?: number | null
   verified?: boolean | null
   ff_ratio?: number | null
 }

@@ -68,9 +68,12 @@ function main() {
   };
 
   // 1) SocialBlade stats per account
+  // Windows has no /usr/bin/python3; honor PYTHON_BIN, else fall back per-platform.
+  const pythonBin = process.env.PYTHON_BIN
+    || (process.platform === 'win32' ? 'python' : '/usr/bin/python3');
   for (const account of accounts) {
     try {
-      const out = run('/usr/bin/python3', [path.join(repoRoot, 'scripts', 'socialblade', 'collect-socialblade-stats.py'), account.username], { cwd: repoRoot });
+      const out = run(pythonBin, [path.join(repoRoot, 'scripts', 'socialblade', 'collect-followers.py'), account.username], { cwd: repoRoot });
       summary.socialblade.processed += 1;
       const parsed = extractTrailingJson(out);
       summary.socialblade.accounts.push({ username: account.username, status: 'processed', output: parsed || {} });
@@ -86,6 +89,16 @@ function main() {
     summary.followerHistory = extractTrailingJson(out) || { status: 'unknown' };
   } catch (error) {
     summary.followerHistory = { status: 'error', reason: error.message };
+  }
+
+  // 2b) Daily insights (reach + new followers) for accounts connected to the
+  // Instagram Graph. Non-fatal: missing insights must not block the dashboard.
+  try {
+    const out = run(pythonBin, [path.join(repoRoot, 'scripts', 'insights', 'collect-insights.py'), '--days', '7'], { cwd: repoRoot });
+    summary.insights = extractTrailingJson(out) || { status: 'processed' };
+  } catch (error) {
+    summary.insights = { status: 'error', reason: error.message };
+    console.warn('insights stage failed (non-fatal):', error.message);
   }
 
   // 3) Run Apify batch (capture output even on partial failure — exit code 2 = some accounts failed)

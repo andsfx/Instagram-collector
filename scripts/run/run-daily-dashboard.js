@@ -258,8 +258,25 @@ function main() {
     const buildOut = run('node', [path.join(repoRoot, 'scripts', 'export', 'build-dashboard-data.js')], { cwd: repoRoot });
     summary.dashboardBuild = extractTrailingJson(buildOut) || { status: 'unknown' };
 
-    const trackedPaths = ['dashboard/data.json', 'data/dashboard-snapshot.json', 'incoming/apify/datasets'];
+    const trackedPaths = ['dashboard/data.json', 'data/dashboard-snapshot.json', 'data/insights/history.json'];
     summary.git.changed = hasChanges(repoRoot, trackedPaths);
+
+    // Guard: kalau scrape follower gagal total, build tetap menulis ulang file
+    // (asset_version baru) padahal tidak ada baris history untuk hari ini.
+    // Commit seperti itu bikin dashboard terlihat ter-update padahal datanya basi.
+    let hasTodayRow = true;
+    try {
+      const snap = JSON.parse(fs.readFileSync(path.join(repoRoot, 'data', 'dashboard-snapshot.json'), 'utf8'));
+      hasTodayRow = (snap.history || []).some((row) => row.date === today);
+    } catch (error) {
+      hasTodayRow = true; // jangan blok commit hanya karena snapshot tidak terbaca
+    }
+    if (summary.git.changed && !hasTodayRow && !skipCommit) {
+      console.log(`\n>>> no history row for ${today}; revert dashboard files instead of committing an empty update`);
+      run('git', ['checkout', '--', ...trackedPaths], { cwd: repoRoot });
+      summary.git.changed = false;
+      summary.git.skippedReason = 'no_new_history_row';
+    }
 
     if (summary.git.changed && !skipCommit) {
       try {

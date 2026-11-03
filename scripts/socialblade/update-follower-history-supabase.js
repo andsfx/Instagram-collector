@@ -25,6 +25,16 @@ async function main() {
     const stats = readJson(statsPath);
     if (!date && stats.date) date = stats.date;
 
+    // Guard: never upsert a partial/null row. A failed SocialBlade scrape
+    // writes followers: null + ok: false; upserting that poisons
+    // follower_history -> build reads latest.followers = null -> schema
+    // reject (incident 2026-10-13). Skip instead; omission is honest.
+    const followersNum = Number(stats.followers);
+    if (stats.ok === false || !Number.isFinite(followersNum) || followersNum <= 0) {
+      results.push({ username, status: 'skipped', reason: 'no follower data (scrape failed) - refusing null upsert' });
+      continue;
+    }
+
     // Ensure account exists
     const { error: accountError } = await supabase
       .from('accounts')
