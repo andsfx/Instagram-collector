@@ -2,15 +2,20 @@ import { useMemo } from 'react'
 import { getDailyMetricsView } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
 import { formatInteger } from '../utils/formatters'
-import { EmptyState } from './ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Ledger } from './dashboard/Ledger'
+import { useTableDesktop } from './dashboard/states'
 
 const RANGE_OPTIONS = [7, 14, 30]
 
 function renderDelta(value: number, isBaseline: boolean) {
-  if (isBaseline) return <span className="text-[var(--text-muted)]">--</span>
-  if (value > 0) return <span className="text-[var(--success)]">+{formatInteger(value)}</span>
-  if (value < 0) return <span className="text-[var(--danger)]">{formatInteger(value)}</span>
-  return <span className="text-[var(--text-muted)]">--</span>
+  if (isBaseline) return <span className='text-muted-foreground'>--</span>
+  if (value > 0) return <span className='text-emerald-600 dark:text-emerald-400'>+{formatInteger(value)}</span>
+  if (value < 0) return <span className='text-destructive'>{formatInteger(value)}</span>
+  return <span className='text-muted-foreground'>--</span>
 }
 
 export function DailyMetrics({
@@ -26,113 +31,170 @@ export function DailyMetrics({
   rangeDays: number
   setRangeDays: (v: number) => void
 }) {
-
   const view = useMemo(() => getDailyMetricsView(data, selectedAccount, rangeDays), [data, rangeDays, selectedAccount])
+  const isDesktop = useTableDesktop()
 
   return (
-    <div className="grid gap-6">
-      {/* Stat-Led lead */}
-      <div className="border-b border-[var(--border)] pb-6">
-        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-          Akun aktif{view.selectedAccount ? ` · @${view.selectedAccount}` : ''}
-        </p>
-        <p className="font-display text-[clamp(2rem,4vw,3rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
-          @{view.selectedAccount}
-        </p>
-      </div>
+    <div className='grid gap-4'>
+      <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+        <Card className='xl:col-span-2'>
+          <CardHeader>
+            <CardTitle className='text-sm'>
+              Akun aktif{view.selectedAccount ? ` · @${view.selectedAccount}` : ''}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className='font-heading text-base font-semibold tracking-tight break-all md:text-lg'>
+              @{view.selectedAccount}
+            </p>
 
-      {/* Toolbar */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:max-w-[560px]">
-        <label className="grid gap-1.5">
-          <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Pilih akun</span>
-          <select className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3.5 py-2.5 text-sm text-[var(--text)]" value={view.selectedAccount} onChange={(event) => setSelectedAccount(event.target.value)}>
-            {view.accounts.map((account) => (
-              <option key={account} value={account}>@{account}</option>
-            ))}
-          </select>
-        </label>
-        <label className="grid gap-1.5">
-          <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Rentang</span>
-          <select className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3.5 py-2.5 text-sm text-[var(--text)]" value={rangeDays} onChange={(event) => setRangeDays(Number(event.target.value))}>
-            {RANGE_OPTIONS.map((option) => (
-              <option key={option} value={option}>{option} hari terakhir</option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="grid gap-3">
-        <p className="text-sm leading-relaxed text-[var(--text-muted)]">{view.disclosureTitle}. {view.disclosureHint}</p>
-      </div>
-
-      {/* Desktop table */}
-      <section className="hidden border border-[var(--border)] bg-[var(--panel)] p-6 lg:block">
-        <div className="overflow-x-auto">
-          {view.rows.length === 0 ? (
-            <EmptyState>Tidak ada data harian untuk rentang ini.</EmptyState>
-          ) : (
-            <table className="min-w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th className="border-b border-[var(--border)] px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Tanggal</th>
-                  <th className="border-b border-[var(--border)] px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]" colSpan={2}>Followers</th>
-                  <th className="border-b border-[var(--border)] px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]" colSpan={2}>Following</th>
-                  <th className="border-b border-[var(--border)] px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]" colSpan={2}>Posts</th>
-                </tr>
-              </thead>
-              <tbody>
-                {view.rows.map((row) => (
-                  <tr key={row.date}>
-                    <td className="border-b border-[var(--border)] px-4 py-3 align-top">
-                      <div className="grid gap-0.5">
-                        <div className="font-medium text-[var(--text)]">{row.dayLabel}</div>
-                        <div className="text-xs text-[var(--text-soft)]">{row.fullDateLabel}</div>
-                      </div>
-                    </td>
-                    <td className="border-b border-[var(--border)] px-4 py-3">{renderDelta(row.deltaFollowers, row.isBaseline)}</td>
-                    <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger(row.followers)}</td>
-                    <td className="border-b border-[var(--border)] px-4 py-3">{renderDelta(row.deltaFollowing, row.isBaseline)}</td>
-                    <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger(row.following)}</td>
-                    <td className="border-b border-[var(--border)] px-4 py-3">{renderDelta(row.deltaPosts, row.isBaseline)}</td>
-                    <td className="border-b border-[var(--border)] px-4 py-3 font-semibold text-[var(--text)]">{formatInteger(row.posts)}</td>
-                  </tr>
-                ))}
-                {view.summaryRows.map((row) => (
-                  <tr key={row.label}>
-                    <td className="px-4 py-3 font-medium text-[var(--text)]">{row.label}</td>
-                    <td className="px-4 py-3" colSpan={2}>{renderDelta(row.followers, false)}</td>
-                    <td className="px-4 py-3" colSpan={2}>{renderDelta(row.following, false)}</td>
-                    <td className="px-4 py-3" colSpan={2}>{renderDelta(row.posts, false)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
-
-      {/* Mobile rows */}
-      <div className="grid gap-4 lg:hidden">
-        {view.mobileRows.length === 0 ? (
-          <EmptyState>Tidak ada data harian untuk rentang ini.</EmptyState>
-        ) : (
-          <>
-            {view.mobileRows.map((row, index) => (
-              <div key={`${row.date}-mobile`} className="grid gap-3 border-t border-[var(--border)] pt-4 first:border-t-0 first:pt-0">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-medium text-[var(--text)]">{index === 0 ? 'Terbaru' : row.fullDateLabel}</div>
-                  <div className="text-xs text-[var(--text-soft)]">{row.dayLabel}</div>
-                </div>
-                <div className="grid gap-2 text-sm">
-                  <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Followers</span><strong className="text-[var(--text)]">{formatInteger(row.followers)}</strong></div>
-                  <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Perubahan followers</span><strong className="text-[var(--text)]">{row.isBaseline ? '--' : `${row.deltaFollowers >= 0 ? '+' : ''}${formatInteger(row.deltaFollowers)}`}</strong></div>
-                  <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Following</span><strong className="text-[var(--text)]">{formatInteger(row.following)}</strong></div>
-                  <div className="flex items-center justify-between gap-3"><span className="text-[var(--text-muted)]">Posts</span><strong className="text-[var(--text)]">{formatInteger(row.posts)}</strong></div>
+            <div className='mt-4 flex flex-wrap items-end gap-3'>
+              <div className='grid min-w-[200px] gap-1'>
+                <span className='text-xs font-medium text-muted-foreground'>Pilih akun</span>
+                <Select value={view.selectedAccount} onValueChange={setSelectedAccount}>
+                  <SelectTrigger aria-label='Pilih akun'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {view.accounts.map((account) => (
+                      <SelectItem key={account} value={account}>
+                        @{account}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className='grid gap-1'>
+                <span className='text-xs font-medium text-muted-foreground'>Rentang</span>
+                <div className='flex flex-wrap gap-1' role='group' aria-label='Rentang hari'>
+                  {RANGE_OPTIONS.map((option) => (
+                    <Button
+                      key={option}
+                      type='button'
+                      size='sm'
+                      variant={rangeDays === option ? 'default' : 'outline'}
+                      aria-pressed={rangeDays === option}
+                      onClick={() => setRangeDays(option)}
+                    >
+                      {option}h
+                    </Button>
+                  ))}
                 </div>
               </div>
-            ))}
-          </>
-        )}
+            </div>
+
+            <p className='mt-4 max-w-[46ch] text-xs leading-relaxed text-muted-foreground'>
+              {view.disclosureTitle}. {view.disclosureHint}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className='text-sm'>Ringkasan rentang</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Ledger
+              rows={view.summaryRows.map((row) => ({
+                key: row.label,
+                value: (
+                  <span className='inline-flex gap-3'>
+                    <span>{renderDelta(row.followers, false)}</span>
+                    <span>{renderDelta(row.following, false)}</span>
+                    <span>{renderDelta(row.posts, false)}</span>
+                  </span>
+                ),
+              }))}
+            />
+            <p className='mt-2 text-xs leading-relaxed text-muted-foreground'>
+              Urutan delta: followers · following · posts.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+        <Card className='md:col-span-2 xl:col-span-3'>
+          <CardHeader>
+            <CardTitle className='text-sm'>Riwayat harian</CardTitle>
+            <CardDescription className='text-xs'>{`${view.rows.length} hari`}</CardDescription>
+          </CardHeader>
+          {view.rows.length === 0 ? (
+            <CardContent>
+              <p className='text-sm text-muted-foreground'>Tidak ada data harian untuk rentang ini.</p>
+            </CardContent>
+          ) : isDesktop ? (
+            <CardContent className='p-0'>
+              <Table className='min-w-[720px]'>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead scope='col' className='pl-6'>
+                      Tanggal
+                    </TableHead>
+                    <TableHead scope='col' colSpan={2}>
+                      Followers
+                    </TableHead>
+                    <TableHead scope='col' colSpan={2}>
+                      Following
+                    </TableHead>
+                    <TableHead scope='col' colSpan={2}>
+                      Posts
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {view.rows.map((row) => (
+                    <TableRow key={row.date}>
+                      <TableCell className='pl-6'>
+                        <div className='font-medium'>{row.dayLabel}</div>
+                        <div className='text-xs text-muted-foreground'>{row.fullDateLabel}</div>
+                      </TableCell>
+                      <TableCell>{renderDelta(row.deltaFollowers, row.isBaseline)}</TableCell>
+                      <TableCell className='font-medium tabular-nums'>{formatInteger(row.followers)}</TableCell>
+                      <TableCell>{renderDelta(row.deltaFollowing, row.isBaseline)}</TableCell>
+                      <TableCell className='font-medium tabular-nums'>{formatInteger(row.following)}</TableCell>
+                      <TableCell>{renderDelta(row.deltaPosts, row.isBaseline)}</TableCell>
+                      <TableCell className='font-medium tabular-nums'>{formatInteger(row.posts)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          ) : (
+            <CardContent>
+              {view.mobileRows.map((row, index) => (
+                <div key={`${row.date}-mobile`} className='border-b border-border py-2 text-sm last:border-b-0'>
+                  <div className='flex items-center justify-between gap-3'>
+                    <span className='font-medium'>{index === 0 ? 'Terbaru' : row.fullDateLabel}</span>
+                    <span className='text-xs text-muted-foreground'>{row.dayLabel}</span>
+                  </div>
+                  <div className='mt-2 grid gap-1'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-muted-foreground'>Followers</span>
+                      <strong className='tabular-nums'>{formatInteger(row.followers)}</strong>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-muted-foreground'>Δ followers</span>
+                      <strong className='tabular-nums'>
+                        {row.isBaseline
+                          ? '--'
+                          : `${row.deltaFollowers >= 0 ? '+' : ''}${formatInteger(row.deltaFollowers)}`}
+                      </strong>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-muted-foreground'>Following</span>
+                      <strong className='tabular-nums'>{formatInteger(row.following)}</strong>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-muted-foreground'>Posts</span>
+                      <strong className='tabular-nums'>{formatInteger(row.posts)}</strong>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          )}
+        </Card>
       </div>
     </div>
   )

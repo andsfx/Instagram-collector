@@ -39,6 +39,11 @@ function dashboardDataPlugin() {
 
 export default defineConfig({
   plugins: [react(), dashboardDataPlugin()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   server: {
     host: true,
   },

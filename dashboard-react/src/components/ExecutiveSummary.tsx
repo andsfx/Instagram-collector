@@ -1,77 +1,77 @@
 import type { ExecutiveSummaryData } from '../data/selectors'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Ledger } from './dashboard/Ledger'
+import { Notes } from './dashboard/Notes'
 
 export function ExecutiveSummary({ summary }: { summary: ExecutiveSummaryData }) {
   if (summary.kpis.length === 0) {
     return (
-      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
-        <h2 className="text-lg font-semibold text-[var(--text)]">Sinyal utama brand</h2>
-        <p className="mt-4 py-6 text-center text-sm text-[var(--text-muted)]">
-          Ringkasan belum bisa dibuat karena data belum lengkap.
-        </p>
-      </section>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="md:col-span-2 xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm">Ringkasan</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Ringkasan belum bisa dibuat karena data belum lengkap.</p>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   const [lead, ...rest] = summary.kpis
 
   return (
-    <div className="grid gap-6">
-      {/* Stat-Led lead */}
-      <div className="border-b border-[var(--border)] pb-6">
-        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-          {lead.label}
-          {lead.account ? ` · @${lead.account}` : ''}
-        </p>
-        <p className="font-display text-[clamp(2.5rem,6vw,4.5rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
-          {lead.value}
-        </p>
-      </div>
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <Card className="xl:col-span-2">
+        <CardHeader>
+          <CardDescription className="text-xs font-medium">
+            {lead.label}
+            {lead.account ? ` · @${lead.account}` : ''}
+          </CardDescription>
+          <CardTitle className="font-heading text-4xl font-semibold tabular-nums tracking-tight break-words md:text-5xl">
+            {lead.value}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="max-w-[46ch] text-sm leading-relaxed text-muted-foreground">
+            Puncak ukuran audiens pada periode ini. Angka lain di kanan adalah pembanding cepat
+            sebelum turun ke tabel kompetitor.
+          </p>
+        </CardContent>
+      </Card>
 
-      {/* Remaining KPIs — 2-col table */}
-      {rest.length > 0 && (
-        <div className="grid sm:grid-cols-2">
-          {rest.map((kpi) => (
-            <div
-              key={kpi.key}
-              className="flex items-baseline justify-between gap-4 border-t border-[var(--border)] py-3"
-            >
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                  {kpi.label}
-                </p>
-                {kpi.account ? (
-                  <p className="mt-0.5 text-xs text-[var(--text-muted)]">@{kpi.account}</p>
-                ) : (
-                  <p className="mt-0.5 text-xs text-[var(--text-muted)]">Lintas akun</p>
-                )}
-              </div>
-              <p className="shrink-0 font-display text-2xl font-normal tracking-tight text-[var(--text)]">
-                {kpi.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Indikator pendukung</CardTitle>
+          <CardDescription className="text-xs">{`${rest.length} metrik`}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Ledger
+            rows={rest.map((kpi) => ({
+              key: kpi.label,
+              note: kpi.account ? `@${kpi.account}` : 'lintas akun',
+              value: kpi.value,
+            }))}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Key Takeaways — paper-3 editorial panel */}
-      {summary.bullets.length > 0 && (
-        <section className="border border-[var(--border)] bg-[var(--panel-muted)] p-6">
-          <h2 className="text-lg font-semibold text-[var(--text)]">Key Takeaways</h2>
-          <ol className="mt-4">
-            {summary.bullets.map((bullet, i) => (
-              <li
-                key={bullet}
-                className="flex items-start gap-3 border-t border-[var(--border)] py-3 first:border-t-0 first:pt-0"
-              >
-                <span className="mt-0.5 shrink-0 font-display text-sm font-normal text-[var(--brand)]">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="text-sm leading-relaxed text-[var(--text-muted)]">{bullet}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+      {summary.bullets.length > 0 ? (
+        <Card className="md:col-span-2 xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm">Key takeaways</CardTitle>
+            <CardDescription className="text-xs">3 poin</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Notes
+              items={summary.bullets.map((bullet) => ({
+                title: bullet,
+              }))}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   )
 }

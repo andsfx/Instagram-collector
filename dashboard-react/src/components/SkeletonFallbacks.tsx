@@ -1,120 +1,108 @@
 import type React from 'react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 
 function Bone({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return <div className={`skeleton rounded-[var(--radius-sm)] ${className ?? ''}`} style={style} />
+  return <Skeleton className={`rounded-md ${className ?? ''}`} style={style} />
+}
+
+/** Shared shell: one section head + a card grid of bone lines. */
+function SkeletonBand({ lines = 3, tall }: { lines?: number; tall?: boolean }) {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="h-5 w-40" />
+      <Skeleton className="h-8 w-72" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardContent className="grid gap-2.5">
+            {Array.from({ length: lines }).map((_, i) => (
+              <Bone key={i} style={{ width: `${88 - i * 16}%`, height: tall ? 22 : 14 }} />
+            ))}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="grid gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Bone key={i} style={{ width: `${70 - i * 8}%`, height: 12 }} />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
 }
 
 export function GrowthSkeleton() {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-5 sm:col-span-2">
-        <Bone className="mb-2 h-3 w-24" />
-        <Bone className="mb-2 h-10 w-48" />
-        <Bone className="h-4 w-32" />
-      </div>
-      <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-5">
-        <Bone className="mb-2 h-3 w-20" />
-        <Bone className="mb-2 h-7 w-32" />
-        <Bone className="h-3 w-24" />
-      </div>
-      <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-5">
-        <Bone className="mb-2 h-3 w-16" />
-        <Bone className="mb-2 h-7 w-20" />
-        <Bone className="h-3 w-24" />
-      </div>
-      <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-4 sm:col-span-2 lg:col-span-4">
-        <Bone className="mb-3 h-3 w-28" />
-        <div className="grid gap-2">
-          {[100, 75, 70, 55, 50].map((w) => (
-            <div key={w} className="grid grid-cols-[140px_1fr_80px] items-center gap-3">
-              <Bone className="h-4 w-24" />
-              <Bone className="h-5" style={{ width: `${w}%` }} />
-              <Bone className="h-4 w-16" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
+  return <SkeletonBand lines={2} tall />
 }
 
 export function HeadToHeadSkeleton() {
-  return (
-    <div className="grid gap-5">
-      <div className="grid gap-2 sm:grid-cols-3">
-        <Bone className="h-10 rounded-[var(--radius-sm)]" />
-        <Bone className="h-10 rounded-[var(--radius-sm)]" />
-        <Bone className="h-10 rounded-[var(--radius-sm)]" />
-      </div>
-      <div className="flex gap-2">
-        {[1, 2, 3, 4].map((i) => (
-          <Bone key={i} className="h-9 w-24 rounded-[var(--radius-sm)]" />
-        ))}
-      </div>
-      <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-4">
-        <div className="grid gap-3">
-          <div className="grid grid-cols-3 gap-3">
-            <Bone className="h-5" />
-            <Bone className="mx-auto h-5 w-20" />
-            <Bone className="ml-auto h-5 w-24" />
-          </div>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="grid grid-cols-3 items-center gap-3 border-t border-[var(--border)] pt-3">
-              <Bone className="h-4 w-20" />
-              <Bone className="mx-auto h-3 w-16" />
-              <Bone className="ml-auto h-4 w-20" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <Bone className="h-[280px] rounded-[var(--radius-sm)]" />
-    </div>
-  )
+  return <SkeletonBand lines={5} />
 }
 
 export function HeatmapSkeleton() {
   return (
-    <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <Bone className="h-3 w-32" />
-        <Bone className="h-8 w-40 rounded-[var(--radius-sm)]" />
-      </div>
-      <div className="grid grid-cols-7 gap-1">
-        {Array.from({ length: 28 }).map((_, i) => (
-          <Bone key={i} className="h-8 rounded-[4px]" />
-        ))}
-      </div>
+    <div className="grid gap-4">
+      <Card>
+        <CardContent>
+          <div className="grid grid-cols-[64px_repeat(4,minmax(0,1fr))] gap-0.5">
+            {Array.from({ length: 35 }).map((_, i) => (
+              <Bone key={i} className="h-[34px]" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
 
 export function ChartSuiteSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-4">
-          <Bone className="mb-2 h-4 w-32" />
-          <Bone className="mb-3 h-3 w-48" />
-          <Bone className="h-[200px] rounded-[var(--radius-sm)]" />
-        </div>
-      ))}
+    <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        {[0, 1].map((i) => (
+          <Card key={i}>
+            <CardContent>
+              <Bone className="mb-3.5 h-3 w-[120px]" />
+              <Bone className="h-[220px]" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {[0, 1].map((i) => (
+          <Card key={i}>
+            <CardContent>
+              <Bone className="mb-3.5 h-3 w-[120px]" />
+              <Bone className="h-[220px]" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   )
 }
 
 export function DashboardSkeleton() {
   return (
-    <div className="grid gap-6 py-8">
-      <GrowthSkeleton />
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] p-4">
-            <Bone className="mb-2 h-3 w-20" />
-            <Bone className="mb-2 h-8 w-28" />
-            <Bone className="h-3 w-36" />
-          </div>
-        ))}
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardContent>
+            <Bone className="mb-3.5 h-3 w-[140px]" />
+            <Bone className="h-20 w-[min(70%,360px)]" />
+            <Bone className="mt-4 h-3 w-[220px]" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="grid gap-3.5">
+            {[0, 1, 2, 3].map((i) => (
+              <Bone key={i} style={{ width: `${92 - i * 12}%`, height: 14 }} />
+            ))}
+          </CardContent>
+        </Card>
       </div>
+      <SkeletonBand lines={4} />
     </div>
   )
 }

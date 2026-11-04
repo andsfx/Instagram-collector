@@ -1,216 +1,46 @@
-.h2h-layout {
-  display: grid;
-  grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.05fr);
-  gap: 16px;
+/* Charts — data-visual layer only.
+ *
+ * Everything structural (cards, grids, tables, chips) is Tailwind in the
+ * components. What stays here is what Tailwind cannot express safely:
+ *  - the pixel-height stage Recharts' ResponsiveContainer measures against
+ *    (.chart-wrap > .chart-fill > ResponsiveContainer height="100%"),
+ *  - horizontal-scroll shells that must keep overflow-y hidden,
+ *  - the heatmap intensity ramp (format-mix and inline-bar fills are Tailwind now).
+ * The ≤860px / ≤620px chart overrides used to live in mobile.css and are
+ * ported here verbatim so deleting that file cannot change chart heights.
+ */
+
+.chart-wrap { width: 100%; height: 280px; }
+.chart-wrap-compact { height: 232px; }
+.chart-wrap-lg { height: 340px; }
+
+.chart-scroll-shell { width: 100%; overflow-x: auto; overflow-y: hidden; }
+.chart-fill { height: 100%; }
+.chart-min-wide { min-width: 460px; }
+.chart-min-sm { min-width: 320px; }
+.chart-min-xl { min-width: 680px; }
+
+/* --- Heatmap / matrix intensity ramp ------------------------------------ */
+
+.matrix-cell.i0 { background: var(--card); }
+.matrix-cell.i1 { background: color-mix(in oklch, var(--primary) 16%, var(--background)); }
+.matrix-cell.i2 { background: color-mix(in oklch, var(--primary) 36%, var(--background)); }
+.matrix-cell.i3 { background: color-mix(in oklch, var(--primary) 62%, var(--background)); }
+.matrix-cell.i4 { background: var(--primary); color: var(--primary-foreground); }
+
+/* --- Responsive stages -------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .chart-wrap { height: 220px; }
+  .chart-wrap-lg { height: 260px; }
+  .chart-wrap-compact { height: 200px; }
+  .chart-min-wide { min-width: 460px; }
+  .chart-min-xl { min-width: 600px; }
 }
 
-.heatmap-grid {
-  display: grid;
-  grid-template-columns: 72px repeat(4, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.heatmap-scroll-shell {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.heatmap-header,
-.heatmap-day,
-.heatmap-cell,
-.heatmap-corner {
-  min-height: 58px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 10px;
-}
-
-.heatmap-header,
-.heatmap-day,
-.heatmap-corner {
-  background: var(--panel-muted);
-  border: 1px solid var(--border);
-}
-
-.heatmap-header {
-  flex-direction: column;
-  font-weight: 600;
-}
-
-.heatmap-header small {
-  color: var(--text-soft);
-  font-size: 0.75rem;
-}
-
-.heatmap-day {
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.heatmap-legend {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.heatmap-legend-box {
-  width: 18px;
-  height: 18px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-}
-
-.heatmap-legend-box.is-0 { background: var(--panel); }
-.heatmap-legend-box.is-1 { background: rgba(225, 48, 108, 0.12); }
-.heatmap-legend-box.is-2 { background: rgba(225, 48, 108, 0.3); }
-.heatmap-legend-box.is-3 { background: rgba(193, 53, 132, 0.55); }
-.heatmap-legend-box.is-4 { background: rgba(131, 58, 180, 0.85); }
-
-.heatmap-cell {
-  border: 1px solid color-mix(in srgb, var(--ig-pink) 14%, var(--border));
-  font-weight: 600;
-}
-
-.editorial-heatmap-shell {
-  padding: 10px;
-  border-radius: var(--radius-sm);
-  background: var(--panel);
-  border: 1px solid var(--border);
-}
-
-.chart-wrap {
-  width: 100%;
-  height: 280px;
-}
-
-.chart-wrap-compact {
-  height: 240px;
-}
-
-.chart-scroll-shell {
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.chart-min-wide {
-  min-width: 540px;
-}
-
-.chart-min-xl {
-  min-width: 720px;
-}
-
-.featured-post {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-  border-radius: var(--radius-sm);
-  background: var(--panel);
-  border: 1px solid var(--border);
-}
-
-.daily-table-wrap {
-  overflow-x: auto;
-}
-
-.daily-mobile-list {
-  display: none;
-}
-
-.daily-mobile-item {
-  padding: 14px 0;
-  border-top: 1px solid var(--border);
-  display: grid;
-  gap: 10px;
-}
-
-.daily-mobile-item:first-child {
-  margin-top: 14px;
-}
-
-.daily-mobile-date {
-  color: var(--text-soft);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-}
-
-.daily-mobile-metrics {
-  display: grid;
-  gap: 8px;
-}
-
-.daily-mobile-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 0.92rem;
-  color: var(--text-muted);
-}
-
-.daily-mobile-row strong {
-  color: var(--text);
-}
-
-.daily-mobile-summary {
-  margin-top: 12px;
-  color: var(--text-soft);
-  font-size: 0.84rem;
-}
-
-.daily-table {
-  width: 100%;
-  min-width: 320px;
-  border-collapse: collapse;
-  margin-top: 14px;
-}
-
-.daily-table-expanded {
-  min-width: 760px;
-}
-
-.daily-table th,
-.daily-table td {
-  padding: 10px 0;
-  text-align: left;
-  font-size: 0.9rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.daily-table th {
-  color: var(--text-soft);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-:root[data-theme="dark"] .daily-table th,
-:root[data-theme="dark"] .daily-table td,
-:root[data-theme="dark"] .comparison-head,
-:root[data-theme="dark"] .comparison-row {
-  border-color: var(--border);
-}
-
-.chart-card-wide {
-  grid-column: 1 / -1;
-}
-
-.chart-wrap-lg {
-  height: 340px;
-}
-
-.editorial-chart-card {
-  background: var(--panel);
-  border-color: var(--border);
-}
-
-.editorial-chart-card-hero {
-  background: var(--panel);
+/* phones: figures fit their column instead of scrolling sideways */
+@media (max-width: 620px) {
+  .chart-min-wide,
+  .chart-min-sm,
+  .chart-min-xl { min-width: 0; }
 }

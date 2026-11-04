@@ -1,4 +1,6 @@
 import type { ExecutiveSummaryData, FreshnessSummary, InsightsData, TodaySummaryData } from '../data/selectors'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Notes } from './dashboard/Notes'
 
 export function ClosingSummary({
   summary,
@@ -15,44 +17,59 @@ export function ClosingSummary({
   const takeaway = insights.items[0]
 
   return (
-    <div className="grid gap-6">
-      {/* Narrative lead */}
-      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Ringkasan penutup</h2>
-        <p className="mt-4 text-lg leading-relaxed text-[var(--text)]">
-          {takeaway ? `${takeaway.title} — ${takeaway.description}` : 'Tidak ada ringkasan yang tersedia untuk hari ini.'}
-        </p>
-
-        {/* Closing figure */}
-        {lead ? (
-          <div className="mt-6 border-t border-[var(--border)] pt-4">
-            <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-              {lead.label}{lead.account ? ` · @${lead.account}` : ''}
+    <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-sm">Ringkasan penutup</CardTitle>
+            <CardDescription className="text-xs">{today.referenceDate}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="font-heading text-2xl font-semibold tracking-tight break-words md:text-3xl">
+              {takeaway ? takeaway.title : 'Tidak ada ringkasan untuk hari ini.'}
             </p>
-            <p className="mt-1 font-display text-[clamp(1.8rem,3.5vw,2.6rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
-              {lead.value}
+            {takeaway ? <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{takeaway.description}</p> : null}
+            {lead ? (
+              <div className="mt-5 border-t border-border pt-4">
+                <span className="text-xs font-medium text-muted-foreground">
+                  {lead.label}
+                  {lead.account ? ` · @${lead.account}` : ''}
+                </span>
+                <p className="mt-1 font-heading text-2xl font-semibold tabular-nums tracking-tight break-words">{lead.value}</p>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Temuan pendukung</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {insights.items.length > 1 ? (
+              <Notes
+                items={insights.items.slice(1, 4).map((item) => ({
+                  title: item.title,
+                  description: item.description,
+                }))}
+              />
+            ) : (
+              <p className="text-sm leading-relaxed text-muted-foreground">Belum ada temuan pendukung lain pada periode ini.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="bg-muted/40 md:col-span-2 xl:col-span-3">
+          <CardContent>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Ref {today.referenceDate} · Generated {freshness.generatedAtLabel} · Latest {freshness.latestDateLabel} ·
+              Sumber {freshness.sourceLabel}
             </p>
-          </div>
-        ) : null}
-      </section>
-
-      {/* Supporting paragraphs */}
-      {insights.items.length > 1 && (
-        <section className="border border-[var(--border)] bg-[var(--panel-muted)] p-6">
-          <div className="grid">
-            {insights.items.slice(1, 4).map((item, i) => (
-              <p key={item.title} className={`text-sm leading-relaxed text-[var(--text-muted)] ${i === 0 ? '' : 'border-t border-[var(--border)] pt-4'} ${i === 0 ? 'pb-4' : ''}`}>
-                <strong className="font-semibold text-[var(--text)] break-words">{item.title}</strong> — {item.description}
-              </p>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Reference line */}
-      <p className="text-xs text-[var(--text-soft)]">
-        Ref: {today.referenceDate} · Generated {freshness.generatedAtLabel} · Latest: {freshness.latestDateLabel}
-      </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

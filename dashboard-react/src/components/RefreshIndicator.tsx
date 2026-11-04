@@ -1,24 +1,21 @@
 import { memo } from 'react'
+import { Badge } from '@/components/ui/badge'
 
 export type RefreshStatus = 'live' | 'static' | 'cached' | 'loading'
 
 const STATUS_CONFIG: Record<RefreshStatus, { dotClass: string; label: string }> = {
-  live: { dotClass: 'bg-[var(--success)] shadow-[0_0_6px_rgba(46,204,113,0.5)] animate-live-pulse', label: 'Live data' },
-  static: { dotClass: 'bg-[var(--ig-blue)] shadow-[0_0_6px_rgba(64,93,230,0.5)]', label: 'Snapshot terbaru' },
-  cached: { dotClass: 'bg-[var(--ig-orange)] shadow-[0_0_6px_rgba(247,119,55,0.5)]', label: 'Cache lokal' },
-  loading: { dotClass: 'bg-[var(--text-soft)]', label: 'Memuat...' },
+  live: { dotClass: 'bg-emerald-600 dark:bg-emerald-400', label: 'Live data' },
+  static: { dotClass: 'bg-primary', label: 'Snapshot terbaru' },
+  cached: { dotClass: 'bg-amber-600 dark:bg-amber-400', label: 'Cache lokal' },
+  loading: { dotClass: 'bg-muted-foreground', label: 'Memuat...' },
 }
 
 export const RefreshIndicator = memo(function RefreshIndicator({ status }: { status: RefreshStatus }) {
   const config = STATUS_CONFIG[status]
   return (
-    <div
-      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] shadow-[var(--shadow-sm)]"
-      role="status"
-      aria-label={`Data status: ${config.label}`}
-    >
-      <span className={`h-2 w-2 rounded-full ${config.dotClass}`} aria-hidden="true" />
+    <Badge variant="outline" role="status" aria-label={`Data status: ${config.label}`} className="gap-2 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">
+      <span className={`size-2 rounded-full ${config.dotClass}`} aria-hidden="true" />
       <span>{config.label}</span>
-    </div>
+    </Badge>
   )
 })

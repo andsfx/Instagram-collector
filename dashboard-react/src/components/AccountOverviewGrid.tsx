@@ -1,74 +1,89 @@
 import type { UiAccountSummary } from '../data/types'
 import { formatCompact, formatEngagementRate, formatPercent } from '../utils/formatters'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
+function trendClass(value: number) {
+  if (value > 0) return 'text-emerald-600 dark:text-emerald-400'
+  if (value < 0) return 'text-destructive'
+  return 'text-muted-foreground'
+}
 
 export function AccountOverviewGrid({ accounts }: { accounts: UiAccountSummary[] }) {
   if (accounts.length === 0) {
     return (
-      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Perbandingan cepat tiap akun</h2>
-        <p className="mt-4 py-6 text-center text-sm text-[var(--text-muted)]">Belum ada akun yang bisa ditampilkan.</p>
-      </section>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="md:col-span-2 xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm">Perbandingan akun</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Belum ada akun yang bisa ditampilkan.</p>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   return (
-    <div className="grid gap-6">
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {accounts.map((acc, index) => {
-          const isBrand = index === 0
-          const isMuted = index % 2 === 1
-          return (
-            <section
-              key={acc.key}
-              className={`border border-[var(--border)] p-5 ${isMuted ? 'bg-[var(--panel-muted)]' : 'bg-[var(--panel)]'}`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="truncate text-base font-semibold text-[var(--text)]">{acc.name}</h3>
-                {isBrand ? (
-                  <span className="rounded-[var(--radius-sm)] bg-[var(--brand-soft)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--brand)]">Brand</span>
-                ) : (
-                  <span className="rounded-[var(--radius-sm)] bg-[var(--panel-muted)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-soft)]">Competitor</span>
-                )}
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {accounts.map((acc, index) => {
+        const isBrand = index === 0
+        return (
+          <Card key={acc.key} className={isBrand ? 'bg-muted/60' : undefined}>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium break-all">@{acc.name}</CardTitle>
+              <Badge variant={isBrand ? 'default' : 'secondary'} className="justify-self-start">
+                {isBrand ? 'Brand' : 'Kompetitor'}
+              </Badge>
+            </CardHeader>
+            <CardContent>
+              <span className="text-xs font-medium text-muted-foreground">Followers</span>
+              <p className="mt-1 mb-2.5 font-heading text-2xl font-semibold tabular-nums tracking-tight break-words">
+                {formatCompact(acc.followers)}
+              </p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="min-w-0">
+                  <span className="text-xs font-medium text-muted-foreground">1 hari</span>
+                  <p className={`mt-0.5 text-sm tabular-nums ${trendClass(acc.change1d)}`}>
+                    {acc.change1d >= 0 ? '+' : ''}
+                    {formatCompact(acc.change1d)}
+                  </p>
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-medium text-muted-foreground">7 hari</span>
+                  <p className={`mt-0.5 text-sm tabular-nums ${trendClass(acc.change7dPct)}`}>
+                    {acc.change7dPct >= 0 ? '+' : ''}
+                    {formatPercent(acc.change7dPct)}
+                  </p>
+                </div>
               </div>
 
-              <div className="mt-4">
-                <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">Followers</p>
-                <p className="mt-1 font-display text-[clamp(1.8rem,2.5vw,2.4rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
-                  {formatCompact(acc.followers)}
-                </p>
+              <div className="mt-3 grid grid-cols-2 gap-4 border-t border-border pt-3">
+                <div className="min-w-0">
+                  <span className="text-xs font-medium text-muted-foreground">Following</span>
+                  <p className="mt-0.5 text-sm font-medium tabular-nums break-words">{formatCompact(acc.following)}</p>
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-medium text-muted-foreground">Posts</span>
+                  <p className="mt-0.5 text-sm font-medium tabular-nums break-words">{formatCompact(acc.posts)}</p>
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-medium text-muted-foreground">Avg likes</span>
+                  <p className="mt-0.5 text-sm font-medium tabular-nums break-words">{formatCompact(acc.avgLikes)}</p>
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-medium text-muted-foreground">ER</span>
+                  <p className="mt-0.5 text-sm font-medium tabular-nums break-words">
+                    {formatEngagementRate(acc.engagementRate)}
+                  </p>
+                </div>
               </div>
-
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <p className={`text-sm ${acc.change1d >= 0 ? 'text-[var(--success)]' : acc.change1d < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
-                  {acc.change1d >= 0 ? '+' : ''}{formatCompact(acc.change1d)} <span className="text-xs text-[var(--text-soft)]">1d</span>
-                </p>
-                <p className={`text-sm ${acc.change7dPct >= 0 ? 'text-[var(--success)]' : acc.change7dPct < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
-                  {acc.change7dPct >= 0 ? '+' : ''}{formatPercent(acc.change7dPct)} <span className="text-xs text-[var(--text-soft)]">7d</span>
-                </p>
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-2 border-t border-[var(--border)] pt-3">
-                <p className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="text-xs text-[var(--text-soft)]">Following</span>
-                  <span className="font-semibold text-[var(--text)]">{formatCompact(acc.following)}</span>
-                </p>
-                <p className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="text-xs text-[var(--text-soft)]">Posts</span>
-                  <span className="font-semibold text-[var(--text)]">{formatCompact(acc.posts)}</span>
-                </p>
-                <p className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="text-xs text-[var(--text-soft)]">Avg Likes</span>
-                  <span className="font-semibold text-[var(--text)]">{formatCompact(acc.avgLikes)}</span>
-                </p>
-                <p className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="text-xs text-[var(--text-soft)]">ER</span>
-                  <span className="font-semibold text-[var(--text)]">{formatEngagementRate(acc.engagementRate)}</span>
-                </p>
-              </div>
-            </section>
-          )
-        })}
-      </div>
+            </CardContent>
+          </Card>
+        )
+      })}
     </div>
   )
 }

@@ -1,7 +1,12 @@
 import { getContentHighlights } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
 import { formatEngagementRate, formatInteger } from '../utils/formatters'
-import { EmptyState } from './ui'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Stat } from './dashboard/Stat'
+
+const MIX_KEYS = ['reels', 'carousels', 'images', 'videos'] as const
 
 export function ContentBreakdownPresentation({ data }: { data: DashboardRecord }) {
   const latest = data.latest
@@ -21,155 +26,151 @@ export function ContentBreakdownPresentation({ data }: { data: DashboardRecord }
   })
 
   const meaningful = perAccount.filter((row) => (row.posts ?? 0) > 0)
-  const maxPosts = meaningful.length ? Math.max(...meaningful.map((row) => row.posts)) : 1
 
   return (
-    <div className="grid gap-6">
-      {/* Stat-Led lead — dominant media type */}
-      <div className="border-b border-[var(--border)] pb-6">
-        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-          Format dominan
-        </p>
-        <p className="font-display text-[clamp(2.5rem,6vw,4.5rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
-          {highlights.topFormatLabel}
-        </p>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          {highlights.topFormatCount > 0
-            ? `${formatInteger(highlights.topFormatCount)} post · ER top ${
-                highlights.topErAccount
-                  ? `@${highlights.topErAccount} (${formatEngagementRate(highlights.topErValue)})`
+    <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-sm">Format dominan</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="font-heading text-4xl font-semibold tracking-tight break-words">{highlights.topFormatLabel}</p>
+            <p className="mt-3 max-w-[46ch] text-xs leading-relaxed text-muted-foreground">
+              {highlights.topFormatCount > 0
+                ? `${formatInteger(highlights.topFormatCount)} post · ER top ${
+                    highlights.topErAccount
+                      ? `@${highlights.topErAccount} (${formatEngagementRate(highlights.topErValue)})`
+                      : '-'
+                  }`
+                : 'Belum ada data konten.'}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Stat
+              label="ER tertinggi"
+              size="sm"
+              value={highlights.topErAccount ? `@${highlights.topErAccount}` : '–'}
+              note={highlights.topErAccount ? formatEngagementRate(highlights.topErValue) : '-'}
+            />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Stat
+              label="Best post"
+              size="sm"
+              value={highlights.bestPostOwner ? `@${highlights.bestPostOwner}` : '–'}
+              note={
+                highlights.bestPostOwner
+                  ? `${formatInteger(highlights.bestPostLikes)} interactions${highlights.bestPostType ? ` · ${highlights.bestPostType}` : ''}`
                   : '-'
-              }`
-            : 'Belum ada data konten.'}
-        </p>
+              }
+            />
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Secondary KPIs as hairline table */}
-      <div className="grid sm:grid-cols-2">
-        <div className="flex items-baseline justify-between gap-4 border-t border-[var(--border)] py-3">
-          <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-            ER tertinggi
-          </p>
-          <div className="text-right">
-            <p className="font-display text-xl font-normal text-[var(--text)]">
-              {highlights.topErAccount ? `@${highlights.topErAccount}` : '-'}
-            </p>
-            <p className="text-xs text-[var(--text-muted)]">
-              {highlights.topErAccount ? formatEngagementRate(highlights.topErValue) : '-'}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-baseline justify-between gap-4 border-t border-[var(--border)] py-3">
-          <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-            Best post
-          </p>
-          <div className="text-right">
-            <p className="font-display text-xl font-normal text-[var(--text)]">
-              {highlights.bestPostOwner ? `@${highlights.bestPostOwner}` : '-'}
-            </p>
-            <p className="text-xs text-[var(--text-muted)]">
-              {highlights.bestPostOwner
-                ? `${formatInteger(highlights.bestPostLikes)} interactions`
-                : '-'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Breakdown table + solid brand progress bars */}
       {meaningful.length ? (
-        <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
-          <h2 className="text-lg font-semibold text-[var(--text)]">Format konten per akun</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[36rem] text-left text-sm">
-              <thead>
-                <tr>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Account
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Posts
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Mix
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Share
-                  </th>
-                  <th className="pb-2 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Best
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {meaningful.map((row) => (
-                  <tr key={row.account} className="border-t border-[var(--border)]">
-                    <td className="py-3 pr-3 font-semibold text-[var(--text)]">@{row.account}</td>
-                    <td className="py-3 pr-3 font-display text-base font-normal text-[var(--text)]">
-                      {row.posts}
-                    </td>
-                    <td className="py-3 pr-3">
-                      <div className="flex flex-wrap gap-1">
-                        {typeof row.reels === 'number' && row.reels > 0 ? (
-                          <span className="rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
-                            Reels {row.reels}
-                          </span>
-                        ) : null}
-                        {typeof row.carousels === 'number' && row.carousels > 0 ? (
-                          <span className="rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
-                            Carousel {row.carousels}
-                          </span>
-                        ) : null}
-                        {typeof row.images === 'number' && row.images > 0 ? (
-                          <span className="rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
-                            Image {row.images}
-                          </span>
-                        ) : null}
-                        {typeof row.videos === 'number' && row.videos > 0 ? (
-                          <span className="rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
-                            Video {row.videos}
-                          </span>
-                        ) : null}
-                      </div>
-                    </td>
-                    <td className="py-3 pr-3 min-w-[8rem]">
-                      <div className="h-2 overflow-hidden rounded-[var(--radius-sm)] bg-[var(--panel-muted)]">
-                        <div
-                          className="h-full rounded-[var(--radius-sm)] bg-[var(--brand)]"
-                          style={{ width: `${(row.posts / maxPosts) * 100}%` }}
-                        />
-                      </div>
-                    </td>
-                    <td className="py-3 text-[var(--text-muted)]">
-                      {row.bestPost?.interactions ? (
-                        <span>
-                          {formatInteger(row.bestPost.interactions)} int.
-                          {row.bestPost.url ? (
-                            <>
-                              {' · '}
-                              <a
-                                className="text-[var(--brand)] hover:underline"
-                                href={row.bestPost.url}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Lihat
-                              </a>
-                            </>
-                          ) : null}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <Card className="md:col-span-2 xl:col-span-3">
+            <CardHeader>
+              <CardTitle className="text-sm">Format konten per akun</CardTitle>
+              <CardDescription className="text-xs">{`${meaningful.length} akun`}</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table className="min-w-[40rem]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead scope="col" className="pl-6">
+                      Akun
+                    </TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Posts
+                    </TableHead>
+                    <TableHead scope="col">Mix</TableHead>
+                    <TableHead scope="col" className="w-[24%]">
+                      Komposisi
+                    </TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Best
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {meaningful.map((row) => (
+                    <TableRow key={row.account}>
+                      <TableCell className="pl-6 font-medium">@{row.account}</TableCell>
+                      <TableCell className="text-right tabular-nums">{row.posts}</TableCell>
+                      <TableCell className="whitespace-normal">
+                        <span className="inline-flex flex-wrap gap-1">
+                          {typeof row.reels === 'number' && row.reels > 0 ? <Badge variant="outline">Reels {row.reels}</Badge> : null}
+                          {typeof row.carousels === 'number' && row.carousels > 0 ? <Badge variant="outline">Carousel {row.carousels}</Badge> : null}
+                          {typeof row.images === 'number' && row.images > 0 ? <Badge variant="outline">Image {row.images}</Badge> : null}
+                          {typeof row.videos === 'number' && row.videos > 0 ? <Badge variant="outline">Video {row.videos}</Badge> : null}
                         </span>
-                      ) : (
-                        '-'
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex h-2.5 w-full">
+                          <div
+                            className="flex h-full overflow-hidden rounded-full"
+                            title={[
+                              row.reels ? `Reels ${row.reels}` : null,
+                              row.carousels ? `Carousel ${row.carousels}` : null,
+                              row.images ? `Image ${row.images}` : null,
+                              row.videos ? `Video ${row.videos}` : null,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          >
+                            {MIX_KEYS.map((key) => {
+                              const count = Number(row[key] ?? 0)
+                              if (!count) return null
+                              return (
+                                <span
+                                  key={key}
+                                  className={`mix-part is-${key}`}
+                                  style={{ width: `${(count / Math.max(row.posts, 1)) * 100}%` }}
+                                />
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">
+                        {row.bestPost?.interactions ? (
+                          <>
+                            {formatInteger(row.bestPost.interactions)} int.
+                            {row.bestPost.url ? (
+                              <>
+                                {' · '}
+                                <a href={row.bestPost.url} target="_blank" rel="noreferrer" className="text-primary underline-offset-4 hover:underline">
+                                  Lihat
+                                </a>
+                              </>
+                            ) : null}
+                          </>
+                        ) : (
+                          '–'
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
       ) : (
-        <EmptyState>Data content breakdown belum tersedia.</EmptyState>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <Card className="md:col-span-2 xl:col-span-3">
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Data content breakdown belum tersedia.</p>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )

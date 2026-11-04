@@ -1,100 +1,80 @@
-/* Hallmark · genre: editorial · macrostructure: Stat-Led · theme: Newsprint · enrichment: none
- * nav: N6 masthead + section row · footer: none · product: competitive-daily-brief
+/* Dashboard tokens.
+ *
+ * Theme source of truth: shadcn preset b6qdjpSgFE (radix-luma · neutral · teal ·
+ * rose · public-sans + montserrat · medium radius), declared in styles/index.css.
+ * Only what the preset cannot express lives here: font stacks, status colours,
+ * chart runtime variables (read from JS as var() strings), spacing and motion.
+ * Semantic colours are consumed directly as Tailwind utilities (bg-card,
+ * text-muted-foreground, border-border, …) — no second name for the same colour.
  */
 :root {
   color-scheme: light;
   font-family: var(--font-body);
   line-height: 1.5;
   font-weight: 400;
-  background: #F4F6F8;
-  color: #23262E;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --font-display: "Instrument Serif", serif;
-  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --bg: #F4F6F8;
-  --panel: #FBFCFD;
-  --panel-muted: #EDF0F4;
-  --border: #D3DAE3;
-  --border-strong: #B9C2CE;
-  --text: #23262E;
-  --text-muted: #5A6472;
-  --text-soft: #4E5A6B;
-  --ig-pink: #E1306C;
-  --ig-purple: #833AB4;
-  --ig-orange: #F77737;
-  --ig-blue: #405DE6;
-  --ig-violet: #5B51D8;
-  --ig-yellow: #FCAF45;
-  --ig-red: #FD1D1D;
-  --brand: #E1306C;
-  --brand-hover: #c9285f;
-  --brand-strong: #a8204e;
-  --brand-soft: rgba(225, 48, 108, 0.08);
-  --brand-soft-2: rgba(225, 48, 108, 0.15);
-  --accent: #4A6FA5;
-  --success: #2ecc71;
-  --success-soft: rgba(46, 204, 113, 0.12);
-  --warning: #F77737;
-  --warning-soft: rgba(247, 119, 55, 0.12);
-  --danger: #e74c3c;
-  --danger-soft: rgba(231, 76, 60, 0.12);
-  --chart-1: #E1306C;
-  --chart-2: #833AB4;
-  --chart-3: #F77737;
-  --chart-4: #405DE6;
-  --chart-5: #5B51D8;
-  --chart-6: #FCAF45;
-  --chart-grid: #D3DAE3;
-  --chart-axis: #5A6472;
-  --chart-tooltip-bg: rgba(251, 252, 253, 0.97);
-  --chart-tooltip-border: #D3DAE3;
-  --radius-md: 6px;
-  --radius-sm: 6px;
-  --shadow-sm: 0 1px 2px rgba(35, 38, 46, 0.06);
 
-  /* Hallmark bridge tokens */
-  --color-paper: var(--bg);
-  --color-paper-2: var(--panel);
-  --color-paper-3: var(--panel-muted);
-  --color-ink: var(--text);
-  --color-ink-2: var(--text-muted);
-  --color-rule: var(--border);
-  --color-accent: var(--brand);
-  --color-accent-ink: #ffffff;
-  --color-focus: var(--accent);
+  /* --- type: preset public-sans (body) + montserrat (heading) ------------ */
+  --font-sans: "Public Sans Variable", "Public Sans", system-ui, -apple-system, sans-serif;
+  --font-heading: "Montserrat Variable", "Montserrat", system-ui, sans-serif;
+  --font-display: var(--font-heading);
+  --font-body: var(--font-sans);
+  --font-mono: var(--font-body);
+
+  /* --- semantic --------------------------------------------------------- */
+  --success: oklch(48% 0.11 155);
+  --success-soft: oklch(48% 0.11 155 / 0.1);
+  --warning: oklch(62% 0.13 70);
+  --warning-soft: oklch(62% 0.13 70 / 0.12);
+  --danger: var(--destructive);
+  --danger-soft: color-mix(in oklab, var(--destructive) 10%, transparent);
+
+  /* --- chart encoding: preset rose ramp (--chart-1..5) ------------------- */
+  --chart-6: var(--chart-5);
+  --chart-grid: var(--border);
+  --chart-axis: var(--muted-foreground);
+  --chart-tooltip-bg: var(--popover);
+  --chart-tooltip-border: var(--border);
+
+  /* IG names kept only so chart-theme.ts keeps resolving its var() strings */
+  --ig-pink: var(--chart-1);
+  --ig-purple: var(--chart-2);
+  --ig-orange: var(--chart-3);
+  --ig-blue: var(--chart-4);
+  --ig-violet: var(--chart-5);
+  --ig-yellow: var(--chart-6);
+  --ig-red: var(--danger);
+
+  /* --- runtime aliases still read by JS/SVG props outside this phase ----- */
+  /* chart-theme.ts builds tooltip styles from these exact names. */
+  --text: var(--foreground);
+  --text-muted: var(--muted-foreground);
+
+  /* --- space / motion --------------------------------------------------- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.5rem;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-short: 220ms;
+  --dur-short: 180ms;
 }
 
+/* Only the tokens the preset does not express need a dark override.
+ * Everything aliased to --background/--primary/--border/... switches
+ * automatically through the preset's own .dark layer. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #141920;
-  --panel: #191F28;
-  --panel-muted: #1D242F;
-  --border: #303A46;
-  --border-strong: #3F4B59;
-  --text: #E9EDF2;
-  --text-muted: #A9B3BF;
-  --text-soft: #8E99A8;
-  --brand: #F05F92;
-  --brand-hover: #ff7aa7;
-  --brand-strong: #ff97ba;
-  --brand-soft: rgba(240, 95, 146, 0.15);
-  --brand-soft-2: rgba(240, 95, 146, 0.25);
-  --accent: #7FA5E0;
-  --success: #34d399;
-  --success-soft: rgba(52, 211, 153, 0.16);
-  --warning: #F77737;
-  --warning-soft: rgba(247, 119, 55, 0.16);
-  --danger: #f87171;
-  --danger-soft: rgba(248, 113, 113, 0.16);
-  --chart-grid: #303A46;
-  --chart-axis: #A9B3BF;
-  --chart-tooltip-bg: rgba(25, 31, 40, 0.97);
-  --chart-tooltip-border: #3F4B59;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+  --success: oklch(74% 0.14 158);
+  --success-soft: oklch(74% 0.14 158 / 0.16);
+  --warning: oklch(78% 0.13 75);
+  --warning-soft: oklch(78% 0.13 75 / 0.16);
 }

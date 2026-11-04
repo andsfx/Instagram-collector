@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { ErrorState } from './ui'
+import { ErrorState } from './dashboard/states'
 
 interface AppErrorBoundaryProps {
   children: ReactNode
@@ -60,7 +60,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-6 py-16">
+        <div className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
           <div className="grid max-w-md gap-4 text-center">
             <ErrorState
               title="Terjadi kesalahan pada aplikasi"

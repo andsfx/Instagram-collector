@@ -23,15 +23,31 @@ import type { QuickVisualData } from '../data/selectors'
 import { downsampleData } from '../data/downsample'
 import { formatInteger } from '../utils/formatters'
 import { chartAxisColor, chartGridColor, chartItemStyle, chartLabelStyle, chartLegendStyle, chartTooltipStyle } from './chart-theme'
-import { EmptyState } from './ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-function FigurePanel({ title, caption, children, muted }: { title: string; caption?: string; children: React.ReactNode; muted?: boolean }) {
+function FigurePanel({
+  title,
+  caption,
+  children,
+  muted,
+  wide,
+}: {
+  title: string
+  caption?: string
+  children: React.ReactNode
+  muted?: boolean
+  wide?: boolean
+}) {
   return (
-    <section className={`border border-[var(--border)] p-5 ${muted ? 'bg-[var(--panel-muted)]' : 'bg-[var(--panel)]'}`}>
-      <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">{title}</p>
-      <div className="mt-3">{children}</div>
-      {caption ? <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">{caption}</p> : null}
-    </section>
+    <Card className={wide ? 'md:col-span-2' : muted ? 'bg-muted/40' : undefined}>
+      <CardHeader>
+        <CardTitle className="text-sm">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {children}
+        {caption ? <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">{caption}</p> : null}
+      </CardContent>
+    </Card>
   )
 }
 
@@ -40,14 +56,19 @@ const MAX_CHART_POINTS = 90
 export function QuickVisual({ data }: { data: QuickVisualData }) {
   if (!data.followerTrend.length || !data.series.length) {
     return (
-      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--text)]">Visual analytics</h2>
-        <EmptyState>Belum ada data chart yang tersedia.</EmptyState>
-      </section>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="md:col-span-2 xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm">Visual analytics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Belum ada data chart yang tersedia.</p>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
-  // Downsample time-series data when exceeding threshold
   const firstSeriesKey = data.series[0]?.key
   const followerTrend = downsampleData(data.followerTrend, MAX_CHART_POINTS, firstSeriesKey)
   const engagementTrend = downsampleData(data.engagementTrend, MAX_CHART_POINTS, firstSeriesKey)
@@ -58,22 +79,28 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
   const leadAccount = firstSeriesKey
 
   return (
-    <div className="grid gap-6">
-      {/* Stat-Led lead */}
-      <div className="border-b border-[var(--border)] pb-6">
-        <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-          Tren pengikut{leadAccount ? ` · @${leadAccount}` : ''}
-        </p>
-        <p className="font-display text-[clamp(2.5rem,6vw,4.5rem)] font-normal tracking-[-0.03em] text-[var(--text)]">
-          {typeof leadValue === 'number' ? formatInteger(leadValue) : '—'}
-        </p>
+    <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="bg-muted/60 md:col-span-2 xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm">Tren pengikut{leadAccount ? ` · @${leadAccount}` : ''}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="font-heading text-4xl font-semibold tabular-nums tracking-tight break-words md:text-5xl">
+              {typeof leadValue === 'number' ? formatInteger(leadValue) : '—'}
+            </p>
+            <p className="mt-2.5 max-w-[46ch] text-xs leading-relaxed text-muted-foreground">
+              Enam figure di bawah memecah tren, ranking, share, profil radar, dan proyeksi. Semua warna series
+              data-only, satu signal ink.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        {/* Follower Trend */}
-        <FigurePanel title="Follower Trend (10d)" caption="Perkembangan jumlah pengikut 10 hari terakhir lintas akun terpantau.">
-          <div className="h-[260px] w-full overflow-x-auto">
-            <div className="h-full min-w-[480px]">
+      <div className="grid gap-4 md:grid-cols-2">
+        <FigurePanel title="Follower trend (10d)" caption="Perkembangan jumlah pengikut 10 hari terakhir lintas akun terpantau.">
+          <div className="chart-wrap chart-scroll-shell">
+            <div className="chart-fill chart-min-wide">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={followerTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
@@ -90,29 +117,27 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
           </div>
         </FigurePanel>
 
-        {/* ER Ranking Bar */}
-        <FigurePanel title="Engagement Rate Ranking" caption="Urutan akun berdasarkan engagement rate terbaru." muted>
-          <div className="h-[240px] w-full overflow-x-auto">
-            <div className="h-full min-w-[320px]">
+        <FigurePanel title="Engagement rate ranking" caption="Urutan akun berdasarkan engagement rate terbaru." muted>
+          <div className="chart-wrap chart-wrap-compact chart-scroll-shell">
+            <div className="chart-fill chart-min-sm">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.engagementRanking} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                   <XAxis type="number" stroke={chartAxisColor} fontSize={11} />
-                  <YAxis type="category" dataKey="account" width={110} stroke={chartAxisColor} fontSize={11} />
+                  <YAxis type="category" dataKey="account" width={140} stroke={chartAxisColor} fontSize={10} />
                   <Tooltip formatter={(v: number) => `${v.toFixed(2)}%`} contentStyle={chartTooltipStyle} labelStyle={chartLabelStyle} itemStyle={chartItemStyle} />
-                  <Bar dataKey="engagementRate" fill="var(--brand)" radius={[0, 6, 6, 0]} />
+                  <Bar dataKey="engagementRate" fill="var(--primary)" radius={0} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
         </FigurePanel>
 
-        {/* Follower Share Pie */}
-        <FigurePanel title="Follower Share" caption="Porsi jumlah pengikut setiap akun terhadap total.">
-          <div className="h-[240px] w-full">
+        <FigurePanel title="Follower share" caption="Porsi jumlah pengikut setiap akun terhadap total.">
+          <div className="chart-wrap chart-wrap-compact">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={data.followerShare} dataKey="followers" nameKey="account" innerRadius={50} outerRadius={80} paddingAngle={2}>
+                <Pie data={data.followerShare} dataKey="followers" nameKey="account" innerRadius={48} outerRadius={80} paddingAngle={1}>
                   {data.followerShare.map((e) => (
                     <Cell key={e.account} fill={e.fill} />
                   ))}
@@ -124,14 +149,13 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
           </div>
         </FigurePanel>
 
-        {/* Radar Comparison */}
-        <FigurePanel title="Radar Comparison" caption="Profil metrik antar akun dalam satu bidang perbandingan." muted>
-          <div className="h-[240px] w-full overflow-x-auto">
-            <div className="h-full min-w-[320px]">
+        <FigurePanel title="Radar comparison" caption="Profil metrik antar akun dalam satu bidang perbandingan." muted>
+          <div className="chart-wrap chart-scroll-shell">
+            <div className="chart-fill chart-min-sm">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={data.radarComparison}>
-                  <PolarGrid stroke="var(--chart-grid)" />
-                  <PolarAngleAxis dataKey="metric" tick={{ fill: 'var(--chart-axis)', fontSize: 11 }} />
+                  <PolarGrid stroke={chartGridColor} />
+                  <PolarAngleAxis dataKey="metric" tick={{ fill: chartAxisColor, fontSize: 11 }} />
                   {data.series.map((s) => (
                     <Radar key={s.key} name={`@${s.key}`} dataKey={s.key} stroke={s.color} fill={s.color} fillOpacity={0.1} />
                   ))}
@@ -143,10 +167,9 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
           </div>
         </FigurePanel>
 
-        {/* Engagement Trend */}
-        <FigurePanel title="Engagement Rate Trend" caption="Perubahan engagement rate harian pada jendela terpantau.">
-          <div className="h-[260px] w-full overflow-x-auto">
-            <div className="h-full min-w-[480px]">
+        <FigurePanel title="Engagement rate trend" caption="Perubahan engagement rate harian pada jendela terpantau.">
+          <div className="chart-wrap chart-scroll-shell">
+            <div className="chart-fill chart-min-wide">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={engagementTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
@@ -163,10 +186,9 @@ export function QuickVisual({ data }: { data: QuickVisualData }) {
           </div>
         </FigurePanel>
 
-        {/* Projection */}
-        <FigurePanel title="Follower Projection (30d)" caption={data.projectionNote} muted>
-          <div className="h-[280px] w-full overflow-x-auto">
-            <div className="h-full min-w-[480px]">
+        <FigurePanel title="Follower projection (30d)" caption={data.projectionNote} muted>
+          <div className="chart-wrap chart-scroll-shell">
+            <div className="chart-fill chart-min-wide">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={projectionTrend} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />

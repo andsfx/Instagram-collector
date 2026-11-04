@@ -1,13 +1,238 @@
-@import './tokens.css';
-@import './base.css';
-@import './layout.css';
-@import './components/shell.css';
-@import './components/cards.css';
-@import './components/data-display.css';
-@import './components/charts.css';
-@import './components/states.css';
-@import './components/mobile.css';
+/*
+ * Tailwind v4 entry sheet.
+ *
+ * Tailwind v3 config (tailwind.config.js) is superseded by the CSS-first
+ * @theme block below. `@config` is intentionally not used: v4 auto-detects
+ * sources from the project root, and the theme is declared here.
+ */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/public-sans";
+@import "@fontsource-variable/montserrat";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "./tokens.css";
+@import "./components/charts.css";
+
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
+@theme inline {
+  /* shadcn semantic tokens (preset b6qdjpSgFE · radix-luma) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+
+  /* product tokens that no shadcn semantic expresses */
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-axis: var(--chart-axis);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+/* The chart series colours stay plain custom properties (tokens.css): they are
+ * read by chart-theme.ts as `var(--ig-*)` inline styles, never as utilities, so
+ * no `--color-ig-*` bridge is needed. */
+
+/* Preset palette must land after product tokens (tokens.css above), which
+ * otherwise own `--border` and the shared chart vars. */
+@layer base {
+  :root {
+    /* preset b6qdjpSgFE (radix-luma) — overrides product tokens by order */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.511 0.096 186.391);
+    --primary-foreground: oklch(0.984 0.014 180.72);
+    --secondary: oklch(0.967 0.001 286.375);
+    --secondary-foreground: oklch(0.21 0.006 285.885);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.511 0.096 186.391);
+    --accent-foreground: oklch(0.984 0.014 180.72);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.984 0 0);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.81 0.117 11.638);
+    --chart-2: oklch(0.645 0.246 16.439);
+    --chart-3: oklch(0.586 0.253 17.585);
+    --chart-4: oklch(0.514 0.222 16.935);
+    --chart-5: oklch(0.455 0.188 13.697);
+    --radius: 0.625rem;
+    /* runtime mirrors of the @theme radius scale. `@theme inline` never emits
+     * custom properties on :root, chart-theme.ts (borderRadius:
+     * var(--radius-sm)), sidebar.tsx ([--radius:var(--radius-xl)]) and the
+     * unlayered radius block at the bottom of this file all read them. */
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.6 0.118 184.704);
+    --sidebar-primary-foreground: oklch(0.984 0.014 180.72);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+  }
+  .dark,
+  [data-theme="dark"] {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.437 0.078 188.216);
+    --primary-foreground: oklch(0.984 0.014 180.72);
+    --secondary: oklch(0.274 0.006 286.033);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.437 0.078 188.216);
+    --accent-foreground: oklch(0.984 0.014 180.72);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.984 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.81 0.117 11.638);
+    --chart-2: oklch(0.645 0.246 16.439);
+    --chart-3: oklch(0.586 0.253 17.585);
+    --chart-4: oklch(0.514 0.222 16.935);
+    --chart-5: oklch(0.455 0.188 13.697);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.704 0.14 182.503);
+    --sidebar-primary-foreground: oklch(0.277 0.046 192.524);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+  }
+  .theme {
+    --font-sans: 'Public Sans Variable', sans-serif;
+    --font-heading: 'Montserrat Variable', sans-serif;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  /* --- Surviving globals from the retired base.css ---------------------- */
+  html {
+    scroll-behavior: smooth;
+    overflow-x: clip;
+  }
+  body {
+    min-width: 320px;
+    line-height: 1.5;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  /* Raw <a>/<button> have no shadcn focus ring; this is their only indicator. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Tabular numerals: still emitted as `.num` by components not yet rebuilt. */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Dashboard radius scale. The luma preset ships marketing radii (Card 32px,
+ * Button/Select 32px); on a dense dashboard that reads as blobs. Unlayered on
+ * purpose: Tailwind v4 emits `rounded-*` into @layer utilities, which outranks
+ * the components layer, so a layered override is dead weight. Unlayered wins
+ * over every layer, and keying on data-slot keeps `shadcn add` regenerations
+ * covered without per-instance classes. */
+[data-slot="card"] {
+  border-radius: calc(var(--radius) + 4px);
+}
+[data-slot="button"],
+[data-slot="select-trigger"],
+[data-slot="input"] {
+  border-radius: calc(var(--radius) - 2px);
+}
+/* composites that wrap Button but own their own data-slot */
+[data-button-slot="button"] {
+  border-radius: calc(var(--radius) - 2px);
+}
+[data-slot="skeleton"] {
+  border-radius: calc(var(--radius) - 2px);
+}
+/* Badge is deliberately absent: the preset's pill (rounded-3xl) was never
+ * part of the oversized-radius problem. */

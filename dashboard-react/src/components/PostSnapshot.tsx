@@ -7,7 +7,10 @@ import {
 } from '../data/selectors'
 import type { DashboardRecord } from '../data/types'
 import { formatEngagementRate, formatInteger } from '../utils/formatters'
-import { EmptyState } from './ui'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 const SORT_OPTIONS: Array<{ value: PostSnapshotSort; label: string }> = [
   { value: 'viral_posts', label: 'Viral terbanyak' },
@@ -34,165 +37,151 @@ export function PostSnapshot({ data }: { data: DashboardRecord }) {
   )
 
   return (
-    <div className="grid gap-6">
-      {/* Filters — flat, radius-sm, no pills */}
-      <section className="border border-[var(--border)] bg-[var(--panel)] p-6">
-        <h2 className="text-lg font-semibold text-[var(--text)]">12-post snapshot per akun</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <label className="grid gap-1">
-            <span className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-              Akun
-            </span>
-            <select
-              className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--text)]"
-              value={selectedAccount}
-              onChange={(e) => setSelectedAccount(e.target.value)}
-            >
-              <option value="all">Semua akun</option>
-              {view.accounts.map((a) => (
-                <option key={a} value={a}>
-                  @{a}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1">
-            <span className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-              Urutan
-            </span>
-            <select
-              className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--text)]"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as PostSnapshotSort)}
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1">
-            <span className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-              Filter
-            </span>
-            <select
-              className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--text)]"
-              value={filterBy}
-              onChange={(e) => setFilterBy(e.target.value as PostPerformanceFilter)}
-            >
-              {FILTER_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        {/* Summary as hairline table row */}
-        {view.summaryCards.length > 0 && (
-          <div className="mt-4 grid grid-cols-2 gap-x-4 sm:grid-cols-5">
-            {view.summaryCards.map((card) => (
-              <div key={card.label} className="border-t border-[var(--border)] py-3">
-                <p className="text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                  {card.label}
-                </p>
-                <p className="mt-0.5 font-display text-lg font-normal text-[var(--text)]">
-                  {card.value}
-                </p>
+    <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="md:col-span-2 xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm">12-post snapshot per akun</CardTitle>
+            <CardDescription className="text-xs">{`${view.cards.length} akun`}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="grid min-w-[180px] gap-1">
+                <span className="text-xs font-medium text-muted-foreground">Akun</span>
+                <Select value={selectedAccount} onValueChange={setSelectedAccount}>
+                  <SelectTrigger aria-label="Akun">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua akun</SelectItem>
+                    {view.accounts.map((a) => (
+                      <SelectItem key={a} value={a}>
+                        @{a}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+              <div className="grid min-w-[180px] gap-1">
+                <span className="text-xs font-medium text-muted-foreground">Urutan</span>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value as PostSnapshotSort)}>
+                  <SelectTrigger aria-label="Urutan">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SORT_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid min-w-[160px] gap-1">
+                <span className="text-xs font-medium text-muted-foreground">Filter</span>
+                <Select value={filterBy} onValueChange={(value) => setFilterBy(value as PostPerformanceFilter)}>
+                  <SelectTrigger aria-label="Filter">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FILTER_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-      {/* Editorial post table */}
+            {view.summaryCards.length > 0 ? (
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+                {view.summaryCards.map((card) => (
+                  <div key={card.label} className="flex min-w-0 flex-col gap-1">
+                    <span className="text-xs font-medium text-muted-foreground">{card.label}</span>
+                    <p className="font-heading text-xl font-semibold tabular-nums tracking-tight break-words">{card.value}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      </div>
+
       {view.cards.length ? (
-        <section className="border border-[var(--border)] bg-[var(--panel-muted)] p-6">
-          <h2 className="text-lg font-semibold text-[var(--text)]">Post list</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[40rem] text-left text-sm">
-              <thead>
-                <tr>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Account
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Type
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    ER
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Avg likes
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Viral
-                  </th>
-                  <th className="pb-2 pr-3 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Date
-                  </th>
-                  <th className="pb-2 text-[11px] uppercase tracking-wider font-medium text-[var(--text-muted)]">
-                    Permalink
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {view.cards.map((card) => {
-                  const post = card.featuredPost
-                  const dateLabel = post
-                    ? formatPostDate(post.published_at ?? post.timestamp)
-                    : '-'
-                  return (
-                    <tr key={card.account} className="border-t border-[var(--border)]">
-                      <td className="py-3 pr-3 font-semibold text-[var(--text)]">
-                        @{card.account}
-                      </td>
-                      <td className="py-3 pr-3">
-                        <span className="inline-block rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--panel)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
-                          {card.dominantType ?? 'unknown'}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-3 font-display text-base font-normal text-[var(--text)]">
-                        {card.averagePostEr > 0
-                          ? formatEngagementRate(card.averagePostEr * 100)
-                          : '-'}
-                      </td>
-                      <td className="py-3 pr-3 text-[var(--text)]">
-                        {formatInteger(Math.round(card.averageLikes))}
-                      </td>
-                      <td className="py-3 pr-3 text-[var(--text)]">
-                        {formatInteger(card.viralPosts)}
-                        <span className="text-[var(--text-muted)]">
-                          {' / '}
-                          {formatInteger(card.underperformPosts)} und.
-                        </span>
-                      </td>
-                      <td className="py-3 pr-3 text-[var(--text-muted)]">{dateLabel}</td>
-                      <td className="py-3">
-                        {post?.url ? (
-                          <a
-                            className="text-[var(--brand)] hover:underline"
-                            href={post.url}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Buka post
-                          </a>
-                        ) : (
-                          <span className="text-[var(--text-muted)]">-</span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <Card className="md:col-span-2 xl:col-span-3">
+            <CardHeader>
+              <CardTitle className="text-sm">Post list</CardTitle>
+              <CardDescription className="text-xs">
+                {`${view.cards.reduce((n, c) => n + c.visiblePosts.length, 0)} post`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table className="min-w-[44rem]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead scope="col" className="pl-6">
+                      Akun
+                    </TableHead>
+                    <TableHead scope="col">Tipe</TableHead>
+                    <TableHead scope="col" className="text-right">
+                      ER
+                    </TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Avg likes
+                    </TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Viral / und.
+                    </TableHead>
+                    <TableHead scope="col">Tanggal</TableHead>
+                    <TableHead scope="col">Permalink</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {view.cards.map((card) => {
+                    const post = card.featuredPost
+                    const dateLabel = post ? formatPostDate(post.published_at ?? post.timestamp) : '-'
+                    return (
+                      <TableRow key={card.account}>
+                        <TableCell className="pl-6 font-medium">@{card.account}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{card.dominantType ?? 'unknown'}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {card.averagePostEr > 0 ? formatEngagementRate(card.averagePostEr * 100) : '–'}
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{formatInteger(Math.round(card.averageLikes))}</TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {formatInteger(card.viralPosts)}
+                          <span className="text-muted-foreground"> / {formatInteger(card.underperformPosts)}</span>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{dateLabel}</TableCell>
+                        <TableCell>
+                          {post?.url ? (
+                            <a href={post.url} target="_blank" rel="noreferrer" className="text-primary underline-offset-4 hover:underline">
+                              Buka post
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">–</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
       ) : (
-        <EmptyState>Tidak ada data sesuai filter.</EmptyState>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <Card className="md:col-span-2 xl:col-span-3">
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Tidak ada data sesuai filter.</p>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )

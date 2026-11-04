@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { ErrorState, LoadingState } from './ui'
+import { ErrorState, LoadingState } from './dashboard/states'
 
 /**
  * Extract HTTP status code from error message if present.
@@ -41,7 +41,7 @@ class AsyncErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <section className="panel panel-section section-card">
+        <section>
           <ErrorState
             title={this.props.fallbackTitle}
             message={this.state.message || this.props.fallbackDescription}
@@ -87,7 +87,7 @@ export function SectionAsyncBoundary({
 
 export function SectionLoadingFallback({ title, description }: { title: string; description: string }) {
   return (
-    <section className="panel panel-section">
+    <section>
       <LoadingState title={title} description={description} />
     </section>
   )

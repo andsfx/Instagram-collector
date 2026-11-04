@@ -1,65 +1,68 @@
 import type { ReachSummaryData } from '../data/selectors'
-import { EmptyState, SectionCard } from './ui'
 import { formatDate, formatInteger } from '../utils/formatters'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 /**
- * Kartu reach + follower baru harian.
+ * Reach + follower baru harian.
  * Hanya akun yang tersambung ke Instagram Graph yang punya angka; sisanya
- * disebut di footer supaya gap-nya kelihatan, bukan disembunyikan.
+ * disebut sebagai catatan supaya gap-nya kelihatan, bukan disembunyikan.
  */
 export function ReachCard({ summary }: { summary: ReachSummaryData }) {
   if (!summary.rows.length) {
     return (
-      <SectionCard
-        eyebrow="Audiens"
-        title="Reach & follower baru"
-        description="Metrik ini hanya tersedia untuk akun yang tersambung ke Instagram Graph resmi."
-      >
-        <EmptyState>
-          Belum ada data reach. Angka muncul setelah insight Instagram tersedia (mundur satu hari).
-        </EmptyState>
-      </SectionCard>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="md:col-span-2 xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm">Reach &amp; follower baru</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="max-w-[60ch] text-sm leading-relaxed text-muted-foreground">
+              Belum ada data reach. Angka muncul setelah insight Instagram tersedia (mundur satu hari).
+              Metrik ini hanya tersedia untuk akun yang tersambung ke Instagram Graph resmi.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   return (
-    <SectionCard
-      eyebrow={`Audiens · ${formatDate(summary.date)}`}
-      title="Reach & follower baru"
-      description="Jumlah akun unik yang melihat konten dan follower baru pada hari itu."
-    >
-      <div className="grid gap-4 sm:grid-cols-2">
-        {summary.rows.map((row) => (
-          <article
-            key={row.account}
-            className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow-sm)]"
-          >
-            <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">
-              @{row.account}
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Reach</div>
-                <div className="mt-1 font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
-                  {row.reach == null ? '-' : formatInteger(row.reach)}
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <Card className="md:col-span-2 xl:col-span-3">
+        <CardHeader>
+          <CardTitle className="text-sm">{`Reach & follower baru · ${formatDate(summary.date)}`}</CardTitle>
+          <CardDescription className="text-xs">{`${summary.rows.length} akun`}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {summary.rows.map((row) => (
+              <div key={row.account} className="min-w-0">
+                <p className="text-sm font-medium break-all">@{row.account}</p>
+                <div className="mt-2 grid grid-cols-2 gap-4 border-t border-border pt-2">
+                  <div className="min-w-0">
+                    <span className="text-xs font-medium text-muted-foreground">Reach</span>
+                    <p className="mt-1 font-heading text-xl font-semibold tabular-nums tracking-tight break-words">
+                      {row.reach == null ? '–' : formatInteger(row.reach)}
+                    </p>
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-xs font-medium text-muted-foreground">Follower baru</span>
+                    <p className="mt-1 font-heading text-xl font-semibold tabular-nums tracking-tight break-words">
+                      {row.newFollowers == null ? '–' : formatInteger(row.newFollowers)}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-soft)]">Follower baru</div>
-                <div className="mt-1 font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
-                  {row.newFollowers == null ? '-' : formatInteger(row.newFollowers)}
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-      {summary.missing.length ? (
-        <p className="mt-3 text-xs text-[var(--text-muted)]">
-          Tanpa data Graph: {summary.missing.map((account) => `@${account}`).join(', ')}. Akun ini belum
-          tersambung ke Instagram Graph, jadi hanya punya angka follower harian.
-        </p>
-      ) : null}
-    </SectionCard>
+            ))}
+          </div>
+          {summary.missing.length ? (
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              Tanpa data Graph: {summary.missing.map((account) => `@${account}`).join(', ')} — akun ini
+              hanya punya angka follower harian.
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
+    </div>
   )
 }
