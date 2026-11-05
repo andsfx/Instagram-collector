@@ -21,12 +21,12 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
 loadEnvFile(path.join(REPO_ROOT, '.env.daily-dashboard'));
 loadEnvFile(path.join(REPO_ROOT, '.env'));
 
-// --- Egress workaround: ISP blackhole (since 2026-10-20) ---
-// api.apify.com is unroutable DIRECT from this VPS (TCP 443 times out, both A records).
-// WARP proxy on 127.0.0.1:40000 reaches it. curl calls below inherit process.env,
-// so setting it here scopes the proxy to the Apify batch only (SocialBlade/Sheets untouched).
-if (!process.env.APIFY_HTTPS_PROXY) process.env.APIFY_HTTPS_PROXY = 'http://127.0.0.1:40000';
-if (!process.env.HTTPS_PROXY) {
+// --- Egress workaround: ISP blackhole (was 2026-10-20 .. 2026-11-05) ---
+// WARP was removed 2026-11-05 and api.apify.com is routable DIRECT again.
+// Do NOT hardcode a proxy: only honor an explicitly provided APIFY_HTTPS_PROXY.
+// If the ISP blackhole ever returns, set APIFY_HTTPS_PROXY=http://127.0.0.1:40000
+// in .env.daily-dashboard (gitignored) to route the Apify batch through a proxy.
+if (process.env.APIFY_HTTPS_PROXY) {
   process.env.HTTPS_PROXY = process.env.APIFY_HTTPS_PROXY;
   process.env.https_proxy = process.env.APIFY_HTTPS_PROXY;
 }
