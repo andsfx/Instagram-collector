@@ -74,6 +74,14 @@ function isHardLimitError(err) {
   return /monthly usage hard limit|usage limit|limit exceeded|monthly.*lim|quota|429|402|payment.*required/i.test(msg);
 }
 
+function isDeadTokenError(err) {
+  // 2026-11-14: a revoked/deleted token returns 401 user-or-token-not-found and the
+  // batch must rotate away from it, otherwise every account fails with no way back
+  // to the healthy primary (rotation used to trigger on hard-limit errors only).
+  const msg = String((err && err.message) || '');
+  return /user-or-token-not-found|token is not valid|invalid.*token|unauthorized|401/i.test(msg);
+}
+
 function rotateToken() {
   _loadActiveToken();
   // exclude current token from candidates (it's exhausted)
@@ -298,7 +306,7 @@ async function main() {
         };
         break; // success, exit token retry loop
       } catch (error) {
-        if (isHardLimitError(error) && attempt + 1 < maxTokenAttempts) {
+        if ((isHardLimitError(error) || isDeadTokenError(error)) && attempt + 1 < maxTokenAttempts) {
           markTokenExhausted();
           if (rotateToken()) {
             console.error(`[${username}] token exhausted - rotating, retry ${attempt + 2}/${maxTokenAttempts}`);
