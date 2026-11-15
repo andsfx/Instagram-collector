@@ -195,7 +195,9 @@ def main() -> int:
         text = "IG Dashboard (LLM)\n\n" + llm_text
         mode = "llm"
     else:
-        text = "IG Dashboard\n\n" + deterministic_summary(pipeline)
+        # Penanda kualitas terlihat: fallback deterministik lebih miskin dari
+        # LLM, jadi pembaca harus tahu mode mana yang dia terima hari ini.
+        text = "IG Dashboard (mode ringkas, LLM tidak tersedia)\n\n" + deterministic_summary(pipeline)
         mode = "fallback"
 
     ok = send_telegram(text)
