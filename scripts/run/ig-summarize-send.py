@@ -16,34 +16,18 @@ import urllib.request
 import urllib.error
 
 
-def llm_summarize(pipeline: dict) -> str:
-    """Try 9router combo. Returns '' on any failure."""
-    endpoint = "http://127.0.0.1:20128/v1/chat/completions"
-    token = (os.environ.get("ROUTER_API_KEY") or os.environ.get("NINE_ROUTER_KEY")
-             or os.environ.get("OPENAI_API_KEY") or "sk-9router-local")
-    payload = {
-        "model": "combo",
-        "messages": [
-            {"role": "system", "content": (
-                "Kamu asisten ringkas. Buat ringkasan pipeline Instagram dashboard "
-                "metropolitan mall. Bahasa Indonesia, maksimal 120 kata, bullet singkat, "
-                "tanpa emoji berlebihan, tanpa em/en dash. Hanya laporkan angka yang ada "
-                "di data - jangan menambah data.")},
-            {"role": "user", "content": json.dumps(pipeline, ensure_ascii=False)[:8000]},
-        ],
-        "max_tokens": 300,
-        "stream": False,
-    }
+def _chat(endpoint, model, token, payload):
+    """Satu panggilan chat completion. Raise pada kegagalan apa pun."""
     req = urllib.request.Request(
-        endpoint,
+        f"{endpoint}/chat/completions",
         data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+        headers={"Content-Type": "application/json",
+                 "Authorization": f"Bearer {token}"},
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
         raw = resp.read().decode()
-    # 9router sometimes returns SSE stream even when stream=False is set.
-    # Detect and extract the content from SSE `data: {...}` lines.
+    # 9router-era SSE (stream=False tapi balas SSE) dan jawaban carte JSON.
     if raw.lstrip().startswith("data:"):
         content = ""
         for line in raw.splitlines():
@@ -57,18 +41,54 @@ def llm_summarize(pipeline: dict) -> str:
                     continue
         if content.strip():
             return content.strip()
-        # Fallback: try the final line with finish_reason=stop
-        for line in reversed(raw.splitlines()):
-            if line.startswith("data: ") and '"finish_reason":"stop"' in line:
-                try:
-                    body = json.loads(line.removeprefix("data: "))
-                    content = body["choices"][0]["message"]["content"].strip()
-                    return content
-                except Exception:
-                    continue
-        return ""
+        raise ValueError("empty SSE content")
     body = json.loads(raw)
-    content = body["choices"][0]["message"]["content"].strip()
+    msg = (body.get("choices") or [{}])[0].get("message") or {}
+    content = msg.get("content")
+    if not content or not str(content).strip():
+        raise ValueError("model returned empty content (reasoning-only?)")
+    return str(content).strip()
+
+
+def llm_summarize(pipeline: dict) -> str:
+    """Coba carte lokal (primary) lalu tiprouter (fallback). Gagal semua -> ''.
+
+    9router combo sudah diuninstall 2026-10-14; endpoint :20128 sekarang carte
+    lokal. Model deepseek-v4.1-flash (terbukti JSON/teks bersih di scorer).
+    """
+    payload = {
+        "model": "deepseek-v4.1-flash",
+        "messages": [
+            {"role": "system", "content": (
+                "Kamu asisten ringkas. Buat ringkasan pipeline Instagram dashboard "
+                "metropolitan mall. Bahasa Indonesia, maksimal 120 kata, bullet singkat, "
+                "tanpa emoji berlebihan, tanpa em/en dash. Hanya laporkan angka yang ada "
+                "di data - jangan menambah data.")},
+            {"role": "user", "content": json.dumps(pipeline, ensure_ascii=False)[:8000]},
+        ],
+        # 1000 pernah habis dimakan reasoning -> content kosong -> gagal palsu.
+        "max_tokens": 4000,
+        "stream": False,
+    }
+    # Model per endpoint: tiprouter TIDAK punya nama model carte.
+    attempts = [
+        ("http://127.0.0.1:20128/v1", "HERMES_CUSTOM_CARTETHYIA_LOCAL_API_KEY",
+         "deepseek-v4.1-flash"),
+        ("https://tiprouter.my.id/v1", "HERMES_CUSTOM_TIPROUTER_MY_ID_API_KEY",
+         "deepseek-v4.1-flash-1017"),
+    ]
+    for ep, key_env, model in attempts:
+        token = os.environ.get(key_env) or ""
+        if not token:
+            continue
+        payload["model"] = model
+        # Reasoning non-deterministik: empty content sekali belum tentu mati.
+        for _ in range(2):
+            try:
+                return _chat(ep, model, token, payload)
+            except Exception:
+                continue
+    return ""
 
 
 def deterministic_summary(p: dict) -> str:
