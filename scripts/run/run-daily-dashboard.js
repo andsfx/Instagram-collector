@@ -65,11 +65,20 @@ function extractTrailingJson(output) {
 }
 
 function hasChanges(repoRoot, paths) {
-  const out = execFileSync('git', ['status', '--porcelain', '--', ...paths], {
-    cwd: repoRoot,
-    encoding: 'utf8'
-  }).trim();
-  return out.length > 0;
+  try {
+    const out = execFileSync('git', ['status', '--porcelain', '--', ...paths], {
+      cwd: repoRoot,
+      encoding: 'utf8'
+    }).trim();
+    return out.length > 0;
+  } catch (error) {
+    const detail = String(error && (error.stderr || error.message) || '');
+    if (detail.includes('not a git repository')) {
+      console.log('>>> git repo tidak ada di worker; lewati deteksi perubahan git');
+      return false;
+    }
+    throw error;
+  }
 }
 
 function requireEnv(name) {
